@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WISESAMA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!------------- start-navbar ------------->
+    <nav class="navbar navbar-expand-lg topbar">
+      <div class="container">
+        <div class="main-nav">
+          <a class="navbar-brand" href="./index.html">
+            <img src="images/logo.svg">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="./Report.html">Report</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">API Docs</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="d-flex language-with-join">
+          <select name="language" id="language">
+            <option value="English">ENG</option>
+            <option value="France">FRANCE</option>
+          </select>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+            <a href="#">JOIN US</a>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <!------------- End-nav-bar ------------->
+    <!------------- start-Banner ------------->
+    <section class="banner search_page">
+      <div class="container">
+        <div class="inner_banner">
+          <div class="txt_rght">
+            <p>Wallet Address, Url or twitter handle</p>
+            <form class="form-inline my-2 my-lg-0">
+              <span class="btns" type="submit">
+                <img src="images/search.png">
+                </a>
+              </span>
+              <input class="form-control mr-sm-2" type="search" placeholder="13pkayxomDRSFRQ8Tuomvs6hm49szqkQ6s" aria-label="Search">
+            </form>
+            <div class="leates_text">
+              <p>Wisesama Risk Meter <i class="fa fa-info-circle" aria-hidden="true"></i>
+              </p>
+              <h5>High Risk (95%)</h5>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 95%" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <hr>
+              <p>Assessment Result</p>
+              <h4>FRAUD <i class="fa fa-window-close" aria-hidden="true"></i>
+              </h4>
+              <p>This has been assessed as fraud!! Please do not transact with this entity. Wisesama makes this assessment based on the following information.</p>
+            </div>
+            <div class="leates_text under-sec">
+              <p>Machine Learning Analysis of Wallet Transactions <i class="fa fa-info-circle" aria-hidden="true"></i>
+              </p>
+              <h5>Probability of fraud is 99%</h5>
+              <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 99%" aria-valuenow="99" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <hr>
+              <div class="under-inner-main">
+                <div class="under-inner">
+                  <p>Total Transactions <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </p>
+                  <p>
+                    <strong>2</strong>
+                  </p>
+                  <button>
+                    <a href="#">View on Block Explorer <img src="images/arrow-up-right.png">
+                    </a>
+                  </button>
+                </div>
+                <div class="under-inner2">
+                  <p>Total Transactions <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </p>
+                  <p>
+                    <strong>Frequency of transactions in this wallet</strong>
+                  </p>
+                  <p>
+                    <strong>Number of transactions in this wallet</strong>
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Total Received <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th>Total Sent <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th>Current Balance <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="color:#F4DA4A"> 0,0012 DOT</td>
+                      <td style="color:#F4DA4A">0,0012 DOT</td>
+                      <td style="color:#F4DA4A">0,0012 DOT</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <hr>
+              <div class="under-inner3">
+                <p>ML Analysis Limitations <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </p>
+                <p style="color:#8E8E8E">
+                  <span>Wisesama currently only supports SS58 addresses.</span>
+                </p>
+                <p style="color:#8E8E8E">
+                  <span>Addresses with over 10,000 transactions may fail to be analyzed properly at this time.</span>
+                </p>
+              </div>
+              <hr>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Reported by Users <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th>Number of Times Searched <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th>Last Searched <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="color:#F4DA4A"> 0</td>
+                      <td style="color:#F4DA4A">165</td>
+                      <td style="color:#F4DA4A">Mar 8, 2023</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <hr>
+              <div class="under-inner">
+                <p>If you are impacted by this, then please Report this as fraud <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </p>
+                <div class="under-inners">
+                  <button>
+                    <a href="#">Report This Fraud <img src="images/arrow-up-right.png">
+                    </a>
+                  </button>
+                  <button class="under-innerss">
+                    <a href="#">Track this wallet/Address</a>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="leates_text last_sec">
+              <p>Share this result</p>
+              <ul>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-link" aria-hidden="true"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-twitter" aria-hidden="true"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-reddit" aria-hidden="true"></i>
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!------------- End-Banner ------------->
+    <!------------- Start-Footer ------------->
+    <section class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-3">
+            <a class="navbar-brand" href="./index.html">
+              <img src="images/logo.svg">
+            </a>
+            <p>Your defense against scams, frauds, and all things malicious in the Polkadot and Kusama ecosystem.</p>
+            <ul class="fooetr_links">
+              <li>
+                <a href="#">
+                  <i class="fa fa-facebook" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-linkedin" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-instagram" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-sm-2">
+            <div class="footer_inner">
+              <h4>Company</h4>
+              <ul>
+                <li>
+                  <a href="#">Scan</a>
+                </li>
+                <li>
+                  <a href="#">Report</a>
+                </li>
+                <li>
+                  <a href="#">API Docs</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <div class="footer_inner">
+              <h4>Legal</h4>
+              <ul>
+                <li>
+                  <a href="./Privacy.html">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="./Term.html">Terms of Services</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="footer_inner">
+              <h4>Newsletter</h4>
+              <p>Sign up for our newsletter to get the <br> lattest news in your inbox. </p>
+              <form class="form_inner" action="/action_page.php">
+                <input type="text" placeholder="Enter your email" name="mail" required="">
+                <button>
+                  <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-------------End-footer------------->
+        <!------------- start-copyright------->
+        <div class="to-the-top">
+          <p class="powered-by-wordpresss"> Copyright 2022 © Wisesama, All Right Reserved</p>
+        </div>
+        <!------------- End-copyright------->
+      </div>
+    </section>
+  </body>
+</html>

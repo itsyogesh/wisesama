@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WISESAMA</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <!------------- start-navbar ------------->
+    <nav class="navbar navbar-expand-lg topbar">
+      <div class="container">
+        <div class="main-nav">
+          <a class="navbar-brand" href="./index.html">
+            <img src="images/logo.svg">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Report</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">API Docs</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="d-flex language-with-join">
+          <select name="language" id="language">
+            <option value="English">ENG</option>
+            <option value="France">FRANCE</option>
+          </select>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+            <a href="#">JOIN US</a>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <!------------- End-nav-bar ------------->
+    <!------------- Our-Features ------------->
+    <div class="report_section">
+      <div class="container">
+        <div class="report_inner_section">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="report_image">
+                <img src="images/report.png">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="report_text">
+                <h3>File Scam <span>Report</span>
+                </h3>
+                <p>Help us find malicious entities in the Dotsama ecosystem by filling the form below!</p>
+                <form action="/action_page.php" class="row g-3">
+                  <div class="col-md-12">
+                    <label for="inputState" class="form-label">Scam</label>
+                    <select id="inputState" class="form-select">
+                      <option selected>Select a scam</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="inputAddress" class="form-label">Scam Address</label>
+                      <input type="text" class="form-control" id="inputAddress" placeholder="1PRugWeVRR7aAuSJJVit2mp2gb4hqccMn">
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="exampleFormControlTextarea1" class="form-label">Description</label>
+                      <textarea class="form-control" id="exampleFormControlTextarea1" placeholder="COMPANY NAME
+STOLEN AMOUNT
+TRANSACTION ID
+CONTACT DETAILS (IF ANY)" rows="5"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Report</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!------------- Our-Features ------------->
+    <!------------- Start-Footer ------------->
+    <section class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-3">
+            <a class="navbar-brand" href="./index.html">
+              <img src="images/logo.svg">
+            </a>
+            <p>Your defense against scams, frauds, and all things malicious in the Polkadot and Kusama ecosystem.</p>
+            <ul class="fooetr_links">
+              <li>
+                <a href="#">
+                  <i class="fa fa-facebook" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-twitter" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-linkedin" aria-hidden="true"></i>
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  <i class="fa fa-instagram" aria-hidden="true"></i>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="col-sm-2">
+            <div class="footer_inner">
+              <h4>Company</h4>
+              <ul>
+                <li>
+                  <a href="#">Scan</a>
+                </li>
+                <li>
+                  <a href="#">Report</a>
+                </li>
+                <li>
+                  <a href="#">API Docs</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <div class="footer_inner">
+              <h4>Legal</h4>
+              <ul>
+                <li>
+                  <a href="./Privacy.html">Privacy Policy</a>
+                </li>
+                <li>
+                  <a href="./Term.html">Terms of Services</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-5">
+            <div class="footer_inner">
+              <h4>Newsletter</h4>
+              <p>Sign up for our newsletter to get the <br> lattest news in your inbox. </p>
+              <form class="form_inner" action="/action_page.php">
+                <input type="text" placeholder="Enter your email" name="mail" required="">
+                <button>
+                  <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-------------End-footer------------->
+        <!------------- start-copyright------->
+        <div class="to-the-top">
+          <p class="powered-by-wordpresss"> Copyright 2022 © Wisesama, All Right Reserved</p>
+        </div>
+        <!------------- End-copyright------->
+      </div>
+    </section>
+  </body>
+</html>
