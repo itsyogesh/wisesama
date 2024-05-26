@@ -44,17 +44,18 @@ a.nav-link:hover {
   background: linear-gradient(to left, #340062, #d0aaff);
   -webkit-text-fill-color: transparent;
   -webkit-background-clip: text;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   font-size: 16px;
   border-bottom: 1px solid #8c30ff;
   padding-bottom: 5px !important;
 }
 li.nav-item a {
   font-size: 16px;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   color: #fff;
   padding: 0 !important;
   margin: 0 20px;
+  font-family: "Clash Display", sans-serif;
 }
 select#language {
   background: #1a1a1a;
@@ -220,6 +221,9 @@ marquee {
 marquee span,
 marquee {
   color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: "Clash Display", sans-serif;
 }
 marquee span {
   margin: 0 10px;
