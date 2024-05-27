@@ -38,7 +38,7 @@
         <div class="d-flex language-with-join">
           <select name="language" id="language">
             <option value="English">ENG</option>
-            <option value="France">FRANCE</option>
+            <option value="Hindi">HI</option>
           </select>
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
             <a href="#">JOIN US</a>
@@ -61,21 +61,30 @@
               <div class="report_text">
                 <h3>File Scam <span>Report</span>
                 </h3>
-                <p>Help us find malicious entities in the Dotsama ecosystem by filling the form below!</p>
-                <form action="/action_page.php" class="row g-3">
+                <p>Help us find malicious entities in the Polkadot ecosystem by filling the form below!</p>
+                <form action="/action_page.html" class="row g-3">
                   <div class="col-md-12">
                     <label for="inputState" class="form-label">Scam</label>
                     <select id="inputState" class="form-select">
                       <option selected>Select a scam</option>
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
+                      <option>Phishing</option>
+                      <option>Rug Pull</option>
+                      <option>Scam Token</option>
+                      <option>Ransomware</option>
+                      <option>Impersonation</option>
+                      <option>Other</option>
                     </select>
                   </div>
                   <div class="col-12">
                     <div class="form-group">
-                      <label for="inputAddress" class="form-label">Scam Address</label>
-                      <input type="text" class="form-control" id="inputAddress" placeholder="1PRugWeVRR7aAuSJJVit2mp2gb4hqccMn">
+                      <label for="inputAddress" class="form-label">Scam Entity</label>
+                      <input type="text" class="form-control" id="inputAddress" placeholder="Wallet Address/Website URL/Twitter Handle">
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label for="inputAddress" class="form-label">Website URL(if any)</label>
+                      <input type="text" class="form-control" id="inputAddress" placeholder="Scam Website">
                     </div>
                   </div>
                   <div class="col-12">

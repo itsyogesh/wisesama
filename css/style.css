@@ -544,6 +544,8 @@ p.powered-by-wordpresss {
   background: #b62e2e !important;
   padding: 10px 20px;
   font-size: 20px;
+  font-weight: 500;
+  font-family: "Clash Display", sans-serif;
 }
 .report_text span {
   color: #b62e2e;
@@ -559,6 +561,9 @@ p.powered-by-wordpresss {
 .report_text ::placeholder {
   color: #666 !important;
   font-size: 16px !important;
+}
+.report_text::input {
+  height: 100px;
 }
 .report_text form label {
   color: #fff;
