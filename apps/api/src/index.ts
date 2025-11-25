@@ -10,8 +10,11 @@ import { checkRoutes } from './modules/query/check.routes';
 import { identityRoutes } from './modules/identity/identity.routes';
 import { reportRoutes } from './modules/report/report.routes';
 import { authRoutes } from './modules/auth/auth.routes';
+import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
+import { whitelistRoutes } from './modules/admin/whitelist.routes';
+import { reportsAdminRoutes } from './modules/admin/reports.routes';
 import { scheduleRecurringSync, runInitialSync, shutdownWorker } from './workers/sync.worker';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -63,7 +66,23 @@ async function buildApp() {
         { name: 'identity', description: 'Polkadot identity operations' },
         { name: 'report', description: 'Fraud report submission' },
         { name: 'auth', description: 'Authentication' },
+        { name: 'api-keys', description: 'API key management' },
+        { name: 'admin', description: 'Admin operations (requires admin role)' },
       ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+          },
+          apiKey: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'x-api-key',
+          },
+        },
+      },
     },
   });
   await fastify.register(swaggerUi, {
@@ -104,7 +123,12 @@ async function buildApp() {
   await fastify.register(identityRoutes, { prefix: '/api/v1' });
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
   await fastify.register(authRoutes, { prefix: '/api/v1' });
-  await fastify.register(adminRoutes, { prefix: '/api/v1/admin' });
+  await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
+
+  // Admin routes (require admin role)
+  await fastify.register(adminRoutes, { prefix: '/api/v1' });
+  await fastify.register(whitelistRoutes, { prefix: '/api/v1' });
+  await fastify.register(reportsAdminRoutes, { prefix: '/api/v1' });
 
   return fastify;
 }

@@ -9,6 +9,7 @@
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
     "sync": "dotenv -e ../../.env -- tsx scripts/sync-phishing.ts",
+    "make-admin": "dotenv -e ../../.env -- tsx scripts/make-admin.ts",
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
