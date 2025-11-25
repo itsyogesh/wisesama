@@ -1,0 +1,283 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core entity types
+enum EntityType {
+  ADDRESS
+  DOMAIN
+  TWITTER
+  EMAIL
+}
+
+enum RiskLevel {
+  SAFE    // Verified/Whitelisted (score 0-19)
+  UNKNOWN // No data (score: null)
+  CAUTION // Suspicious (score 40-69)
+  FRAUD   // Confirmed malicious (score 70-100)
+}
+
+enum ThreatCategory {
+  PHISHING
+  SCAM
+  RUG_PULL
+  IMPERSONATION
+  FAKE_AIRDROP
+  RANSOMWARE
+  MIXER
+  OFAC_SANCTIONED
+  OTHER
+}
+
+model Chain {
+  id                  Int                 @id @default(autoincrement())
+  code                String              @unique // 'dot', 'ksm', 'astr'
+  name                String              // 'Polkadot', 'Kusama'
+  ss58Prefix          Int
+  rpcEndpoint         String?
+  explorerUrl         String?
+  isActive            Boolean             @default(true)
+  entities            Entity[]
+  identities          PolkadotIdentity[]
+  whitelistedEntities WhitelistedEntity[]
+}
+
+model Entity {
+  id              String          @id @default(cuid())
+  entityType      EntityType
+  value           String          // Original value
+  normalizedValue String          // Lowercase/normalized
+  chainId         Int?
+  chain           Chain?          @relation(fields: [chainId], references: [id])
+
+  // Risk assessment
+  riskLevel      RiskLevel       @default(UNKNOWN)
+  riskScore      Int?            // 0-100
+  threatCategory ThreatCategory?
+
+  // Source tracking
+  source     String  @default("unknown")
+  sourceUrl  String? // Related phishing URL
+  threatName String? // Category from phishing list
+
+  // Stats
+  timesSearched   Int       @default(0)
+  lastSearchedAt  DateTime?
+  userReportCount Int       @default(0)
+
+  // Timestamps
+  firstReportedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  reports  Report[]
+  searches Search[]
+  comments EntityComment[]
+
+  @@unique([entityType, normalizedValue])
+  @@index([normalizedValue])
+  @@index([riskLevel])
+  @@index([source])
+}
+
+model PolkadotIdentity {
+  id      String @id @default(cuid())
+  address String
+  chainId Int
+  chain   Chain  @relation(fields: [chainId], references: [id])
+
+  // Identity fields
+  displayName String?
+  legalName   String?
+  email       String?
+  twitter     String?
+  web         String?
+  riot        String?
+
+  // Verification
+  hasIdentity Boolean @default(false)
+  isVerified  Boolean @default(false)
+  judgements  Json    @default("[]") // [{registrar_id, judgement}]
+
+  lastSyncedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  whitelistedEntity WhitelistedEntity?
+
+  @@unique([address, chainId])
+  @@index([address])
+  @@index([isVerified])
+}
+
+model User {
+  id            String  @id @default(cuid())
+  email         String  @unique
+  passwordHash  String?
+  walletAddress String? // Polkadot wallet for Web3 auth
+
+  // Quota
+  remainingQuota Int    @default(100)
+  tier           String @default("free")
+
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  apiKeys          ApiKey[]
+  reports          Report[]
+  searches         Search[]
+  watchedAddresses WatchedAddress[]
+}
+
+model ApiKey {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  keyHash   String  @unique // SHA256 hash
+  keyPrefix String  // First 8 chars for display
+  name      String?
+
+  remainingQuota  Int @default(10000)
+  rateLimitPerMin Int @default(60)
+
+  isActive   Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([keyHash])
+}
+
+model Report {
+  id       String  @id @default(cuid())
+  userId   String?
+  user     User?   @relation(fields: [userId], references: [id])
+  entityId String?
+  entity   Entity? @relation(fields: [entityId], references: [id])
+
+  reportedValue  String
+  entityType     EntityType
+  threatCategory ThreatCategory
+  otherCategory  String?
+  description    String?
+  relatedUrl     String?
+  evidenceUrls   String[]       @default([])
+
+  // Reporter info (if not logged in)
+  reporterName  String?
+  reporterEmail String?
+
+  status     String    @default("pending") // pending, verified, rejected
+  reviewedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([entityType])
+}
+
+model Search {
+  id             String      @id @default(cuid())
+  searchTerm     String
+  normalizedTerm String
+  entityType     EntityType?
+  entityId       String?
+  entity         Entity?     @relation(fields: [entityId], references: [id])
+
+  userId     String?
+  user       User?   @relation(fields: [userId], references: [id])
+  apiKeyUsed String?
+
+  resultRisk     RiskLevel?
+  responseTimeMs Int?
+  cacheHit       Boolean    @default(false)
+
+  searchedAt DateTime @default(now())
+
+  @@index([searchedAt])
+  @@index([normalizedTerm])
+}
+
+model WatchedAddress {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  address    String
+  chain      String  @default("dot")
+  webhookUrl String?
+
+  isActive    Boolean   @default(true)
+  lastAlertAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, address, chain])
+  @@index([address])
+}
+
+model EntityComment {
+  id       String @id @default(cuid())
+  entityId String
+  entity   Entity @relation(fields: [entityId], references: [id])
+
+  comment     String
+  authorName  String?
+  authorEmail String?
+
+  isApproved Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([entityId])
+}
+
+model SyncState {
+  id               String    @id @default(cuid())
+  sourceName       String    @unique // 'polkadot-js-phishing'
+  lastSyncAt       DateTime?
+  lastSyncHash     String? // Content hash for change detection
+  recordsProcessed Int       @default(0)
+  lastError        String?
+  metadata         Json      @default("{}")
+}
+
+// Ecosystem Whitelist - Top projects, validators, exchanges
+model WhitelistedEntity {
+  id              String     @id @default(cuid())
+  entityType      EntityType
+  value           String     // Address, domain, handle
+  normalizedValue String
+  chainId         Int?
+  chain           Chain?     @relation(fields: [chainId], references: [id])
+
+  // Entity info
+  name        String  // "Polkadot Treasury", "Parity Technologies"
+  category    String  // "exchange", "validator", "treasury", "project"
+  description String?
+  website     String?
+  twitter     String?
+  logoUrl     String?
+
+  // Verification
+  source     String    // "manual", "governance", "subscan"
+  verifiedAt DateTime?
+  verifiedBy String?   // Admin who verified
+
+  // On-chain identity link
+  identityId String?           @unique
+  identity   PolkadotIdentity? @relation(fields: [identityId], references: [id])
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([entityType, normalizedValue])
+  @@index([category])
+  @@index([name])
+}
