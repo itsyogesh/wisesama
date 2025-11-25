@@ -1,5 +1,9 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { prisma } from '@wisesama/database';
+import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
+
+// Cache TTL: 1 hour for identity lookups
+const IDENTITY_CACHE_TTL = 3600;
 
 const RPC_ENDPOINTS: Record<string, string> = {
   polkadot: process.env.POLKADOT_RPC || 'wss://rpc.polkadot.io',
@@ -43,6 +47,13 @@ export class PolkadotService {
     } | null;
     judgements: Array<{ registrarId: number; judgement: string }>;
   }> {
+    // Check Redis cache first
+    const cacheKey = cacheKeys.identity(address, chain);
+    const cached = await cacheGet<Awaited<ReturnType<typeof this.getIdentity>>>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     try {
       const api = await this.getApi(chain);
 
@@ -50,7 +61,7 @@ export class PolkadotService {
       const identityOf = await api.query.identity.identityOf(address);
 
       if (identityOf.isNone) {
-        return {
+        const noIdentityResult = {
           address,
           chain,
           hasIdentity: false,
@@ -58,6 +69,9 @@ export class PolkadotService {
           identity: null,
           judgements: [],
         };
+        // Cache the no-identity result
+        await cacheSet(cacheKey, noIdentityResult, IDENTITY_CACHE_TTL);
+        return noIdentityResult;
       }
 
       const identity = identityOf.unwrap();
@@ -129,7 +143,7 @@ export class PolkadotService {
         });
       }
 
-      return {
+      const result = {
         address,
         chain,
         hasIdentity: true,
@@ -137,6 +151,11 @@ export class PolkadotService {
         identity: identityData,
         judgements,
       };
+
+      // Cache the result in Redis
+      await cacheSet(cacheKey, result, IDENTITY_CACHE_TTL);
+
+      return result;
     } catch (error) {
       console.error('Failed to fetch identity:', error);
       throw error;

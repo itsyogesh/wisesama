@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
+    "sync": "dotenv -e ../../.env -- tsx scripts/sync-phishing.ts",
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
@@ -34,6 +35,8 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.9.1",
     "@wisesama/config": "workspace:*",
+    "dotenv-cli": "^7.4.4",
+    "pino-pretty": "^13.0.0",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"

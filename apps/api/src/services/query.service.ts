@@ -2,12 +2,27 @@ import { prisma } from '@wisesama/database';
 import type { CheckResponse, RiskLevel, EntityType } from '@wisesama/types';
 import { detectEntityType, normalizeEntity } from '../utils/entity-detector';
 import { LevenshteinService } from './levenshtein.service';
+import { PolkadotService } from './polkadot.service';
+import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
 
 const levenshteinService = new LevenshteinService();
+const polkadotService = new PolkadotService();
+
+// Cache TTL in seconds
+const CACHE_TTL = 300; // 5 minutes
 
 export class QueryService {
   async checkEntity(input: string): Promise<CheckResponse> {
     const { type, normalized, chain } = detectEntityType(input);
+
+    // Check cache first
+    const cacheKey = cacheKeys.entity(type, normalized);
+    const cached = await cacheGet<CheckResponse>(cacheKey);
+    if (cached) {
+      // Update stats in background (don't wait)
+      this.recordSearch(input, normalized, type, cached.stats.timesSearched > 0 ? 'cached' : null);
+      return { ...cached, stats: { ...cached.stats, timesSearched: cached.stats.timesSearched + 1 } };
+    }
 
     // Look up in database
     const entity = await prisma.entity.findUnique({
@@ -35,6 +50,31 @@ export class QueryService {
       lookAlike = await levenshteinService.checkImpersonation(normalized, 'twitter');
     }
 
+    // Fetch on-chain identity for addresses
+    let identityData: {
+      hasIdentity: boolean;
+      isVerified: boolean;
+      displayName?: string | null;
+      judgements?: Array<{ registrarId: number; judgement: string }>;
+    } = { hasIdentity: false, isVerified: false };
+
+    if (type === 'ADDRESS' && chain) {
+      try {
+        const chainName = chain === 'dot' ? 'polkadot' : chain === 'ksm' ? 'kusama' : null;
+        if (chainName) {
+          const identity = await polkadotService.getIdentity(normalized, chainName);
+          identityData = {
+            hasIdentity: identity.hasIdentity,
+            isVerified: identity.isVerified,
+            displayName: identity.identity?.displayName,
+            judgements: identity.judgements,
+          };
+        }
+      } catch (error) {
+        console.error('Failed to fetch identity for address:', error);
+      }
+    }
+
     // Update search stats
     if (entity) {
       await prisma.entity.update({
@@ -47,20 +87,12 @@ export class QueryService {
     }
 
     // Record the search
-    await prisma.search.create({
-      data: {
-        searchTerm: input,
-        normalizedTerm: normalized,
-        entityType: type,
-        entityId: entity?.id,
-        resultRisk: entity?.riskLevel || (whitelisted ? 'SAFE' : 'UNKNOWN'),
-      },
-    });
+    this.recordSearch(input, normalized, type, entity?.id || null);
 
     // Calculate risk
-    const assessment = this.calculateRisk(entity, whitelisted, lookAlike);
+    const assessment = this.calculateRisk(entity, whitelisted, lookAlike, identityData);
 
-    return {
+    const response: CheckResponse = {
       entity: input,
       entityType: type,
       chain: chain || undefined,
@@ -76,8 +108,10 @@ export class QueryService {
         category: whitelisted?.category,
       },
       identity: {
-        hasIdentity: false, // TODO: Integrate with PolkadotService
-        isVerified: false,
+        hasIdentity: identityData.hasIdentity,
+        isVerified: identityData.isVerified,
+        displayName: identityData.displayName,
+        judgements: identityData.judgements,
       },
       lookAlike,
       stats: {
@@ -86,12 +120,39 @@ export class QueryService {
         lastSearched: entity?.lastSearchedAt || new Date(),
       },
     };
+
+    // Cache the response
+    await cacheSet(cacheKey, response, CACHE_TTL);
+
+    return response;
+  }
+
+  private async recordSearch(
+    searchTerm: string,
+    normalizedTerm: string,
+    entityType: EntityType,
+    entityId: string | null
+  ) {
+    try {
+      await prisma.search.create({
+        data: {
+          searchTerm,
+          normalizedTerm,
+          entityType,
+          entityId,
+          cacheHit: entityId === 'cached',
+        },
+      });
+    } catch (error) {
+      console.error('Failed to record search:', error);
+    }
   }
 
   private calculateRisk(
     entity: { riskLevel: RiskLevel; source: string; userReportCount: number } | null,
     whitelisted: { name: string } | null,
-    lookAlike: { isLookAlike: boolean; similarity?: number } | undefined
+    lookAlike: { isLookAlike: boolean; similarity?: number } | undefined,
+    identity: { hasIdentity: boolean; isVerified: boolean } = { hasIdentity: false, isVerified: false }
   ) {
     // 1. Whitelisted = SAFE
     if (whitelisted) {
@@ -107,7 +168,7 @@ export class QueryService {
       return {
         riskLevel: 'FRAUD' as RiskLevel,
         riskScore: 95,
-        threatCategory: 'PHISHING',
+        threatCategory: 'PHISHING' as const,
       };
     }
 
@@ -116,7 +177,7 @@ export class QueryService {
       return {
         riskLevel: 'CAUTION' as RiskLevel,
         riskScore: 70,
-        threatCategory: 'IMPERSONATION',
+        threatCategory: 'IMPERSONATION' as const,
       };
     }
 
@@ -129,7 +190,25 @@ export class QueryService {
       };
     }
 
-    // 5. Unknown
+    // 5. Verified on-chain identity = LOW_RISK (trusted but not whitelisted)
+    if (identity.isVerified) {
+      return {
+        riskLevel: 'LOW_RISK' as RiskLevel,
+        riskScore: 20,
+        threatCategory: null,
+      };
+    }
+
+    // 6. Has identity but not verified = slightly better than unknown
+    if (identity.hasIdentity) {
+      return {
+        riskLevel: 'UNKNOWN' as RiskLevel,
+        riskScore: 40,
+        threatCategory: null,
+      };
+    }
+
+    // 7. Unknown
     return {
       riskLevel: 'UNKNOWN' as RiskLevel,
       riskScore: null,

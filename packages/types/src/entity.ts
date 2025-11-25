@@ -1,6 +1,6 @@
 export type EntityType = 'ADDRESS' | 'DOMAIN' | 'TWITTER' | 'EMAIL';
 
-export type RiskLevel = 'SAFE' | 'UNKNOWN' | 'CAUTION' | 'FRAUD';
+export type RiskLevel = 'SAFE' | 'LOW_RISK' | 'UNKNOWN' | 'CAUTION' | 'FRAUD';
 
 export type ThreatCategory =
   | 'PHISHING'

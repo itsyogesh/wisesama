@@ -11,6 +11,8 @@ import { identityRoutes } from './modules/identity/identity.routes';
 import { reportRoutes } from './modules/report/report.routes';
 import { authRoutes } from './modules/auth/auth.routes';
 import { healthRoutes } from './modules/health/health.routes';
+import { adminRoutes } from './modules/admin/admin.routes';
+import { scheduleRecurringSync, runInitialSync, shutdownWorker } from './workers/sync.worker';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -102,6 +104,7 @@ async function buildApp() {
   await fastify.register(identityRoutes, { prefix: '/api/v1' });
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
   await fastify.register(authRoutes, { prefix: '/api/v1' });
+  await fastify.register(adminRoutes, { prefix: '/api/v1/admin' });
 
   return fastify;
 }
@@ -109,9 +112,30 @@ async function buildApp() {
 async function start() {
   try {
     const app = await buildApp();
+
+    // Start the server
     await app.listen({ port: PORT, host: HOST });
     console.log(`Server running at http://${HOST}:${PORT}`);
     console.log(`API docs at http://${HOST}:${PORT}/docs`);
+
+    // Initialize background sync worker
+    try {
+      await scheduleRecurringSync();
+      await runInitialSync();
+    } catch (err) {
+      console.warn('Background sync initialization failed (Redis may not be running):', err);
+    }
+
+    // Graceful shutdown
+    const shutdown = async () => {
+      console.log('Shutting down...');
+      await shutdownWorker();
+      await app.close();
+      process.exit(0);
+    };
+
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
   } catch (err) {
     console.error('Failed to start server:', err);
     process.exit(1);
