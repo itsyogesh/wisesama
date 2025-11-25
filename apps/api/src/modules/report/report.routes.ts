@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '@wisesama/database';
 import type { ThreatCategory, EntityType } from '@wisesama/types';
+import { sendReportConfirmation, sendAdminNewReportAlert } from '../../services/email.service';
 
 const reportSchema = z.object({
   value: z.string().min(1),
@@ -84,6 +85,34 @@ export async function reportRoutes(fastify: FastifyInstance) {
             status: 'pending',
           },
         });
+
+        // Send confirmation email to reporter (async, don't block response)
+        if (data.reporterEmail) {
+          sendReportConfirmation({
+            email: data.reporterEmail,
+            reportId: report.id,
+            entityValue: data.value,
+            entityType: data.entityType,
+            threatCategory: data.threatCategory,
+          }).catch((err) => {
+            request.log.warn({ err }, 'Failed to send report confirmation email');
+          });
+        }
+
+        // Send alert to admin (async)
+        const adminEmail = process.env.ADMIN_ALERT_EMAIL;
+        if (adminEmail) {
+          sendAdminNewReportAlert({
+            adminEmail,
+            reportId: report.id,
+            entityValue: data.value,
+            entityType: data.entityType,
+            threatCategory: data.threatCategory,
+            reporterEmail: data.reporterEmail,
+          }).catch((err) => {
+            request.log.warn({ err }, 'Failed to send admin alert email');
+          });
+        }
 
         reply.status(201);
         return {

@@ -7,6 +7,7 @@ interface RiskMeterProps {
 
 const riskColors: Record<RiskLevel, string> = {
   SAFE: '#83FF8F',
+  LOW_RISK: '#3B82F6', // Blue - verified identity but not whitelisted
   UNKNOWN: '#888888',
   CAUTION: '#FFA500',
   FRAUD: '#FF3939',

@@ -15,6 +15,7 @@ import { healthRoutes } from './modules/health/health.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
 import { whitelistRoutes } from './modules/admin/whitelist.routes';
 import { reportsAdminRoutes } from './modules/admin/reports.routes';
+import { contributionsRoutes } from './modules/admin/contributions.routes';
 import { scheduleRecurringSync, runInitialSync, shutdownWorker } from './workers/sync.worker';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -59,7 +60,7 @@ async function buildApp() {
       },
       servers: [
         { url: 'http://localhost:3001', description: 'Development' },
-        { url: 'https://api.wisesama.io', description: 'Production' },
+        { url: 'https://api.wisesama.com', description: 'Production' },
       ],
       tags: [
         { name: 'check', description: 'Entity lookup and risk assessment' },
@@ -129,6 +130,7 @@ async function buildApp() {
   await fastify.register(adminRoutes, { prefix: '/api/v1' });
   await fastify.register(whitelistRoutes, { prefix: '/api/v1' });
   await fastify.register(reportsAdminRoutes, { prefix: '/api/v1' });
+  await fastify.register(contributionsRoutes, { prefix: '/api/v1' });
 
   return fastify;
 }

@@ -2,9 +2,12 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '@wisesama/database';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
+import { sendReportVerified, sendReportRejected } from '../../services/email.service';
+import { contributeToPhishing, isGitHubConfigured } from '../../services/github-contribution.service';
 
 const verifyReportSchema = z.object({
   addToBlacklist: z.boolean().default(true),
+  contributeToUpstream: z.boolean().default(true), // Auto-PR to polkadot-js/phishing
   threatName: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -163,6 +166,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
           type: 'object',
           properties: {
             addToBlacklist: { type: 'boolean', default: true },
+            contributeToUpstream: { type: 'boolean', default: true },
             threatName: { type: 'string' },
             notes: { type: 'string' },
           },
@@ -245,10 +249,52 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
         return updatedReport;
       });
 
+      // Send email notification to reporter (async)
+      if (report.reporterEmail) {
+        sendReportVerified({
+          email: report.reporterEmail,
+          reportId: report.id,
+          entityValue: report.reportedValue,
+          entityType: report.entityType,
+          threatCategory: report.threatCategory,
+          addedToBlacklist: body.addToBlacklist,
+        }).catch((err) => {
+          request.log.warn({ err }, 'Failed to send report verified email');
+        });
+      }
+
+      // Contribute to polkadot-js/phishing (async)
+      let contribution: { contributionId?: string; prUrl?: string } | undefined;
+      if (body.contributeToUpstream) {
+        try {
+          const contributionResult = await contributeToPhishing({
+            reportId: report.id,
+            entityType: report.entityType,
+            entityValue: report.reportedValue,
+            threatCategory: report.threatCategory,
+            description: report.description || undefined,
+            evidenceUrls: report.evidenceUrls,
+          });
+          contribution = {
+            contributionId: contributionResult.contributionId,
+            prUrl: contributionResult.prUrl,
+          };
+        } catch (err) {
+          request.log.warn({ err }, 'Failed to contribute to upstream');
+        }
+      }
+
       return {
         message: 'Report verified successfully',
         report: result,
         addedToBlacklist: body.addToBlacklist,
+        contribution: body.contributeToUpstream
+          ? {
+              enabled: true,
+              githubConfigured: isGitHubConfigured(),
+              ...contribution,
+            }
+          : undefined,
       };
     }
   );
@@ -305,6 +351,19 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
             : `[REJECTED: ${body.reason}]`,
         },
       });
+
+      // Send email notification to reporter (async)
+      if (report.reporterEmail) {
+        sendReportRejected({
+          email: report.reporterEmail,
+          reportId: report.id,
+          entityValue: report.reportedValue,
+          entityType: report.entityType,
+          reason: body.reason,
+        }).catch((err) => {
+          request.log.warn({ err }, 'Failed to send report rejected email');
+        });
+      }
 
       return {
         message: 'Report rejected',

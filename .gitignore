@@ -45,3 +45,4 @@ packages/database/prisma/*.db-journal
 # Temporary
 *.tmp
 *.bak
+.vercel

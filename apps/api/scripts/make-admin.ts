@@ -12,7 +12,7 @@ async function main() {
 
   if (!email) {
     console.error('Usage: pnpm --filter @wisesama/api make-admin <email>');
-    console.error('Example: pnpm --filter @wisesama/api make-admin admin@wisesama.io');
+    console.error('Example: pnpm --filter @wisesama/api make-admin admin@wisesama.com');
     process.exit(1);
   }
 

@@ -1,4 +1,4 @@
-import { CheckCircle, AlertTriangle, XCircle, HelpCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, HelpCircle, ShieldCheck } from 'lucide-react';
 import type { RiskLevel } from '@wisesama/types';
 
 interface RiskBadgeProps {
@@ -22,6 +22,13 @@ const config: Record<
     bgColor: 'bg-wisesama-status-safe/10',
     textColor: 'text-wisesama-status-safe',
     borderColor: 'border-wisesama-status-safe/40',
+  },
+  LOW_RISK: {
+    icon: ShieldCheck,
+    label: 'Low Risk',
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    borderColor: 'border-blue-500/40',
   },
   UNKNOWN: {
     icon: HelpCircle,

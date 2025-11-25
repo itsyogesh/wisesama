@@ -185,8 +185,38 @@ model Report {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Community contribution (auto-PR to polkadot-js/phishing)
+  contribution CommunityContribution?
+
   @@index([status])
   @@index([entityType])
+}
+
+// Track PRs submitted to polkadot-js/phishing repository
+model CommunityContribution {
+  id       String @id @default(cuid())
+  reportId String @unique
+  report   Report @relation(fields: [reportId], references: [id])
+
+  // GitHub PR info
+  prNumber Int?
+  prUrl    String?
+  prStatus String @default("pending") // pending, open, merged, closed, error
+
+  // What was contributed
+  entityType  EntityType
+  entityValue String
+  targetFile  String // "address.json" or "all.json"
+
+  // Tracking
+  submittedAt  DateTime?
+  mergedAt     DateTime?
+  errorMessage String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([prStatus])
 }
 
 model Search {
