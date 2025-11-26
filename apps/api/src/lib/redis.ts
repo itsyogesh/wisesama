@@ -1,26 +1,18 @@
-import Redis from 'ioredis';
+import { Redis } from '@upstash/redis';
+import { Ratelimit } from '@upstash/ratelimit';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
-
-// Main Redis client for caching
-export const redis = new Redis(REDIS_URL, {
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-  retryStrategy: (times) => {
-    if (times > 3) {
-      console.warn('[Redis] Connection failed after 3 retries');
-      return null; // Stop retrying
-    }
-    return Math.min(times * 200, 2000);
-  },
+// Upstash Redis client
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-redis.on('connect', () => {
-  console.log('[Redis] Connected');
-});
-
-redis.on('error', (err) => {
-  console.error('[Redis] Error:', err.message);
+// Rate limiter for API requests (100 requests per minute per key)
+export const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(100, '1 m'),
+  analytics: true,
+  prefix: 'wisesama:ratelimit',
 });
 
 // Cache helpers
@@ -28,8 +20,8 @@ const DEFAULT_TTL = 300; // 5 minutes
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
   try {
-    const data = await redis.get(key);
-    return data ? JSON.parse(data) : null;
+    const data = await redis.get<T>(key);
+    return data;
   } catch (error) {
     console.error('[Redis] Cache get error:', error);
     return null;

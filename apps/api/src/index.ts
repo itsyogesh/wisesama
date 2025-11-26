@@ -2,7 +2,6 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
-import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
@@ -16,7 +15,8 @@ import { adminRoutes } from './modules/admin/admin.routes';
 import { whitelistRoutes } from './modules/admin/whitelist.routes';
 import { reportsAdminRoutes } from './modules/admin/reports.routes';
 import { contributionsRoutes } from './modules/admin/contributions.routes';
-import { scheduleRecurringSync, runInitialSync, shutdownWorker } from './workers/sync.worker';
+import { jobsRoutes } from './modules/jobs/jobs.routes';
+import { ratelimit } from './lib/redis';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -41,13 +41,27 @@ async function buildApp() {
     credentials: true,
   });
 
-  // Rate limiting
-  await fastify.register(rateLimit, {
-    max: 100,
-    timeWindow: '1 minute',
-    keyGenerator: (request) => {
-      return request.headers['x-api-key']?.toString() || request.ip;
-    },
+  // Rate limiting with Upstash
+  fastify.addHook('onRequest', async (request, reply) => {
+    // Skip rate limiting for health checks and docs
+    if (request.url === '/api/v1/health' || request.url.startsWith('/docs')) {
+      return;
+    }
+
+    const identifier = request.headers['x-api-key']?.toString() || request.ip;
+    const { success, limit, remaining, reset } = await ratelimit.limit(identifier);
+
+    reply.header('X-RateLimit-Limit', limit);
+    reply.header('X-RateLimit-Remaining', remaining);
+    reply.header('X-RateLimit-Reset', reset);
+
+    if (!success) {
+      reply.status(429);
+      reply.send({
+        error: 'Too Many Requests',
+        message: 'Rate limit exceeded. Please try again later.',
+      });
+    }
   });
 
   // API Documentation
@@ -69,6 +83,7 @@ async function buildApp() {
         { name: 'auth', description: 'Authentication' },
         { name: 'api-keys', description: 'API key management' },
         { name: 'admin', description: 'Admin operations (requires admin role)' },
+        { name: 'jobs', description: 'Background job endpoints' },
       ],
       components: {
         securitySchemes: {
@@ -125,6 +140,7 @@ async function buildApp() {
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
   await fastify.register(authRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
+  await fastify.register(jobsRoutes, { prefix: '/api/v1' });
 
   // Admin routes (require admin role)
   await fastify.register(adminRoutes, { prefix: '/api/v1' });
@@ -135,6 +151,14 @@ async function buildApp() {
   return fastify;
 }
 
+// Export for Vercel serverless
+export default async function handler(req: unknown, res: unknown) {
+  const app = await buildApp();
+  await app.ready();
+  app.server.emit('request', req, res);
+}
+
+// For local development
 async function start() {
   try {
     const app = await buildApp();
@@ -144,18 +168,9 @@ async function start() {
     console.log(`Server running at http://${HOST}:${PORT}`);
     console.log(`API docs at http://${HOST}:${PORT}/docs`);
 
-    // Initialize background sync worker
-    try {
-      await scheduleRecurringSync();
-      await runInitialSync();
-    } catch (err) {
-      console.warn('Background sync initialization failed (Redis may not be running):', err);
-    }
-
     // Graceful shutdown
     const shutdown = async () => {
       console.log('Shutting down...');
-      await shutdownWorker();
       await app.close();
       process.exit(0);
     };
@@ -168,4 +183,7 @@ async function start() {
   }
 }
 
-start();
+// Only start server if not running on Vercel
+if (process.env.VERCEL !== '1') {
+  start();
+}
