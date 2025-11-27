@@ -1,8 +1,8 @@
 /**
  * GitHub Contribution Service
  * Automatically creates PRs to polkadot-js/phishing repository when reports are verified
+ * Uses native fetch instead of @octokit/rest for CommonJS compatibility
  */
-import { Octokit } from '@octokit/rest';
 import { prisma } from '@wisesama/database';
 import type { EntityType } from '@wisesama/types';
 
@@ -10,6 +10,7 @@ import type { EntityType } from '@wisesama/types';
 const UPSTREAM_OWNER = 'polkadot-js';
 const UPSTREAM_REPO = 'phishing';
 const DEFAULT_BRANCH = 'master';
+const GITHUB_API = 'https://api.github.com';
 
 // Get configuration from environment
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -29,6 +30,31 @@ interface AddressJson {
 interface AllJson {
   allow: string[];
   deny: string[];
+}
+
+/**
+ * GitHub API helper with proper error handling
+ */
+async function githubFetch<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const response = await fetch(`${GITHUB_API}${endpoint}`, {
+    ...options,
+    headers: {
+      Accept: 'application/vnd.github.v3+json',
+      Authorization: `Bearer ${GITHUB_TOKEN}`,
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`GitHub API error: ${response.status} ${error}`);
+  }
+
+  return response.json() as Promise<T>;
 }
 
 /**
@@ -75,10 +101,8 @@ export async function contributeToPhishing(params: {
   }
 
   try {
-    const octokit = new Octokit({ auth: GITHUB_TOKEN });
-
     // Create the PR
-    const prResult = await createPullRequest(octokit, {
+    const prResult = await createPullRequest({
       entityType,
       entityValue,
       threatCategory,
@@ -128,67 +152,56 @@ export async function contributeToPhishing(params: {
 /**
  * Create a pull request to polkadot-js/phishing
  */
-async function createPullRequest(
-  octokit: Octokit,
-  params: {
-    entityType: EntityType;
-    entityValue: string;
-    threatCategory: string;
-    description?: string;
-    evidenceUrls?: string[];
-    targetFile: string;
-    reportId: string;
-  }
-): Promise<{ prNumber: number; prUrl: string }> {
+async function createPullRequest(params: {
+  entityType: EntityType;
+  entityValue: string;
+  threatCategory: string;
+  description?: string;
+  evidenceUrls?: string[];
+  targetFile: string;
+  reportId: string;
+}): Promise<{ prNumber: number; prUrl: string }> {
   const { entityType, entityValue, threatCategory, description, evidenceUrls, targetFile, reportId } = params;
 
-  // 1. Ensure fork exists (will return existing fork if already forked)
-  await ensureFork(octokit);
+  // 1. Ensure fork exists
+  await ensureFork();
 
   // 2. Get the latest commit SHA from upstream
-  const { data: ref } = await octokit.git.getRef({
-    owner: UPSTREAM_OWNER,
-    repo: UPSTREAM_REPO,
-    ref: `heads/${DEFAULT_BRANCH}`,
-  });
+  const ref = await githubFetch<{ object: { sha: string } }>(
+    `/repos/${UPSTREAM_OWNER}/${UPSTREAM_REPO}/git/ref/heads/${DEFAULT_BRANCH}`
+  );
   const baseSha = ref.object.sha;
 
   // 3. Create a unique branch name
   const branchName = `wisesama/add-${entityType.toLowerCase()}-${Date.now()}`;
 
   // 4. Create the branch in our fork
-  await octokit.git.createRef({
-    owner: FORK_OWNER!,
-    repo: UPSTREAM_REPO,
-    ref: `refs/heads/${branchName}`,
-    sha: baseSha,
+  await githubFetch(`/repos/${FORK_OWNER}/${UPSTREAM_REPO}/git/refs`, {
+    method: 'POST',
+    body: JSON.stringify({
+      ref: `refs/heads/${branchName}`,
+      sha: baseSha,
+    }),
   });
 
   // 5. Get current file content
-  const { data: fileData } = await octokit.repos.getContent({
-    owner: FORK_OWNER!,
-    repo: UPSTREAM_REPO,
-    path: targetFile,
-    ref: branchName,
-  });
-
-  if (!('content' in fileData)) {
-    throw new Error(`Cannot read ${targetFile}`);
-  }
+  const fileData = await githubFetch<{ content: string; sha: string }>(
+    `/repos/${FORK_OWNER}/${UPSTREAM_REPO}/contents/${targetFile}?ref=${branchName}`
+  );
 
   // 6. Parse and update the file
   const currentContent = Buffer.from(fileData.content, 'base64').toString('utf-8');
   const updatedContent = updateFileContent(currentContent, targetFile, entityType, entityValue, threatCategory);
 
   // 7. Commit the change
-  await octokit.repos.createOrUpdateFileContents({
-    owner: FORK_OWNER!,
-    repo: UPSTREAM_REPO,
-    path: targetFile,
-    message: `Add ${entityType.toLowerCase()} reported by Wisesama community`,
-    content: Buffer.from(updatedContent).toString('base64'),
-    sha: fileData.sha,
-    branch: branchName,
+  await githubFetch(`/repos/${FORK_OWNER}/${UPSTREAM_REPO}/contents/${targetFile}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      message: `Add ${entityType.toLowerCase()} reported by Wisesama community`,
+      content: Buffer.from(updatedContent).toString('base64'),
+      sha: fileData.sha,
+      branch: branchName,
+    }),
   });
 
   // 8. Create the pull request
@@ -201,14 +214,18 @@ async function createPullRequest(
     reportId,
   });
 
-  const { data: pr } = await octokit.pulls.create({
-    owner: UPSTREAM_OWNER,
-    repo: UPSTREAM_REPO,
-    title: `Add ${entityType.toLowerCase()} to ${targetFile === 'address.json' ? 'address list' : 'deny list'}`,
-    body: prBody,
-    head: `${FORK_OWNER}:${branchName}`,
-    base: DEFAULT_BRANCH,
-  });
+  const pr = await githubFetch<{ number: number; html_url: string }>(
+    `/repos/${UPSTREAM_OWNER}/${UPSTREAM_REPO}/pulls`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        title: `Add ${entityType.toLowerCase()} to ${targetFile === 'address.json' ? 'address list' : 'deny list'}`,
+        body: prBody,
+        head: `${FORK_OWNER}:${branchName}`,
+        base: DEFAULT_BRANCH,
+      }),
+    }
+  );
 
   return {
     prNumber: pr.number,
@@ -219,18 +236,14 @@ async function createPullRequest(
 /**
  * Ensure we have a fork of the repository
  */
-async function ensureFork(octokit: Octokit): Promise<void> {
+async function ensureFork(): Promise<void> {
   try {
     // Check if fork exists
-    await octokit.repos.get({
-      owner: FORK_OWNER!,
-      repo: UPSTREAM_REPO,
-    });
+    await githubFetch(`/repos/${FORK_OWNER}/${UPSTREAM_REPO}`);
   } catch {
     // Fork doesn't exist, create it
-    await octokit.repos.createFork({
-      owner: UPSTREAM_OWNER,
-      repo: UPSTREAM_REPO,
+    await githubFetch(`/repos/${UPSTREAM_OWNER}/${UPSTREAM_REPO}/forks`, {
+      method: 'POST',
     });
 
     // Wait for fork to be ready
@@ -347,14 +360,12 @@ export async function syncContributionStatus(contributionId: string): Promise<vo
     return;
   }
 
-  const octokit = new Octokit({ auth: GITHUB_TOKEN });
-
   try {
-    const { data: pr } = await octokit.pulls.get({
-      owner: UPSTREAM_OWNER,
-      repo: UPSTREAM_REPO,
-      pull_number: contribution.prNumber,
-    });
+    const pr = await githubFetch<{
+      merged: boolean;
+      merged_at: string | null;
+      state: string;
+    }>(`/repos/${UPSTREAM_OWNER}/${UPSTREAM_REPO}/pulls/${contribution.prNumber}`);
 
     let newStatus = contribution.prStatus;
     let mergedAt = contribution.mergedAt;
