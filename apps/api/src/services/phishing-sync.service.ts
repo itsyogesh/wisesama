@@ -203,11 +203,11 @@ export class PhishingSyncService {
    * Normalize a domain for consistent lookup
    */
   private normalizeDomain(domain: string): string {
-    return domain
+    return (domain
       .toLowerCase()
       .replace(/^https?:\/\//, '')
       .replace(/^www\./, '')
-      .split('/')[0];
+      .split('/')[0]) ?? '';
   }
 
   /**

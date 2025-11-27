@@ -1,4 +1,4 @@
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { decodeAddress, encodeAddress } from 'dedot/utils';
 import type { EntityType } from '@wisesama/types';
 
 interface DetectionResult {
@@ -106,7 +106,7 @@ function isPolkadotAddress(input: string): { normalized: string; chain: string }
 
 function isDomain(input: string): boolean {
   // Remove protocol if present
-  const cleaned = input.replace(/^https?:\/\//, '').split('/')[0];
+  const cleaned = input.replace(/^https?:\/\//, '').split('/')[0] ?? '';
 
   // Check if it looks like a domain
   return /^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+$/.test(
@@ -116,9 +116,9 @@ function isDomain(input: string): boolean {
 
 function normalizeDomain(input: string): string {
   // Remove protocol and path
-  const cleaned = input
+  const cleaned = (input
     .replace(/^https?:\/\//, '')
-    .split('/')[0]
+    .split('/')[0] ?? '')
     .toLowerCase();
 
   // Remove www. prefix

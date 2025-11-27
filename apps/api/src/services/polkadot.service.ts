@@ -1,4 +1,6 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { DedotClient, WsProvider } from 'dedot';
+import type { PolkadotApi } from '@dedot/chaintypes/polkadot';
+import type { KusamaApi } from '@dedot/chaintypes/kusama';
 import { prisma } from '@wisesama/database';
 import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
 
@@ -10,12 +12,14 @@ const RPC_ENDPOINTS: Record<string, string> = {
   kusama: process.env.KUSAMA_RPC || 'wss://kusama-rpc.polkadot.io',
 };
 
-export class PolkadotService {
-  private apis: Map<string, ApiPromise> = new Map();
+type ChainApi = PolkadotApi | KusamaApi;
 
-  private async getApi(chain: string): Promise<ApiPromise> {
-    if (this.apis.has(chain)) {
-      return this.apis.get(chain)!;
+export class PolkadotService {
+  private clients: Map<string, DedotClient<ChainApi>> = new Map();
+
+  private async getClient(chain: string): Promise<DedotClient<ChainApi>> {
+    if (this.clients.has(chain)) {
+      return this.clients.get(chain)!;
     }
 
     const endpoint = RPC_ENDPOINTS[chain];
@@ -24,9 +28,14 @@ export class PolkadotService {
     }
 
     const provider = new WsProvider(endpoint);
-    const api = await ApiPromise.create({ provider });
-    this.apis.set(chain, api);
-    return api;
+
+    // Create client with proper chain type
+    const client = chain === 'kusama'
+      ? await DedotClient.new<KusamaApi>(provider)
+      : await DedotClient.new<PolkadotApi>(provider);
+
+    this.clients.set(chain, client as DedotClient<ChainApi>);
+    return client as DedotClient<ChainApi>;
   }
 
   async getIdentity(
@@ -55,12 +64,15 @@ export class PolkadotService {
     }
 
     try {
-      const api = await this.getApi(chain);
+      const client = await this.getClient(chain);
 
-      // Query identity
-      const identityOf = await api.query.identity.identityOf(address);
+      // Query identity - dedot returns native types, no need for unwrap
+      if (!client.query.identity?.identityOf) {
+        throw new Error(`Identity pallet not available on ${chain}`);
+      }
+      const identityOf = await client.query.identity.identityOf(address);
 
-      if (identityOf.isNone) {
+      if (!identityOf) {
         const noIdentityResult = {
           address,
           chain,
@@ -74,34 +86,39 @@ export class PolkadotService {
         return noIdentityResult;
       }
 
-      const identity = identityOf.unwrap();
-      const info = identity[0].info;
+      // With dedot, identityOf is already unwrapped - it's a tuple [Registration, Option<Deposit>]
+      const [registration] = identityOf;
+      const info = registration.info;
 
-      // Parse judgements
-      const judgements = identity[0].judgements.map(([registrarId, judgement]) => ({
-        registrarId: registrarId.toNumber(),
-        judgement: judgement.type,
-      }));
-
-      // Check if verified (has at least one positive judgement)
-      const isVerified = judgements.some((j) =>
-        ['Reasonable', 'KnownGood'].includes(j.judgement)
+      // Parse judgements - dedot returns native types
+      const judgements = registration.judgements.map(
+        ([registrarId, judgement]: [number | bigint, { type: string }]) => ({
+          registrarId: Number(registrarId),
+          judgement: judgement.type,
+        })
       );
 
-      const parseField = (field: { isRaw?: boolean; asRaw?: { toUtf8: () => string } }) => {
-        if (field && 'isRaw' in field && field.isRaw && field.asRaw) {
-          return field.asRaw.toUtf8();
+      // Check if verified (has at least one positive judgement)
+      const isVerified = judgements.some(
+        (j: { registrarId: number; judgement: string }) =>
+          ['Reasonable', 'KnownGood'].includes(j.judgement)
+      );
+
+      // Parse identity data fields - dedot Data type has .value for raw data
+      const parseField = (field: { type: string; value?: Uint8Array } | undefined): string | null => {
+        if (field && field.type === 'Raw' && field.value) {
+          return new TextDecoder().decode(field.value);
         }
         return null;
       };
 
       const identityData = {
-        displayName: parseField(info.display as any),
-        legalName: parseField(info.legal as any),
-        email: parseField(info.email as any),
-        twitter: parseField(info.twitter as any),
-        web: parseField(info.web as any),
-        riot: parseField(info.riot as any),
+        displayName: parseField(info.display as { type: string; value?: Uint8Array }),
+        legalName: parseField(info.legal as { type: string; value?: Uint8Array }),
+        email: parseField(info.email as { type: string; value?: Uint8Array }),
+        twitter: parseField(info.twitter as { type: string; value?: Uint8Array }),
+        web: parseField(info.web as { type: string; value?: Uint8Array }),
+        riot: parseField(info.riot as { type: string; value?: Uint8Array }),
       };
 
       // Cache in database
@@ -125,7 +142,7 @@ export class PolkadotService {
             riot: identityData.riot,
             hasIdentity: true,
             isVerified,
-            judgements: judgements as any,
+            judgements: judgements as unknown as Parameters<typeof prisma.polkadotIdentity.create>[0]['data']['judgements'],
             lastSyncedAt: new Date(),
           },
           update: {
@@ -137,7 +154,7 @@ export class PolkadotService {
             riot: identityData.riot,
             hasIdentity: true,
             isVerified,
-            judgements: judgements as any,
+            judgements: judgements as unknown as Parameters<typeof prisma.polkadotIdentity.create>[0]['data']['judgements'],
             lastSyncedAt: new Date(),
           },
         });

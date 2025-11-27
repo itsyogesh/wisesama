@@ -45,11 +45,10 @@ export class LevenshteinService {
       .filter((m) => m.similarity > 0.7 && m.distance > 0) // Similar but not exact match
       .sort((a, b) => b.similarity - a.similarity);
 
-    if (matches.length === 0) {
+    const topMatch = matches[0];
+    if (!topMatch) {
       return { isLookAlike: false };
     }
-
-    const topMatch = matches[0];
 
     return {
       isLookAlike: true,
