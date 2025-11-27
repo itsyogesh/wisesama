@@ -1,4 +1,4 @@
-import { decodeAddress, encodeAddress } from 'dedot/utils';
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import type { EntityType } from '@wisesama/types';
 
 interface DetectionResult {

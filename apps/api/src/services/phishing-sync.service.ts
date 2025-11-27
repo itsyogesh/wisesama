@@ -5,19 +5,6 @@ import crypto from 'crypto';
 const PHISHING_ADDRESS_URL = 'https://polkadot.js.org/phishing/address.json';
 const PHISHING_ALL_URL = 'https://polkadot.js.org/phishing/all.json';
 
-/**
- * HTTP Response interface matching the Fetch API.
- * Explicitly defined to avoid type conflicts with @dedot/chaintypes
- * which may export a Response type for Substrate RPC responses.
- */
-interface HttpResponse {
-  readonly ok: boolean;
-  readonly status: number;
-  readonly statusText: string;
-  json<T = unknown>(): Promise<T>;
-  text(): Promise<string>;
-}
-
 interface AddressJson {
   [threatName: string]: string[];
 }
@@ -72,7 +59,7 @@ export class PhishingSyncService {
    */
   private async syncAddresses(): Promise<number> {
     try {
-      const response = (await fetch(PHISHING_ADDRESS_URL)) as HttpResponse;
+      const response = await fetch(PHISHING_ADDRESS_URL);
       if (!response.ok) {
         throw new Error(`Failed to fetch addresses: ${response.status}`);
       }
@@ -109,7 +96,7 @@ export class PhishingSyncService {
    */
   private async syncDomains(): Promise<number> {
     try {
-      const response = (await fetch(PHISHING_ALL_URL)) as HttpResponse;
+      const response = await fetch(PHISHING_ALL_URL);
       if (!response.ok) {
         throw new Error(`Failed to fetch domains: ${response.status}`);
       }
