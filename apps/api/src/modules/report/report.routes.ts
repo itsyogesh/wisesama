@@ -175,4 +175,112 @@ export async function reportRoutes(fastify: FastifyInstance) {
       };
     },
   });
+
+  // Get recent verified reports (for homepage ticker)
+  fastify.get<{ Querystring: { limit?: string } }>('/reports/recent', {
+    schema: {
+      tags: ['report'],
+      description: 'Get recent verified reports for display',
+      querystring: {
+        type: 'object',
+        properties: {
+          limit: { type: 'string', default: '10' },
+        },
+      },
+    },
+    handler: async (request) => {
+      const limit = Math.min(parseInt(request.query.limit || '10', 10), 50);
+
+      const reports = await prisma.report.findMany({
+        where: { status: 'verified' },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        select: {
+          id: true,
+          reportedValue: true,
+          entityType: true,
+          threatCategory: true,
+          createdAt: true,
+        },
+      });
+
+      return { reports };
+    },
+  });
+
+  // Get user's own reports (requires authentication)
+  fastify.get<{ Querystring: { page?: string; limit?: string } }>('/reports/my', {
+    schema: {
+      tags: ['report'],
+      description: "Get current user's reports",
+      security: [{ bearerAuth: [] }],
+      querystring: {
+        type: 'object',
+        properties: {
+          page: { type: 'string', default: '1' },
+          limit: { type: 'string', default: '20' },
+        },
+      },
+    },
+    handler: async (request, reply) => {
+      // Check for auth header
+      const authHeader = request.headers.authorization;
+      if (!authHeader?.startsWith('Bearer ')) {
+        reply.status(401);
+        return { error: 'Authentication required' };
+      }
+
+      // For now, support email-based lookup via query param
+      // In production, decode JWT token to get userId
+      const userEmail = request.headers['x-user-email'] as string;
+      if (!userEmail) {
+        reply.status(401);
+        return { error: 'User identification required' };
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { email: userEmail },
+        select: { id: true },
+      });
+
+      if (!user) {
+        reply.status(404);
+        return { error: 'User not found' };
+      }
+
+      const page = parseInt(request.query.page || '1', 10);
+      const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);
+      const skip = (page - 1) * limit;
+
+      const [reports, total] = await Promise.all([
+        prisma.report.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+          select: {
+            id: true,
+            reportedValue: true,
+            entityType: true,
+            threatCategory: true,
+            description: true,
+            status: true,
+            createdAt: true,
+            reviewedAt: true,
+          },
+        }),
+        prisma.report.count({ where: { userId: user.id } }),
+      ]);
+
+      return {
+        reports,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    },
+  });
 }

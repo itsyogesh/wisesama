@@ -12,6 +12,7 @@ import { reportRoutes } from './modules/report/report.routes';
 import { authRoutes } from './modules/auth/auth.routes';
 import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
 import { healthRoutes } from './modules/health/health.routes';
+import { statsRoutes } from './modules/stats/stats.routes';
 import { adminRoutes } from './modules/admin/admin.routes';
 import { whitelistRoutes } from './modules/admin/whitelist.routes';
 import { reportsAdminRoutes } from './modules/admin/reports.routes';
@@ -88,6 +89,7 @@ async function buildApp() {
         { name: 'check', description: 'Entity lookup and risk assessment' },
         { name: 'identity', description: 'Polkadot identity operations' },
         { name: 'report', description: 'Fraud report submission' },
+        { name: 'stats', description: 'Platform statistics' },
         { name: 'auth', description: 'Authentication' },
         { name: 'api-keys', description: 'API key management' },
         { name: 'admin', description: 'Admin operations (requires admin role)' },
@@ -143,6 +145,7 @@ async function buildApp() {
 
   // Routes
   await fastify.register(healthRoutes, { prefix: '/api/v1' });
+  await fastify.register(statsRoutes, { prefix: '/api/v1' });
   await fastify.register(checkRoutes, { prefix: '/api/v1' });
   await fastify.register(identityRoutes, { prefix: '/api/v1' });
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
