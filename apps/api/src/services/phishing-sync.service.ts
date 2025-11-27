@@ -59,7 +59,7 @@ export class PhishingSyncService {
    */
   private async syncAddresses(): Promise<number> {
     try {
-      const response = await fetch(PHISHING_ADDRESS_URL);
+      const response: globalThis.Response = await fetch(PHISHING_ADDRESS_URL);
       if (!response.ok) {
         throw new Error(`Failed to fetch addresses: ${response.status}`);
       }
@@ -96,7 +96,7 @@ export class PhishingSyncService {
    */
   private async syncDomains(): Promise<number> {
     try {
-      const response = await fetch(PHISHING_ALL_URL);
+      const response: globalThis.Response = await fetch(PHISHING_ALL_URL);
       if (!response.ok) {
         throw new Error(`Failed to fetch domains: ${response.status}`);
       }
