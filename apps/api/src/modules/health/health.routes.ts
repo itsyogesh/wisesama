@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { prisma } from '@wisesama/database';
+import { redis } from '../../lib/redis';
 
 export async function healthRoutes(fastify: FastifyInstance) {
   fastify.get('/health', {
@@ -24,18 +25,28 @@ export async function healthRoutes(fastify: FastifyInstance) {
     },
     handler: async () => {
       let dbStatus = 'healthy';
+      let redisStatus = 'healthy';
+
       try {
         await prisma.$queryRaw`SELECT 1`;
       } catch {
         dbStatus = 'unhealthy';
       }
 
+      try {
+        await redis.ping();
+      } catch {
+        redisStatus = 'unhealthy';
+      }
+
+      const isHealthy = dbStatus === 'healthy' && redisStatus === 'healthy';
+
       return {
-        status: dbStatus === 'healthy' ? 'healthy' : 'degraded',
+        status: isHealthy ? 'healthy' : 'degraded',
         timestamp: new Date().toISOString(),
         services: {
           database: dbStatus,
-          redis: 'not_configured', // TODO: Add Redis health check
+          redis: redisStatus,
         },
       };
     },

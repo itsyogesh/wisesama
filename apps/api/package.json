@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenv -e .env.local -- tsx watch src/index.ts",
     "build": "tsup src/index.ts --format cjs --dts",
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
-    "sync": "dotenv -e ../../.env -- tsx scripts/sync-phishing.ts",
-    "make-admin": "dotenv -e ../../.env -- tsx scripts/make-admin.ts",
+    "sync": "dotenv -e .env.local -- tsx scripts/sync-phishing.ts",
+    "make-admin": "dotenv -e .env.local -- tsx scripts/make-admin.ts",
     "clean": "rm -rf dist node_modules .turbo"
   },
   "dependencies": {
