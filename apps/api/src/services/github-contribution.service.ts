@@ -6,6 +6,29 @@
 import { prisma } from '@wisesama/database';
 import type { EntityType } from '@wisesama/types';
 
+/**
+ * HTTP Response interface matching the Fetch API.
+ * Explicitly defined to avoid type conflicts with @polkadot packages
+ * which export a Response type for Substrate RPC responses.
+ */
+interface HttpResponse {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly statusText: string;
+  json<T = unknown>(): Promise<T>;
+  text(): Promise<string>;
+}
+
+/**
+ * HTTP RequestInit interface for fetch options.
+ * Explicitly defined to avoid type conflicts.
+ */
+interface HttpRequestInit {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}
+
 // polkadot-js/phishing repository details
 const UPSTREAM_OWNER = 'polkadot-js';
 const UPSTREAM_REPO = 'phishing';
@@ -37,17 +60,18 @@ interface AllJson {
  */
 async function githubFetch<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: HttpRequestInit = {}
 ): Promise<T> {
-  const response = await fetch(`${GITHUB_API}${endpoint}`, {
-    ...options,
+  const response = (await fetch(`${GITHUB_API}${endpoint}`, {
+    method: options.method,
+    body: options.body,
     headers: {
       Accept: 'application/vnd.github.v3+json',
       Authorization: `Bearer ${GITHUB_TOKEN}`,
       'Content-Type': 'application/json',
       ...options.headers,
     },
-  });
+  })) as HttpResponse;
 
   if (!response.ok) {
     const error = await response.text();
