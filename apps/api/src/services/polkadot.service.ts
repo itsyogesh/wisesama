@@ -124,6 +124,8 @@ export class PolkadotService {
       // Cache in database
       const chainRecord = await prisma.chain.findUnique({ where: { code: chain.slice(0, 3) } });
       if (chainRecord) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const judgementsJson = judgements as any;
         await prisma.polkadotIdentity.upsert({
           where: {
             address_chainId: {
@@ -142,7 +144,7 @@ export class PolkadotService {
             riot: identityData.riot,
             hasIdentity: true,
             isVerified,
-            judgements: judgements as unknown as Parameters<typeof prisma.polkadotIdentity.create>[0]['data']['judgements'],
+            judgements: judgementsJson,
             lastSyncedAt: new Date(),
           },
           update: {
@@ -154,7 +156,7 @@ export class PolkadotService {
             riot: identityData.riot,
             hasIdentity: true,
             isVerified,
-            judgements: judgements as unknown as Parameters<typeof prisma.polkadotIdentity.create>[0]['data']['judgements'],
+            judgements: judgementsJson,
             lastSyncedAt: new Date(),
           },
         });
