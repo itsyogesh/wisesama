@@ -176,6 +176,25 @@ async function start() {
   }
 }
 
+// Singleton for Vercel serverless (reuse across warm invocations)
+let app: Awaited<ReturnType<typeof buildApp>> | null = null;
+
+async function getApp() {
+  if (!app) {
+    app = await buildApp();
+    await app.ready();
+  }
+  return app;
+}
+
+// Export for Vercel serverless
+import type { IncomingMessage, ServerResponse } from 'http';
+
+export default async function handler(req: IncomingMessage, res: ServerResponse) {
+  const fastify = await getApp();
+  fastify.server.emit('request', req, res);
+}
+
 // Only start server if not running on Vercel
 if (process.env.VERCEL !== '1') {
   start();
