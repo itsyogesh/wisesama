@@ -2,90 +2,154 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
+import { motion } from 'motion/react';
+import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { fadeInUp } from '@/lib/motion';
 
 export function HeroSection() {
-  const [searchValue, setSearchValue] = useState('');
+  const [search, setSearch] = useState('');
   const router = useRouter();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchValue.trim()) {
-      router.push(`/check/${encodeURIComponent(searchValue.trim())}`);
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (search.trim()) {
+      router.push(`/check?q=${encodeURIComponent(search.trim())}`);
     }
   };
 
+  const handleReport = () => {
+    router.push('/report');
+  };
+
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-wisesama-purple/10 to-transparent" />
+    <section className="relative py-16 lg:py-24 overflow-hidden bg-[#1A1A1A]">
+      {/* Decorative corner images */}
+      <div className="absolute left-0 top-[-30px] w-[100px] h-[185px] z-0">
+        <Image
+          src="/square.png"
+          alt=""
+          width={100}
+          height={185}
+          className="w-full h-full object-contain"
+        />
+      </div>
+      <div className="absolute right-0 bottom-[90px] w-[100px] h-[215px] z-0">
+        <Image
+          src="/shh.png"
+          alt=""
+          width={100}
+          height={215}
+          className="w-full h-full object-cover"
+        />
+      </div>
 
+      {/* Background blobs */}
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <div className="absolute top-1/4 left-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-0 w-48 h-48 bg-indigo-800/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 right-0 w-32 h-32 bg-indigo-800/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-purple-900/10 via-transparent to-transparent rounded-full" />
+      </div>
+
+      {/* Main content */}
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-8">
-            <Shield className="h-4 w-4 text-wisesama-purple" />
-            <span className="text-sm text-wisesama-purple-light">
-              Protecting the Polkadot Ecosystem
-            </span>
-          </div>
+        <div className="flex flex-col items-center text-center">
+          <motion.h1
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.6 }}
+            className="font-heading font-semibold text-3xl md:text-4xl lg:text-5xl leading-tight text-white mb-6"
+          >
+            Scan and report scams in the Dotsama Ecosystem
+          </motion.h1>
 
-          {/* Headline */}
-          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Detect Fraud in the{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
-              Dotsama
-            </span>{' '}
-            Ecosystem
-          </h1>
+          <motion.p
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base leading-7 text-gray-500 max-w-2xl mb-10"
+          >
+            Wisesama defends you against scams, frauds, and other malicious
+            entities in the Polkadot and Kusama ecosystem. Scan and report
+            suspicious addresses, URLs, Twitter profiles, and more with ease.
+          </motion.p>
 
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Check wallet addresses, domains, and social handles against our database of known
-            scams, phishing sites, and malicious actors.
-          </p>
-
-          {/* Search Form */}
-          <form onSubmit={handleSearch} className="max-w-xl mx-auto mb-12">
+          <motion.form
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="w-full max-w-2xl mb-8"
+            onSubmit={handleSearch}
+          >
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <input
-                type="text"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="Enter address, domain, or Twitter handle..."
-                className="w-full pl-12 pr-32 py-4 rounded-xl bg-wisesama-dark-secondary border border-border focus:border-wisesama-purple focus:ring-1 focus:ring-wisesama-purple outline-none transition-all text-foreground placeholder:text-muted-foreground"
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                <Search className="h-5 w-5" />
+              </div>
+              <Input
+                placeholder="13pkayxsmDRFRQBTUomvs6hmf4SszqKQ6s"
+                className="bg-white text-gray-600 placeholder:text-gray-500 pl-12 pr-12 h-14 text-base rounded-xl focus-visible:ring-2 focus-visible:ring-purple-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 rounded-lg bg-wisesama-purple text-white font-medium hover:bg-wisesama-purple-light transition-colors"
+              <div
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+                onClick={() => handleSearch()}
               >
-                Check
-              </button>
+                <Image src="/scan.png" alt="Search" width={24} height={24} />
+              </div>
             </div>
-          </form>
+          </motion.form>
 
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-wisesama-status-fraud mb-1">
-                54K+
-              </div>
-              <div className="text-sm text-muted-foreground">Phishing Sites</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-wisesama-status-caution mb-1">
-                279+
-              </div>
-              <div className="text-sm text-muted-foreground">Flagged Addresses</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-wisesama-status-safe mb-1">
-                99.9%
-              </div>
-              <div className="text-sm text-muted-foreground">Uptime</div>
-            </div>
-          </div>
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex gap-4 mb-16"
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="gradient"
+                className="w-[150px] h-12 rounded-xl font-medium"
+                type="submit"
+                onClick={() => handleSearch()}
+              >
+                Search
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="outline"
+                className="w-[150px] h-12 rounded-md border-red-500 text-red-500 bg-transparent hover:bg-red-500/10"
+                onClick={handleReport}
+              >
+                Report
+              </Button>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="relative w-full max-w-4xl"
+          >
+            <Image
+              src="/illustration.svg"
+              alt="Scam detection illustration"
+              width={800}
+              height={400}
+              className="w-full h-auto mx-auto"
+              priority
+            />
+          </motion.div>
         </div>
       </div>
     </section>

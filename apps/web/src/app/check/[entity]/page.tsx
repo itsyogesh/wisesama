@@ -1,8 +1,5 @@
 import { Suspense } from 'react';
-import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Header } from '@/components/layout/header';
-import { Footer } from '@/components/layout/footer';
 import { ResultCard } from '@/components/search/result-card';
 import { SearchBar } from '@/components/search/search-bar';
 
@@ -21,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 async function fetchEntityCheck(entity: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
 
   try {
     const res = await fetch(`${apiUrl}/api/v1/check/${encodeURIComponent(entity)}`, {
@@ -46,38 +43,34 @@ export default async function CheckPage({ params }: PageProps) {
   const result = await fetchEntityCheck(decodedEntity);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            {/* Search Bar */}
-            <div className="mb-8">
-              <SearchBar defaultValue={decodedEntity} />
-            </div>
-
-            {/* Results */}
-            <Suspense
-              fallback={
-                <div className="animate-pulse">
-                  <div className="h-64 bg-wisesama-dark-secondary rounded-xl" />
-                </div>
-              }
-            >
-              {result ? (
-                <ResultCard result={result} />
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">
-                    Unable to check this entity. Please try again later.
-                  </p>
-                </div>
-              )}
-            </Suspense>
+    <section className="min-h-screen bg-[#1A1A1A] py-12">
+      <div className="container mx-auto px-4">
+        <div className="max-w-3xl mx-auto">
+          {/* Search Bar */}
+          <div className="mb-8">
+            <SearchBar defaultValue={decodedEntity} />
           </div>
+
+          {/* Results */}
+          <Suspense
+            fallback={
+              <div className="animate-pulse">
+                <div className="h-64 bg-gray-800 rounded-xl" />
+              </div>
+            }
+          >
+            {result ? (
+              <ResultCard result={result} />
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-400">
+                  Unable to check this entity. Please try again later.
+                </p>
+              </div>
+            )}
+          </Suspense>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </section>
   );
 }

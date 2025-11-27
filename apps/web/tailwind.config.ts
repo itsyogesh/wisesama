@@ -54,8 +54,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-vietnam)', 'system-ui', 'sans-serif'],
-        heading: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
+        sans: ['Satoshi', 'system-ui', 'sans-serif'],
+        heading: ['"Clash Display"', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

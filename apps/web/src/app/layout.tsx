@@ -1,19 +1,8 @@
 import type { Metadata } from 'next';
-import { Poppins, Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-poppins',
-});
-
-const vietnamPro = Be_Vietnam_Pro({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  variable: '--font-vietnam',
-});
+import { SiteHeader, SiteFooter } from '@/components/layout';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: {
@@ -56,8 +45,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${poppins.variable} ${vietnamPro.variable} font-sans antialiased`}>
-        <Providers>{children}</Providers>
+      <head>
+        {/* Satoshi + Clash Display from FontShare */}
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
+        <Providers>
+          <SiteHeader />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
