@@ -5,6 +5,19 @@ import crypto from 'crypto';
 const PHISHING_ADDRESS_URL = 'https://polkadot.js.org/phishing/address.json';
 const PHISHING_ALL_URL = 'https://polkadot.js.org/phishing/all.json';
 
+/**
+ * HTTP Response interface matching the Fetch API.
+ * Explicitly defined to avoid type conflicts with @dedot/chaintypes
+ * which may export a Response type for Substrate RPC responses.
+ */
+interface HttpResponse {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly statusText: string;
+  json<T = unknown>(): Promise<T>;
+  text(): Promise<string>;
+}
+
 interface AddressJson {
   [threatName: string]: string[];
 }
@@ -59,12 +72,12 @@ export class PhishingSyncService {
    */
   private async syncAddresses(): Promise<number> {
     try {
-      const response = await fetch(PHISHING_ADDRESS_URL);
+      const response = (await fetch(PHISHING_ADDRESS_URL)) as HttpResponse;
       if (!response.ok) {
         throw new Error(`Failed to fetch addresses: ${response.status}`);
       }
 
-      const data: AddressJson = await response.json();
+      const data = (await response.json()) as AddressJson;
       let count = 0;
 
       for (const [threatName, addresses] of Object.entries(data)) {
@@ -96,12 +109,12 @@ export class PhishingSyncService {
    */
   private async syncDomains(): Promise<number> {
     try {
-      const response = await fetch(PHISHING_ALL_URL);
+      const response = (await fetch(PHISHING_ALL_URL)) as HttpResponse;
       if (!response.ok) {
         throw new Error(`Failed to fetch domains: ${response.status}`);
       }
 
-      const data: AllJson = await response.json();
+      const data = (await response.json()) as AllJson;
       let count = 0;
 
       // Process deny list (malicious domains)
