@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '@wisesama/database';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
+import { normalizeEntityValue } from '../../utils/normalize';
 
 const createWhitelistSchema = z.object({
   entityType: z.enum(['ADDRESS', 'DOMAIN', 'TWITTER', 'EMAIL']),
@@ -159,7 +160,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       const user = request.user!;
       const body = createWhitelistSchema.parse(request.body);
 
-      const normalizedValue = body.value.toLowerCase().replace(/^@/, '');
+      const normalizedValue = normalizeEntityValue(body.value, body.entityType);
 
       // Check for duplicates
       const existing = await prisma.whitelistedEntity.findUnique({
@@ -250,8 +251,11 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
 
       // Handle value update (need to update normalizedValue too)
       let normalizedValue: string | undefined = undefined;
-      if (body.value) {
-        normalizedValue = body.value.toLowerCase().replace(/^@/, '');
+      if (body.value && body.entityType) {
+        normalizedValue = normalizeEntityValue(body.value, body.entityType);
+      } else if (body.value) {
+        // Use existing entityType if only value is being updated
+        normalizedValue = normalizeEntityValue(body.value, existing.entityType);
       }
 
       const entity = await prisma.whitelistedEntity.update({
@@ -357,7 +361,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
 
       for (const item of body.entities) {
         try {
-          const normalizedValue = item.value.toLowerCase().replace(/^@/, '');
+          const normalizedValue = normalizeEntityValue(item.value, item.entityType);
 
           // Check for duplicates
           const existing = await prisma.whitelistedEntity.findUnique({

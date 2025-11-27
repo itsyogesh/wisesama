@@ -28,20 +28,25 @@ export async function jobsRoutes(fastify: FastifyInstance) {
         const signature = request.headers['upstash-signature'] as string;
         const body = (request as unknown as { rawBody: string }).rawBody || JSON.stringify(request.body) || '';
 
+        // Construct URL from request headers (Vercel sets x-forwarded-* headers)
+        const protocol = (request.headers['x-forwarded-proto'] as string) || 'https';
+        const host = (request.headers['x-forwarded-host'] as string) || (request.headers.host as string);
+        const requestUrl = `${protocol}://${host}${request.url}`;
+
         try {
           const isValid = await receiver.verify({
             signature,
             body,
-            url: `${process.env.APP_URL}/api/v1/jobs/sync-phishing`,
+            url: requestUrl,
           });
 
           if (!isValid) {
-            request.log.warn('Invalid QStash signature');
+            request.log.warn({ requestUrl }, 'Invalid QStash signature');
             reply.status(401);
             return { error: 'Invalid signature' };
           }
         } catch (err) {
-          request.log.error({ err }, 'QStash signature verification failed');
+          request.log.error({ err, requestUrl, body: body.substring(0, 100) }, 'QStash signature verification failed');
           reply.status(401);
           return { error: 'Signature verification failed' };
         }

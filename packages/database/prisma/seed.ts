@@ -1,6 +1,31 @@
 import { PrismaClient } from '@prisma/client';
+import { decodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 
 const prisma = new PrismaClient();
+
+// Normalize entity value based on type (matching apps/api/src/utils/normalize.ts)
+function normalizeEntityValue(
+  value: string,
+  entityType: 'ADDRESS' | 'DOMAIN' | 'TWITTER' | 'EMAIL'
+): string {
+  switch (entityType) {
+    case 'ADDRESS':
+      return u8aToHex(decodeAddress(value));
+    case 'TWITTER':
+      return value.toLowerCase().replace(/^@/, '');
+    case 'DOMAIN':
+      return value
+        .toLowerCase()
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .split('/')[0] ?? '';
+    case 'EMAIL':
+      return value.toLowerCase();
+    default:
+      return value.toLowerCase();
+  }
+}
 
 const chains = [
   {
@@ -612,7 +637,7 @@ async function main() {
       ? (await prisma.chain.findUnique({ where: { code: entity.chainCode } }))?.id
       : null;
 
-    const normalizedValue = entity.value.toLowerCase().replace(/^@/, '');
+    const normalizedValue = normalizeEntityValue(entity.value, entity.entityType);
 
     await prisma.whitelistedEntity.upsert({
       where: {

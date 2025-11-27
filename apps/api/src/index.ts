@@ -2,6 +2,7 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
+import rawBody from 'fastify-raw-body';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
@@ -32,6 +33,13 @@ async function buildApp() {
     },
     requestIdHeader: 'x-request-id',
     genReqId: () => crypto.randomUUID(),
+  });
+
+  // Raw body plugin for signature verification (QStash)
+  await fastify.register(rawBody, {
+    field: 'rawBody',
+    global: false, // Only add to routes that need it
+    runFirst: true,
   });
 
   // Security

@@ -1,6 +1,8 @@
 import { prisma } from '@wisesama/database';
 import type { EntityType, ThreatCategory } from '@wisesama/types';
 import crypto from 'crypto';
+import { decodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 
 const PHISHING_ADDRESS_URL = 'https://polkadot.js.org/phishing/address.json';
 const PHISHING_ALL_URL = 'https://polkadot.js.org/phishing/all.json';
@@ -82,10 +84,15 @@ export class PhishingSyncService {
 
       for (const [threatName, addresses] of Object.entries(data)) {
         for (const address of addresses) {
+          const normalizedAddress = this.normalizeAddress(address);
+          if (!normalizedAddress) {
+            console.warn(`[PhishingSync] Skipping invalid address: ${address}`);
+            continue;
+          }
           await this.upsertEntity({
             entityType: 'ADDRESS',
             value: address,
-            normalizedValue: address.toLowerCase(),
+            normalizedValue: normalizedAddress,
             threatName,
             threatCategory: this.categorizeThreat(threatName),
             source: 'polkadot-js-phishing',
@@ -210,6 +217,22 @@ export class PhishingSyncService {
         firstReportedAt: new Date(),
       },
     });
+  }
+
+  /**
+   * Normalize an address to hex public key for chain-agnostic lookup
+   * This matches the normalization in entity-detector.ts
+   * Using hex ensures the same address matches regardless of SS58 prefix
+   * (Polkadot, Kusama, Astar, etc. all resolve to the same hex)
+   * See: https://forum.polkadot.network/t/unifying-polkadot-ecosystem-address-format/10042
+   */
+  private normalizeAddress(address: string): string | null {
+    try {
+      const decoded = decodeAddress(address);
+      return u8aToHex(decoded);
+    } catch {
+      return null;
+    }
   }
 
   /**

@@ -1,4 +1,5 @@
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { u8aToHex } from '@polkadot/util';
 import type { EntityType } from '@wisesama/types';
 
 interface DetectionResult {
@@ -77,11 +78,10 @@ function isEmail(input: string): boolean {
 
 function isPolkadotAddress(input: string): { normalized: string; chain: string } | null {
   try {
-    // Try to decode as SS58
+    // Try to decode as SS58 - this extracts the raw public key bytes
     const decoded = decodeAddress(input);
 
-    // Re-encode to get normalized form
-    // Try to detect the chain from the prefix
+    // Detect the chain from the prefix for informational purposes
     let chain = 'unknown';
     for (const [prefix, chainName] of Object.entries(SS58_PREFIXES)) {
       try {
@@ -95,10 +95,12 @@ function isPolkadotAddress(input: string): { normalized: string; chain: string }
       }
     }
 
-    // Normalize to generic substrate format (SS58 prefix 42)
-    const normalized = encodeAddress(decoded, 42);
+    // Normalize to hex public key - this is chain-agnostic and will match
+    // regardless of whether user searches with Polkadot, Kusama, or any SS58 format
+    // See: https://forum.polkadot.network/t/unifying-polkadot-ecosystem-address-format/10042
+    const normalized = u8aToHex(decoded);
 
-    return { normalized: normalized.toLowerCase(), chain };
+    return { normalized, chain };
   } catch {
     return null;
   }

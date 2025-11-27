@@ -4,6 +4,7 @@ import { prisma } from '@wisesama/database';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
 import { sendReportVerified, sendReportRejected } from '../../services/email.service';
 import { contributeToPhishing, isGitHubConfigured } from '../../services/github-contribution.service';
+import { normalizeEntityValue } from '../../utils/normalize';
 
 const verifyReportSchema = z.object({
   addToBlacklist: z.boolean().default(true),
@@ -202,7 +203,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
 
         // Add to blacklist if requested
         if (body.addToBlacklist) {
-          const normalizedValue = report.reportedValue.toLowerCase().replace(/^@/, '');
+          const normalizedValue = normalizeEntityValue(report.reportedValue, report.entityType);
 
           // Check if entity already exists
           const existingEntity = await tx.entity.findUnique({
