@@ -50,6 +50,12 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
               createdAt: { type: 'string' },
             },
           },
+          400: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
         },
       },
     },
@@ -170,6 +176,12 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
             type: 'object',
             properties: {
               message: { type: 'string' },
+            },
+          },
+          404: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
             },
           },
         },
