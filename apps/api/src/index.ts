@@ -151,13 +151,6 @@ async function buildApp() {
   return fastify;
 }
 
-// Export for Vercel serverless
-export default async function handler(req: unknown, res: unknown) {
-  const app = await buildApp();
-  await app.ready();
-  app.server.emit('request', req, res);
-}
-
 // For local development
 async function start() {
   try {
