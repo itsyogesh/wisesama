@@ -45,3 +45,36 @@ export interface EntityStats {
   lastSearched?: Date | null;
   firstReported?: Date | null;
 }
+
+export interface MLAnalysisResult {
+  available: boolean;
+  riskScore: number | null;
+  confidence: number | null;
+  recommendation: 'safe' | 'review' | 'high_risk' | null;
+  topFeatures?: Array<{
+    name: string;
+    importance: number;
+    value: number | string;
+  }>;
+}
+
+export interface VirusTotalResult {
+  verdict: 'clean' | 'malicious' | 'suspicious' | 'unknown';
+  positives: number;
+  total: number;
+  scanUrl: string;
+  topEngines?: string[];
+}
+
+export interface TransactionSummary {
+  totalTransactions: number;
+  totalReceived: string;
+  totalSent: string;
+  currentBalance: string;
+  lastActivityAt?: Date | null;
+}
+
+export interface ExternalLinks {
+  blockExplorer?: string;
+  virusTotal?: string;
+}

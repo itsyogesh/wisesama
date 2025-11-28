@@ -1,0 +1,334 @@
+/**
+ * Subscan Service - Feature Extraction for ML Analysis
+ *
+ * Extracts on-chain features from Polkadot/Kusama addresses using Subscan API.
+ * These features are used for ML-based risk scoring.
+ *
+ * Subscan API Docs: https://support.subscan.io/
+ */
+
+import type { MLFeatures } from './ml.service';
+import type { TransactionSummary } from '@wisesama/types';
+
+const SUBSCAN_API_KEY = process.env.SUBSCAN_API_KEY;
+const SUBSCAN_TIMEOUT = 10000; // 10 seconds
+
+interface SubscanAccountInfo {
+  address: string;
+  balance: string;
+  lock: string;
+  balance_lock: string;
+  is_evm_contract: boolean;
+  account_display?: {
+    address: string;
+    display: string;
+    judgements: Array<{ index: number; judgement: string }>;
+    identity: boolean;
+    parent?: { address: string; display: string };
+  };
+  substrate_account?: {
+    address: string;
+    nonce: number;
+  };
+}
+
+interface SubscanTransfer {
+  from: string;
+  to: string;
+  amount: string;
+  success: boolean;
+  block_timestamp: number;
+  extrinsic_index: string;
+}
+
+interface SubscanTransfersResponse {
+  count: number;
+  transfers: SubscanTransfer[] | null;
+}
+
+export class SubscanService {
+  private baseUrls: Record<string, string> = {
+    polkadot: 'https://polkadot.api.subscan.io',
+    kusama: 'https://kusama.api.subscan.io',
+  };
+
+  /**
+   * Extract ML features for an address
+   */
+  async extractFeatures(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<Partial<MLFeatures> | null> {
+    if (!SUBSCAN_API_KEY) {
+      console.warn('Subscan API key not configured');
+      return null;
+    }
+
+    try {
+      // Fetch account info and transfers in parallel
+      const [accountInfo, transfers] = await Promise.all([
+        this.getAccountInfo(address, chain),
+        this.getTransfers(address, chain, 100),
+      ]);
+
+      if (!accountInfo) {
+        return null;
+      }
+
+      return this.computeFeatures(accountInfo, transfers);
+    } catch (error) {
+      console.error('Feature extraction error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get account info from Subscan
+   */
+  private async getAccountInfo(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<SubscanAccountInfo | null> {
+    const baseUrl = this.baseUrls[chain];
+    if (!baseUrl) return null;
+
+    try {
+      const response = await fetch(`${baseUrl}/api/v2/scan/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': SUBSCAN_API_KEY!,
+        },
+        body: JSON.stringify({ key: address }),
+        signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as { data?: { account?: SubscanAccountInfo } };
+      return data.data?.account ?? null;
+    } catch (error) {
+      console.error('Subscan account info error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get recent transfers for an address
+   */
+  private async getTransfers(
+    address: string,
+    chain: 'polkadot' | 'kusama',
+    limit: number = 100
+  ): Promise<SubscanTransfersResponse | null> {
+    const baseUrl = this.baseUrls[chain];
+    if (!baseUrl) return null;
+
+    try {
+      const response = await fetch(`${baseUrl}/api/v2/scan/transfers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': SUBSCAN_API_KEY!,
+        },
+        body: JSON.stringify({
+          address,
+          row: limit,
+          page: 0,
+        }),
+        signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as { data?: SubscanTransfersResponse };
+      return data.data ?? null;
+    } catch (error) {
+      console.error('Subscan transfers error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Compute ML features from Subscan data
+   */
+  private computeFeatures(
+    accountInfo: SubscanAccountInfo,
+    transfers: SubscanTransfersResponse | null
+  ): Partial<MLFeatures> {
+    const transfersList = transfers?.transfers ?? [];
+    const now = Date.now() / 1000;
+
+    // Find account creation time (approximate from first transfer)
+    const sortedTransfers = [...transfersList].sort(
+      (a, b) => a.block_timestamp - b.block_timestamp
+    );
+    const firstTransfer = sortedTransfers[0];
+    const accountAgeHours = firstTransfer
+      ? (now - firstTransfer.block_timestamp) / 3600
+      : 0;
+
+    // Count unique counterparties
+    const counterparties = new Set<string>();
+    let inbound = 0;
+    let outbound = 0;
+    let totalValue = 0;
+    let maxValue = 0;
+    const values: number[] = [];
+    const timestamps: number[] = [];
+
+    for (const tx of transfersList) {
+      if (!tx.success) continue;
+
+      const value = parseFloat(tx.amount) || 0;
+      values.push(value);
+      timestamps.push(tx.block_timestamp);
+      totalValue += value;
+      if (value > maxValue) maxValue = value;
+
+      if (tx.from.toLowerCase() === accountInfo.address.toLowerCase()) {
+        outbound++;
+        counterparties.add(tx.to);
+      } else {
+        inbound++;
+        counterparties.add(tx.from);
+      }
+    }
+
+    // Calculate timing patterns
+    const timeDiffs: number[] = [];
+    for (let i = 1; i < timestamps.length; i++) {
+      timeDiffs.push(timestamps[i]! - timestamps[i - 1]!);
+    }
+    const avgTimeBetweenTx =
+      timeDiffs.length > 0
+        ? timeDiffs.reduce((a, b) => a + b, 0) / timeDiffs.length
+        : 0;
+
+    // Check if recently active (last transfer within 7 days)
+    const lastTransfer = sortedTransfers[sortedTransfers.length - 1];
+    const isActiveNow = lastTransfer
+      ? now - lastTransfer.block_timestamp < 7 * 24 * 3600
+      : false;
+
+    // Count dust transactions (very small amounts, potentially spam)
+    const dustThreshold = 0.001; // 0.001 DOT/KSM
+    const dustTransactions = values.filter((v) => v < dustThreshold).length;
+
+    return {
+      accountAgeHours,
+      hasIdentity: accountInfo.account_display?.identity ?? false,
+      totalTransactions: transfersList.length,
+      avgTransactionsPerDay:
+        accountAgeHours > 0
+          ? (transfersList.length / accountAgeHours) * 24
+          : 0,
+      uniqueCounterparties: counterparties.size,
+      inboundOutboundRatio: outbound > 0 ? inbound / outbound : inbound || 0,
+      avgTransactionValue:
+        values.length > 0
+          ? values.reduce((a, b) => a + b, 0) / values.length
+          : 0,
+      maxTransactionValue: maxValue,
+      totalVolumeUsd: 0, // Would need price feed integration
+      avgTimeBetweenTx,
+      hasRegularPattern: this.detectRegularPattern(timeDiffs),
+      isActiveNow,
+      knownFraudInteractions: 0, // Would need cross-reference with blacklist
+      exchangeInteractions: 0, // Would need exchange address list
+      dustTransactions,
+    };
+  }
+
+  /**
+   * Detect if transfers follow a regular timing pattern (potential bot behavior)
+   */
+  private detectRegularPattern(timeDiffs: number[]): boolean {
+    if (timeDiffs.length < 5) return false;
+
+    const mean =
+      timeDiffs.reduce((a, b) => a + b, 0) / timeDiffs.length;
+    const variance =
+      timeDiffs.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+      timeDiffs.length;
+    const stdDev = Math.sqrt(variance);
+
+    // Coefficient of variation < 0.3 suggests regular pattern
+    const cv = mean > 0 ? stdDev / mean : 0;
+    return cv < 0.3;
+  }
+
+  /**
+   * Get transaction summary for display in UI
+   */
+  async getTransactionSummary(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<TransactionSummary | null> {
+    if (!SUBSCAN_API_KEY) {
+      return null;
+    }
+
+    try {
+      const [accountInfo, transfers] = await Promise.all([
+        this.getAccountInfo(address, chain),
+        this.getTransfers(address, chain, 100),
+      ]);
+
+      if (!accountInfo) {
+        return null;
+      }
+
+      const transfersList = transfers?.transfers ?? [];
+      const symbol = chain === 'polkadot' ? 'DOT' : 'KSM';
+      const decimals = chain === 'polkadot' ? 10 : 12;
+
+      // Calculate totals
+      let totalReceived = 0;
+      let totalSent = 0;
+      let lastActivityAt: Date | null = null;
+
+      for (const tx of transfersList) {
+        if (!tx.success) continue;
+
+        const amount = parseFloat(tx.amount) || 0;
+        if (tx.to.toLowerCase() === address.toLowerCase()) {
+          totalReceived += amount;
+        } else {
+          totalSent += amount;
+        }
+
+        const txDate = new Date(tx.block_timestamp * 1000);
+        if (!lastActivityAt || txDate > lastActivityAt) {
+          lastActivityAt = txDate;
+        }
+      }
+
+      // Parse balance from subscan (already in correct units)
+      const rawBalance = parseFloat(accountInfo.balance) || 0;
+      const currentBalance = rawBalance / Math.pow(10, decimals);
+
+      return {
+        totalTransactions: transfers?.count ?? transfersList.length,
+        totalReceived: `${totalReceived.toFixed(5)} ${symbol}`,
+        totalSent: `${totalSent.toFixed(5)} ${symbol}`,
+        currentBalance: `${currentBalance.toFixed(5)} ${symbol}`,
+        lastActivityAt,
+      };
+    } catch (error) {
+      console.error('Transaction summary error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get block explorer URL for an address
+   */
+  getBlockExplorerUrl(address: string, chain: 'polkadot' | 'kusama'): string {
+    return `https://${chain}.subscan.io/account/${address}`;
+  }
+}

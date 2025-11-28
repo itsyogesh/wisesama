@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { ResultCard } from '@/components/search/result-card';
+import { ResultSkeleton } from '@/components/search/result-skeleton';
 import { SearchBar } from '@/components/search/search-bar';
 
 interface PageProps {
@@ -52,13 +53,7 @@ export default async function CheckPage({ params }: PageProps) {
           </div>
 
           {/* Results */}
-          <Suspense
-            fallback={
-              <div className="animate-pulse">
-                <div className="h-64 bg-gray-800 rounded-xl" />
-              </div>
-            }
-          >
+          <Suspense fallback={<ResultSkeleton />}>
             {result ? (
               <ResultCard result={result} />
             ) : (

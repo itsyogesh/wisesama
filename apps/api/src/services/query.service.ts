@@ -1,12 +1,26 @@
 import { prisma } from '@wisesama/database';
-import type { CheckResponse, RiskLevel, EntityType } from '@wisesama/types';
+import type {
+  CheckResponse,
+  RiskLevel,
+  EntityType,
+  MLAnalysisResult,
+  TransactionSummary,
+  VirusTotalResult,
+  ExternalLinks,
+} from '@wisesama/types';
 import { detectEntityType, normalizeEntity } from '../utils/entity-detector';
 import { LevenshteinService } from './levenshtein.service';
 import { PolkadotService } from './polkadot.service';
+import { MLService } from './ml.service';
+import { SubscanService } from './subscan.service';
+import { VirusTotalService } from './virustotal.service';
 import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
 
 const levenshteinService = new LevenshteinService();
 const polkadotService = new PolkadotService();
+const mlService = new MLService();
+const subscanService = new SubscanService();
+const virusTotalService = new VirusTotalService();
 
 // Cache TTL in seconds
 const CACHE_TTL = 300; // 5 minutes
@@ -58,20 +72,70 @@ export class QueryService {
       judgements?: Array<{ registrarId: number; judgement: string }>;
     } = { hasIdentity: false, isVerified: false };
 
+    // ML analysis for addresses (placeholder - returns unavailable until ML server is configured)
+    let mlAnalysis: MLAnalysisResult | undefined = undefined;
+    let transactionSummary: TransactionSummary | undefined = undefined;
+    let virusTotal: VirusTotalResult | undefined = undefined;
+    let links: ExternalLinks | undefined = undefined;
+
     if (type === 'ADDRESS' && chain) {
-      try {
-        const chainName = chain === 'dot' ? 'polkadot' : chain === 'ksm' ? 'kusama' : null;
-        if (chainName) {
-          const identity = await polkadotService.getIdentity(normalized, chainName);
+      const chainName = (chain === 'dot' || chain === 'polkadot') ? 'polkadot' : (chain === 'ksm' || chain === 'kusama') ? 'kusama' : null;
+
+      if (chainName) {
+        // Fetch identity, ML analysis, and transaction summary in parallel
+        const [identityResult, mlResult, txSummaryResult] = await Promise.allSettled([
+          polkadotService.getIdentity(normalized, chainName),
+          this.getMLAnalysis(normalized, chainName),
+          subscanService.getTransactionSummary(normalized, chainName),
+        ]);
+
+        if (identityResult.status === 'fulfilled') {
+          const identity = identityResult.value;
           identityData = {
             hasIdentity: identity.hasIdentity,
             isVerified: identity.isVerified,
             displayName: identity.identity?.displayName,
             judgements: identity.judgements,
           };
+        } else {
+          console.error('Failed to fetch identity for address:', identityResult.reason);
         }
-      } catch (error) {
-        console.error('Failed to fetch identity for address:', error);
+
+        if (mlResult.status === 'fulfilled' && mlResult.value) {
+          mlAnalysis = mlResult.value;
+        }
+
+        if (txSummaryResult.status === 'fulfilled' && txSummaryResult.value) {
+          transactionSummary = txSummaryResult.value;
+        }
+
+        // If no ML result but we have identity data, create basic ML analysis
+        if (!mlAnalysis && identityData) {
+          mlAnalysis = await this.getMLAnalysisFromIdentity(identityData);
+        }
+
+        // Add block explorer link
+        links = {
+          blockExplorer: subscanService.getBlockExplorerUrl(normalized, chainName),
+        };
+      }
+    }
+
+    // VirusTotal scan for domains
+    if (type === 'DOMAIN') {
+      const vtResult = await virusTotalService.scanDomain(normalized);
+      if (vtResult) {
+        virusTotal = {
+          verdict: vtResult.verdict,
+          positives: vtResult.positives,
+          total: vtResult.total,
+          scanUrl: vtResult.scanUrl,
+          topEngines: vtResult.topEngines,
+        };
+        links = {
+          ...links,
+          virusTotal: vtResult.scanUrl,
+        };
       }
     }
 
@@ -114,6 +178,10 @@ export class QueryService {
         judgements: identityData.judgements,
       },
       lookAlike,
+      mlAnalysis,
+      transactionSummary,
+      virusTotal,
+      links,
       stats: {
         timesSearched: entity?.timesSearched || 1,
         userReports: entity?.userReportCount || 0,
@@ -213,6 +281,62 @@ export class QueryService {
       riskLevel: 'UNKNOWN' as RiskLevel,
       riskScore: null,
       threatCategory: null,
+    };
+  }
+
+  /**
+   * Get ML analysis for an address using Subscan features
+   */
+  private async getMLAnalysis(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<MLAnalysisResult | null> {
+    try {
+      // Extract features from Subscan (optional, for future ML training data)
+      const features = await subscanService.extractFeatures(address, chain);
+
+      if (!features) {
+        // No Subscan data available
+        return null;
+      }
+
+      // Get ML prediction
+      const mlResult = await mlService.getAddressRiskScore(address, chain, features);
+
+      return {
+        available: mlResult.available,
+        riskScore: mlResult.riskScore,
+        confidence: mlResult.confidence,
+        recommendation: mlResult.recommendation,
+        topFeatures: mlResult.topFeatures,
+      };
+    } catch (error) {
+      console.error('ML analysis failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get basic ML analysis using just identity data (when Subscan is unavailable)
+   */
+  private async getMLAnalysisFromIdentity(identityData: {
+    hasIdentity: boolean;
+    isVerified: boolean;
+    displayName?: string | null;
+  }): Promise<MLAnalysisResult> {
+    // Create minimal features from identity data
+    const features = {
+      hasIdentity: identityData.hasIdentity,
+    };
+
+    const mlResult = await mlService.getAddressRiskScore('', 'polkadot', features);
+
+    return {
+      available: mlResult.available,
+      riskScore: mlResult.riskScore,
+      confidence: mlResult.confidence ? mlResult.confidence * 0.5 : null, // Lower confidence without full data
+      recommendation: mlResult.recommendation,
+      topFeatures: mlResult.topFeatures,
     };
   }
 }

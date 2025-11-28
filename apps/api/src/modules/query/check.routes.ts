@@ -56,6 +56,71 @@ export async function checkRoutes(fastify: FastifyInstance) {
                 displayName: { type: ['string', 'null'] },
               },
             },
+            lookAlike: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                isLookAlike: { type: 'boolean' },
+                possibleImpersonating: { type: 'string' },
+                knownHandle: { type: 'string' },
+                similarity: { type: 'number' },
+                warning: { type: 'string' },
+              },
+            },
+            mlAnalysis: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                available: { type: 'boolean' },
+                riskScore: { type: ['number', 'null'] },
+                confidence: { type: ['number', 'null'] },
+                recommendation: { type: ['string', 'null'], enum: ['safe', 'review', 'high_risk', null] },
+                topFeatures: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      name: { type: 'string' },
+                      importance: { type: 'number' },
+                      value: { type: ['string', 'number'] },
+                    },
+                  },
+                },
+              },
+            },
+            transactionSummary: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                totalTransactions: { type: 'number' },
+                totalReceived: { type: 'string' },
+                totalSent: { type: 'string' },
+                currentBalance: { type: 'string' },
+                lastActivityAt: { type: ['string', 'null'] },
+              },
+            },
+            virusTotal: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                verdict: { type: 'string', enum: ['clean', 'malicious', 'suspicious', 'unknown'] },
+                positives: { type: 'number' },
+                total: { type: 'number' },
+                scanUrl: { type: 'string' },
+                topEngines: {
+                  type: 'array',
+                  items: { type: 'string' },
+                },
+              },
+            },
+            links: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                blockExplorer: { type: 'string' },
+                virusTotal: { type: 'string' },
+              },
+            },
             stats: {
               type: 'object',
               properties: {

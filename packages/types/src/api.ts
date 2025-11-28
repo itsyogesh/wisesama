@@ -2,9 +2,13 @@ import type { EntityType, RiskLevel, ThreatCategory } from './entity';
 import type {
   BlacklistResult,
   EntityStats,
+  ExternalLinks,
   IdentityResult,
   LookAlikeResult,
+  MLAnalysisResult,
   RiskAssessment,
+  TransactionSummary,
+  VirusTotalResult,
   WhitelistResult,
 } from './risk';
 
@@ -40,6 +44,10 @@ export interface CheckResponse {
   whitelist: WhitelistResult;
   identity: IdentityResult;
   lookAlike?: LookAlikeResult;
+  mlAnalysis?: MLAnalysisResult;
+  transactionSummary?: TransactionSummary;
+  virusTotal?: VirusTotalResult;
+  links?: ExternalLinks;
   stats: EntityStats;
 }
 

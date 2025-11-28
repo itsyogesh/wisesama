@@ -5,6 +5,7 @@ import { SiteHeader, SiteFooter } from '@/components/layout';
 import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://wisesama.com'),
   title: {
     default: 'Wisesama - Polkadot Fraud Detection',
     template: '%s | Wisesama',
@@ -19,8 +20,13 @@ export const metadata: Metadata = {
     'phishing',
     'scam detection',
     'dotsama',
+    'web3 security',
+    'crypto scam',
+    'wallet check',
   ],
   authors: [{ name: 'Wisesama' }],
+  creator: 'Wisesama',
+  publisher: 'Wisesama',
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -29,12 +35,41 @@ export const metadata: Metadata = {
     title: 'Wisesama - Polkadot Fraud Detection',
     description:
       'Detect crypto fraud, phishing, ransomware, and money laundering in the Polkadot/Dotsama ecosystem.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Wisesama - Polkadot Fraud Detection',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Wisesama - Polkadot Fraud Detection',
     description:
       'Detect crypto fraud, phishing, ransomware, and money laundering in the Polkadot/Dotsama ecosystem.',
+    images: ['/og-image.png'],
+    creator: '@wisesama',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
