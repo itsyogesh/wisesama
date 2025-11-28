@@ -93,7 +93,7 @@ export class SubscanService {
     if (!baseUrl) return null;
 
     try {
-      const response = await fetch(`${baseUrl}/api/v2/scan/search`, {
+      const response = await globalThis.fetch(`${baseUrl}/api/v2/scan/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export class SubscanService {
     if (!baseUrl) return null;
 
     try {
-      const response = await fetch(`${baseUrl}/api/v2/scan/transfers`, {
+      const response = await globalThis.fetch(`${baseUrl}/api/v2/scan/transfers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

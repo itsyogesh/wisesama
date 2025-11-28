@@ -25,9 +25,19 @@ export function HeroSection() {
   };
 
   return (
-    <section className="relative py-16 lg:py-24 overflow-hidden bg-[#1A1A1A]">
+    <section className="relative py-16 lg:py-24 overflow-hidden bg-wisesama-bg">
+      {/* Hero background pattern - subtle grid */}
+      <div
+        className="absolute inset-0 opacity-[0.05] z-0"
+        style={{
+          backgroundImage: 'url(/hero-bg.png)',
+          backgroundSize: '400px',
+          backgroundRepeat: 'repeat',
+        }}
+      />
+
       {/* Decorative corner images */}
-      <div className="absolute left-0 top-[-30px] w-[100px] h-[185px] z-0">
+      <div className="absolute left-0 top-[-30px] w-[100px] h-[185px] z-[1]">
         <Image
           src="/square.png"
           alt=""
@@ -36,7 +46,7 @@ export function HeroSection() {
           className="w-full h-full object-contain"
         />
       </div>
-      <div className="absolute right-0 bottom-[90px] w-[100px] h-[215px] z-0">
+      <div className="absolute right-0 bottom-[90px] w-[100px] h-[215px] z-[1]">
         <Image
           src="/shh.png"
           alt=""
@@ -47,7 +57,7 @@ export function HeroSection() {
       </div>
 
       {/* Background blobs */}
-      <div className="absolute inset-0 overflow-hidden z-0">
+      <div className="absolute inset-0 overflow-hidden z-[1]">
         <div className="absolute top-1/4 left-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-0 w-48 h-48 bg-indigo-800/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/3 right-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
@@ -149,6 +159,8 @@ export function HeroSection() {
               className="w-full h-auto mx-auto"
               priority
             />
+            {/* Gradient fade overlay at bottom - blends illustration to background */}
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-hero-fade pointer-events-none" />
           </motion.div>
         </div>
       </div>

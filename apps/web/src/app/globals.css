@@ -102,3 +102,25 @@
     transform: translateY(-20px);
   }
 }
+
+/* Marquee animation for spam ticker - seamless loop */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 30s linear infinite;
+}
+
+/* Nav gradient text utility */
+.nav-gradient-text {
+  background: linear-gradient(276.7deg, #340062 -26.85%, #D0AAFF 178.46%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

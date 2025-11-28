@@ -36,7 +36,7 @@ const iconVariants = {
 export function FeaturesSection() {
   return (
     <section
-      className="py-20 lg:py-32 relative overflow-visible bg-[#1A1A1A]"
+      className="py-20 lg:py-32 relative overflow-visible bg-wisesama-bg"
       style={{
         backgroundImage: 'url(/allbg.png)',
         backgroundSize: 'auto',
@@ -44,6 +44,11 @@ export function FeaturesSection() {
         backgroundPosition: 'center',
       }}
     >
+      {/* Pink glow effect behind features */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-features-glow opacity-50 pointer-events-none"
+        style={{ filter: 'blur(95px)' }}
+      />
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -59,7 +64,7 @@ export function FeaturesSection() {
 
         {/* 2x2 Grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 lg:gap-16 items-stretch justify-center relative"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch justify-center relative"
           variants={containerVariants}
           initial="hidden"
           whileInView="show"
@@ -68,7 +73,7 @@ export function FeaturesSection() {
           {/* Scan Card */}
           <div className="relative flex flex-col items-center justify-center">
             <motion.div
-              className="absolute -top-10 left-[30%] z-20 pointer-events-none w-[204px] h-[204px] rounded-[50px]"
+              className="absolute -top-16 -left-8 z-20 pointer-events-none w-[204px] h-[204px] rounded-[50px]"
             >
               <Image
                 src="/circless.png"
@@ -84,7 +89,7 @@ export function FeaturesSection() {
               whileHover={{ scale: 1.04 }}
               className="w-full flex justify-center"
             >
-              <Card className="bg-transparent border-white rounded-2xl mt-32 pt-12 pb-6 px-4 min-h-[450px] w-full max-w-[400px] flex flex-col justify-between relative overflow-visible transition-all">
+              <Card className="bg-transparent border-white rounded-2xl mt-32 pt-12 pb-6 px-4 min-h-[400px] w-full max-w-[380px] flex flex-col justify-between relative overflow-visible transition-all">
                 <CardContent className="flex flex-col gap-4 items-start">
                   <motion.div variants={iconVariants}>
                     <Image src="/Icon.png" alt="Scan" width={40} height={40} />
@@ -120,9 +125,9 @@ export function FeaturesSection() {
           <motion.div
             variants={cardVariants}
             whileHover={{ scale: 1.04 }}
-            className="w-full flex justify-center items-center min-h-[460px]"
+            className="w-full flex justify-center items-center min-h-[400px]"
           >
-            <Card className="bg-[url('/card2.png')] bg-cover bg-center rounded-2xl p-10 min-h-[460px] w-full max-w-[400px] border-0 shadow-lg flex flex-col justify-between transition-all">
+            <Card className="bg-[url('/card2.png')] bg-cover bg-center rounded-2xl p-10 min-h-[400px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
               <CardContent className="flex flex-col gap-6 items-start p-0">
                 <motion.div variants={iconVariants}>
                   <Image src="/AlertIcon.png" alt="Report" width={40} height={40} />
@@ -156,9 +161,9 @@ export function FeaturesSection() {
           <motion.div
             variants={cardVariants}
             whileHover={{ scale: 1.04 }}
-            className="w-full flex justify-center items-center min-h-[360px]"
+            className="w-full flex justify-center items-center min-h-[280px]"
           >
-            <Card className="bg-[url('/card3.png')] bg-cover bg-center rounded-2xl p-10 min-h-[320px] w-full max-w-[480px] border-0 shadow-lg flex flex-col justify-between transition-all">
+            <Card className="bg-[url('/card3.png')] bg-cover bg-center rounded-2xl p-10 min-h-[280px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
               <CardContent className="flex flex-col gap-6 items-start p-0">
                 <motion.div variants={iconVariants}>
                   <Image src="/AlertIcon.png" alt="Alerts" width={40} height={40} />
@@ -187,13 +192,13 @@ export function FeaturesSection() {
           </motion.div>
 
           {/* API Docs Card */}
-          <div className="relative flex flex-col items-center justify-center min-h-[520px]">
+          <div className="relative flex flex-col items-center justify-center min-h-[380px]">
             <motion.div
               variants={cardVariants}
               whileHover={{ scale: 1.04 }}
               className="w-full flex justify-center"
             >
-              <Card className="bg-transparent border border-white rounded-2xl p-6 min-h-[420px] w-full max-w-[400px] relative overflow-visible flex flex-col justify-between transition-all">
+              <Card className="bg-transparent border border-white rounded-2xl p-6 min-h-[380px] w-full max-w-[380px] relative overflow-visible flex flex-col justify-between transition-all">
                 <CardContent className="flex flex-col gap-6 items-start p-0">
                   <motion.div variants={iconVariants}>
                     <Image src="/ApiIcon.png" alt="API" width={40} height={40} />

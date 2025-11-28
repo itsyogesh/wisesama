@@ -1,4 +1,11 @@
-import { HeroSection, StatsSection, FeaturesSection } from '@/components/marketing';
+import {
+  HeroSection,
+  StatsSection,
+  FeaturesSection,
+  RecentSpamsTicker,
+  RecentReportsSection,
+  BlogsSection,
+} from '@/components/marketing';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -38,7 +45,10 @@ export default function HomePage() {
       />
       <HeroSection />
       <StatsSection />
+      <RecentSpamsTicker />
       <FeaturesSection />
+      <RecentReportsSection />
+      <BlogsSection />
     </>
   );
 }

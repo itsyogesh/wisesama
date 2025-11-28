@@ -37,7 +37,7 @@ export function SiteHeader() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.3 }}
-            className="bg-gradient-to-r from-purple-300 via-purple-600 to-purple-500 w-full h-10 px-4"
+            className="bg-info-banner w-full h-10 px-4"
           >
             <div className="container mx-auto flex items-center justify-between h-full">
               <div className="flex items-center gap-2 text-white">
@@ -90,10 +90,10 @@ export function SiteHeader() {
                   key={href}
                   href={href}
                   className={cn(
-                    'transition-all duration-300 relative py-2',
+                    'font-heading font-semibold text-base tracking-nav transition-all duration-300 relative py-2',
                     isActive(href)
-                      ? 'text-purple-400 hover:text-purple-300'
-                      : 'text-gray-300 hover:text-white'
+                      ? 'nav-gradient-text'
+                      : 'text-gray-400 hover:text-white'
                   )}
                 >
                   <motion.span
@@ -105,7 +105,7 @@ export function SiteHeader() {
                   {isActive(href) && (
                     <motion.div
                       layoutId="activeNav"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-purple-400"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-wisesama-purple-accent"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
@@ -122,7 +122,9 @@ export function SiteHeader() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Button variant="gradient">Check Address</Button>
+                  <button className="w-[149px] h-[46px] bg-btn-purple rounded-[5px] font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity">
+                    Check Address
+                  </button>
                 </motion.div>
               </Link>
             </div>
@@ -157,10 +159,10 @@ export function SiteHeader() {
                     key={href}
                     href={href}
                     className={cn(
-                      'transition-all duration-300 relative py-2',
+                      'font-heading font-semibold text-base tracking-nav transition-all duration-300 relative py-2',
                       isActive(href)
-                        ? 'text-purple-400 hover:text-purple-300'
-                        : 'text-gray-300 hover:text-white'
+                        ? 'nav-gradient-text'
+                        : 'text-gray-400 hover:text-white'
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -173,7 +175,7 @@ export function SiteHeader() {
                     {isActive(href) && (
                       <motion.div
                         layoutId="activeNavMobile"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-purple-400"
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-wisesama-purple-accent"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
@@ -183,9 +185,9 @@ export function SiteHeader() {
                 ))}
                 <Link href="/check" onClick={() => setMobileMenuOpen(false)}>
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button variant="gradient" className="w-full">
+                    <button className="w-full h-[46px] bg-btn-purple rounded-[5px] font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity">
                       Check Address
-                    </Button>
+                    </button>
                   </motion.div>
                 </Link>
               </motion.div>
