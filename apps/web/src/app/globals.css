@@ -118,6 +118,11 @@
 }
 
 /* Nav gradient text utility */
+/* Heading letter spacing */
+.font-heading {
+  letter-spacing: 0.025em;
+}
+
 .nav-gradient-text {
   background: linear-gradient(276.7deg, #340062 -26.85%, #D0AAFF 178.46%);
   -webkit-background-clip: text;

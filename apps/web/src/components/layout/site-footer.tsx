@@ -8,9 +8,10 @@ import { fadeInUp } from '@/lib/motion';
 
 const footerLinks = {
   company: [
-    { name: 'Check Address', href: '/check' },
-    { name: 'Report Fraud', href: '/report' },
+    { name: 'Scan', href: '/check' },
+    { name: 'Report', href: '/report' },
     { name: 'API Docs', href: '/docs' },
+    { name: 'Blog', href: '/blog' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/privacy-policy' },

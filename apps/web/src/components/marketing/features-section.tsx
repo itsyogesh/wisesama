@@ -57,7 +57,7 @@ export function FeaturesSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="font-heading font-bold text-4xl md:text-5xl text-white mb-4">
+          <h2 className="font-heading font-medium text-4xl md:text-5xl text-white mb-4">
             Our Features
           </h2>
         </motion.div>
@@ -73,14 +73,22 @@ export function FeaturesSection() {
           {/* Scan Card */}
           <div className="relative flex flex-col items-center justify-center">
             <motion.div
-              className="absolute -top-16 -left-8 z-20 pointer-events-none w-[204px] h-[204px] rounded-[50px]"
+              className="absolute -top-8 -left-4 z-20 pointer-events-none w-[180px] h-[180px]"
+              animate={{
+                rotate: [0, 360],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 20,
+                ease: 'linear',
+              }}
             >
               <Image
                 src="/circless.png"
                 alt=""
-                width={120}
-                height={150}
-                className="w-full h-full object-contain mt-16"
+                width={180}
+                height={180}
+                className="w-full h-full object-contain"
               />
             </motion.div>
 

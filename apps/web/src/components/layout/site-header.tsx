@@ -12,8 +12,7 @@ import { springTransition } from '@/lib/motion';
 
 const navItems = [
   { name: 'Home', href: '/' },
-  { name: 'Check Entity', href: '/check' },
-  { name: 'Report Fraud', href: '/report' },
+  { name: 'Report', href: '/report' },
   { name: 'API Docs', href: '/docs' },
 ];
 
@@ -39,7 +38,7 @@ export function SiteHeader() {
             transition={{ duration: 0.3 }}
             className="bg-info-banner w-full h-10 px-4"
           >
-            <div className="container mx-auto flex items-center justify-between h-full">
+            <div className="container mx-auto flex items-center justify-center h-full relative">
               <div className="flex items-center gap-2 text-white">
                 <Info className="h-4 w-4" />
                 <span className="font-heading font-semibold text-sm">
@@ -50,7 +49,7 @@ export function SiteHeader() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowInfoBanner(false)}
-                className="text-white hover:text-gray-200 transition-colors"
+                className="absolute right-0 text-white hover:text-gray-200 transition-colors"
               >
                 <X className="h-4 w-4" />
               </motion.button>
@@ -90,7 +89,7 @@ export function SiteHeader() {
                   key={href}
                   href={href}
                   className={cn(
-                    'font-heading font-semibold text-base tracking-nav transition-all duration-300 relative py-2',
+                    'font-heading font-semibold text-base tracking-wide transition-all duration-300 relative py-2',
                     isActive(href)
                       ? 'nav-gradient-text'
                       : 'text-gray-400 hover:text-white'
@@ -159,7 +158,7 @@ export function SiteHeader() {
                     key={href}
                     href={href}
                     className={cn(
-                      'font-heading font-semibold text-base tracking-nav transition-all duration-300 relative py-2',
+                      'font-heading font-semibold text-base tracking-wide transition-all duration-300 relative py-2',
                       isActive(href)
                         ? 'nav-gradient-text'
                         : 'text-gray-400 hover:text-white'

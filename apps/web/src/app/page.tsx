@@ -6,6 +6,7 @@ import {
   RecentReportsSection,
   BlogsSection,
 } from '@/components/marketing';
+import { getAllPosts, formatDate } from '@/lib/blog';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -37,6 +38,11 @@ const jsonLd = {
 };
 
 export default function HomePage() {
+  const posts = getAllPosts().map((post) => ({
+    ...post,
+    date: formatDate(post.date),
+  }));
+
   return (
     <>
       <script
@@ -48,7 +54,7 @@ export default function HomePage() {
       <RecentSpamsTicker />
       <FeaturesSection />
       <RecentReportsSection />
-      <BlogsSection />
+      <BlogsSection posts={posts} />
     </>
   );
 }

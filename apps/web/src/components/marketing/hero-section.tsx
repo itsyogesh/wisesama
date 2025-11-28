@@ -26,13 +26,14 @@ export function HeroSection() {
 
   return (
     <section className="relative py-16 lg:py-24 overflow-hidden bg-wisesama-bg">
-      {/* Hero background pattern - subtle grid */}
+      {/* Hero background image */}
       <div
-        className="absolute inset-0 opacity-[0.05] z-0"
+        className="absolute inset-0 z-0"
         style={{
           backgroundImage: 'url(/hero-bg.png)',
-          backgroundSize: '400px',
-          backgroundRepeat: 'repeat',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
         }}
       />
 
@@ -56,7 +57,7 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Background blobs */}
+      {/* Background blobs for purple glow effect */}
       <div className="absolute inset-0 overflow-hidden z-[1]">
         <div className="absolute top-1/4 left-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-0 w-48 h-48 bg-indigo-800/5 rounded-full blur-3xl" />
@@ -125,14 +126,13 @@ export function HeroSection() {
             className="flex gap-4 mb-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="gradient"
-                className="w-[150px] h-12 rounded-xl font-medium"
+              <button
+                className="w-[150px] h-12 bg-btn-purple rounded-[5px] font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity"
                 type="submit"
                 onClick={() => handleSearch()}
               >
                 Search
-              </Button>
+              </button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
@@ -152,7 +152,7 @@ export function HeroSection() {
             className="relative w-full max-w-4xl"
           >
             <Image
-              src="/illustration.svg"
+              src="/illustration.png"
               alt="Scam detection illustration"
               width={800}
               height={400}

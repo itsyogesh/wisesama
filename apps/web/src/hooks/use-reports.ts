@@ -118,3 +118,30 @@ export function useSubmitReport() {
     },
   });
 }
+
+// Flagged entities from blacklist (polkadot-js phishing list)
+export interface FlaggedEntity {
+  id: string;
+  value: string;
+  entityType: string;
+  riskLevel: string;
+  threatCategory: string | null;
+  createdAt: string;
+}
+
+async function fetchRecentFlaggedEntities(limit = 5): Promise<{ entities: FlaggedEntity[] }> {
+  const res = await fetch(`${API_URL}/api/v1/stats/recent-flagged?limit=${limit}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch recent flagged entities');
+  }
+  const json = await res.json();
+  return json.data || json;
+}
+
+export function useRecentFlaggedEntities(limit = 5) {
+  return useQuery({
+    queryKey: ['recent-flagged-entities', limit],
+    queryFn: () => fetchRecentFlaggedEntities(limit),
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}

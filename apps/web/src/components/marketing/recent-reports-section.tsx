@@ -1,7 +1,7 @@
 'use client';
 
-import { Copy, ExternalLink } from 'lucide-react';
-import { useVerifiedReports } from '@/hooks/use-reports';
+import { Copy } from 'lucide-react';
+import { useRecentFlaggedEntities } from '@/hooks/use-reports';
 import {
   Table,
   TableBody,
@@ -26,7 +26,7 @@ function formatDate(dateString: string): string {
 }
 
 export function RecentReportsSection() {
-  const { data, isLoading } = useVerifiedReports(1, 5);
+  const { data, isLoading } = useRecentFlaggedEntities(5);
 
   return (
     <section className="py-16 bg-wisesama-bg">
@@ -39,7 +39,7 @@ export function RecentReportsSection() {
       <div className="container mx-auto px-4 relative">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="font-heading font-bold text-3xl md:text-4xl text-white mb-4">
+          <h2 className="font-heading font-medium text-3xl md:text-4xl text-white mb-4">
             Checkout the last reported
             <br />
             addresses, tokens
@@ -53,9 +53,9 @@ export function RecentReportsSection() {
               <TableHeader>
                 <TableRow className="border-b border-zinc-800 hover:bg-transparent">
                   <TableHead className="text-gray-400 font-semibold">Address</TableHead>
-                  <TableHead className="text-gray-400 font-semibold">Reported</TableHead>
+                  <TableHead className="text-gray-400 font-semibold">Added</TableHead>
                   <TableHead className="text-gray-400 font-semibold text-center">Type</TableHead>
-                  <TableHead className="text-gray-400 font-semibold text-right">Status</TableHead>
+                  <TableHead className="text-gray-400 font-semibold text-right">Risk</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -77,16 +77,16 @@ export function RecentReportsSection() {
                       </TableCell>
                     </TableRow>
                   ))
-                ) : data?.reports && data.reports.length > 0 ? (
-                  data.reports.map((report) => (
-                    <TableRow key={report.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
+                ) : data?.entities && data.entities.length > 0 ? (
+                  data.entities.map((entity) => (
+                    <TableRow key={entity.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30">
                       <TableCell className="text-white">
                         <div className="flex items-center gap-2">
                           <span className="font-mono text-sm">
-                            {truncateAddress(report.reportedValue)}
+                            {truncateAddress(entity.value)}
                           </span>
                           <button
-                            onClick={() => navigator.clipboard.writeText(report.reportedValue)}
+                            onClick={() => navigator.clipboard.writeText(entity.value)}
                             className="text-gray-500 hover:text-white transition-colors"
                             title="Copy address"
                           >
@@ -95,20 +95,20 @@ export function RecentReportsSection() {
                         </div>
                       </TableCell>
                       <TableCell className="text-gray-400">
-                        {formatDate(report.createdAt)}
+                        {formatDate(entity.createdAt)}
                       </TableCell>
                       <TableCell className="text-center">
                         <span className="px-2 py-1 text-xs font-medium rounded bg-purple-600/20 text-purple-400">
-                          {report.entityType}
+                          {entity.entityType}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className={`px-2 py-1 text-xs font-medium rounded ${
-                          report.status === 'VERIFIED'
+                          entity.riskLevel === 'FRAUD'
                             ? 'bg-red-600/20 text-red-400'
                             : 'bg-yellow-600/20 text-yellow-400'
                         }`}>
-                          {report.status}
+                          {entity.riskLevel}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -116,7 +116,7 @@ export function RecentReportsSection() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-gray-500 py-8">
-                      No reports found
+                      No flagged entities found
                     </TableCell>
                   </TableRow>
                 )}
