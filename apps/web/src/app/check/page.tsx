@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 async function fetchEntityCheck(entity: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
   try {
     const res = await fetch(`${apiUrl}/api/v1/check/${encodeURIComponent(entity)}`, {

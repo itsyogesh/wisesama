@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const API_BASE_URL = 'https://wisesama-api.vercel.app';
+const API_BASE_URL = 'https://api.wisesama.com';
 
 interface EndpointProps {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';

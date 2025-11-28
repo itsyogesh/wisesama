@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
 const scamTypes = [
   { value: 'phishing', label: 'Phishing' },

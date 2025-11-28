@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Check, Key, Eye, EyeOff, Trash2, Loader2 } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
 interface ApiKey {
   id: string;

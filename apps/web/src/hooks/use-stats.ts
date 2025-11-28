@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
 export interface PlatformStats {
   totalReports: number;

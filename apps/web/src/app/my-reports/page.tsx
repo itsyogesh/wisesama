@@ -16,7 +16,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://wisesama-api.vercel.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
 interface Report {
   id: string;
