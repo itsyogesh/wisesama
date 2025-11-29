@@ -1,3 +1,5 @@
+'use client';
+
 import { ExternalLink, CheckCircle, XCircle, HelpCircle, AlertTriangle, Twitter, Globe, MessageSquare, User, Copy, Link2 } from 'lucide-react';
 import { useState } from 'react';
 import type { CheckResponse, EntityType } from '@wisesama/types';
