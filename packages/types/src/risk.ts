@@ -25,6 +25,9 @@ export interface IdentityResult {
   hasIdentity: boolean;
   isVerified: boolean;
   displayName?: string | null;
+  twitter?: string | null;
+  web?: string | null;
+  riot?: string | null;
   judgements?: Array<{
     registrarId: number;
     judgement: string;
@@ -77,4 +80,28 @@ export interface TransactionSummary {
 export interface ExternalLinks {
   blockExplorer?: string;
   virusTotal?: string;
+}
+
+// Identity source for unified identity storage
+export type IdentitySource = 'POLKADOT_PEOPLE' | 'KUSAMA_PEOPLE' | 'KILT';
+
+// Linked identity for reverse lookups (Twitter/Domain -> addresses)
+export interface LinkedIdentity {
+  address: string;
+  chain: string; // 'polkadot' | 'kusama'
+  displayName: string | null;
+  isVerified: boolean;
+  source: IdentitySource;
+  matchedField: 'twitter' | 'web';
+  judgements?: Array<{
+    registrarId: number;
+    judgement: string;
+  }>;
+}
+
+export interface LinkedIdentitiesResult {
+  found: boolean;
+  count: number;
+  identities: LinkedIdentity[];
+  hasMore?: boolean; // If more than 10 results
 }

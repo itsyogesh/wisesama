@@ -50,4 +50,6 @@ export const cacheKeys = {
   identity: (address: string, chain: string) => `identity:${chain}:${address}`,
   whitelist: (type: string, value: string) => `whitelist:${type}:${value}`,
   syncStatus: () => 'sync:status',
+  reverseTwitter: (handle: string) => `reverse:twitter:${handle}`,
+  reverseDomain: (domain: string) => `reverse:domain:${domain}`,
 };

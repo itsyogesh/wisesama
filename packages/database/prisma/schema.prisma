@@ -34,6 +34,13 @@ enum ThreatCategory {
   OTHER
 }
 
+// Identity source for unified identity storage
+enum IdentitySource {
+  POLKADOT_PEOPLE // Polkadot People Chain identity
+  KUSAMA_PEOPLE   // Kusama People Chain identity
+  KILT            // KILT DID (future support)
+}
+
 model Chain {
   id                  Int                 @id @default(autoincrement())
   code                String              @unique // 'dot', 'ksm', 'astr'
@@ -43,7 +50,8 @@ model Chain {
   explorerUrl         String?
   isActive            Boolean             @default(true)
   entities            Entity[]
-  identities          PolkadotIdentity[]
+  polkadotIdentities  PolkadotIdentity[]  @relation("polkadotIdentities") // Legacy
+  identities          Identity[]          @relation("identities") // New unified
   whitelistedEntities WhitelistedEntity[]
 }
 
@@ -85,11 +93,12 @@ model Entity {
   @@index([source])
 }
 
+// Legacy identity table - will be migrated to Identity
 model PolkadotIdentity {
   id      String @id @default(cuid())
   address String
   chainId Int
-  chain   Chain  @relation(fields: [chainId], references: [id])
+  chain   Chain  @relation("polkadotIdentities", fields: [chainId], references: [id])
 
   // Identity fields
   displayName String?
@@ -113,6 +122,48 @@ model PolkadotIdentity {
   @@unique([address, chainId])
   @@index([address])
   @@index([isVerified])
+}
+
+// Unified identity table supporting multiple sources (People chains, KILT, etc.)
+model Identity {
+  id      String         @id @default(cuid())
+  address String
+  source  IdentitySource
+
+  // Optional chain relation (for filtering by ecosystem)
+  chainId Int?
+  chain   Chain? @relation("identities", fields: [chainId], references: [id])
+
+  // Identity fields (normalized on write)
+  displayName String?
+  legalName   String?
+  email       String?
+  twitter     String? // Normalized: lowercase, no @ prefix
+  web         String? // Normalized: lowercase, no protocol/www
+  riot        String?
+
+  // KILT-specific fields (for future use)
+  kiltDid           String?
+  kiltCredentialUri String?
+
+  // Verification
+  hasIdentity Boolean @default(false)
+  isVerified  Boolean @default(false)
+  judgements  Json    @default("[]") // [{registrar_id, judgement}]
+
+  lastSyncedAt DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Composite unique: same address can have identities from different sources
+  @@unique([address, source])
+  @@index([address])
+  @@index([source])
+  @@index([isVerified])
+  @@index([twitter])           // For reverse lookups
+  @@index([web])               // For reverse lookups
+  @@index([twitter, isVerified])
+  @@index([web, isVerified])
 }
 
 enum UserRole {

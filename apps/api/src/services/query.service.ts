@@ -7,6 +7,7 @@ import type {
   TransactionSummary,
   VirusTotalResult,
   ExternalLinks,
+  LinkedIdentitiesResult,
 } from '@wisesama/types';
 import { detectEntityType, normalizeEntity } from '../utils/entity-detector';
 import { LevenshteinService } from './levenshtein.service';
@@ -14,6 +15,7 @@ import { PolkadotService } from './polkadot.service';
 import { MLService } from './ml.service';
 import { SubscanService } from './subscan.service';
 import { VirusTotalService } from './virustotal.service';
+import { ReverseLookupService } from './reverse-lookup.service';
 import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
 
 const levenshteinService = new LevenshteinService();
@@ -21,6 +23,7 @@ const polkadotService = new PolkadotService();
 const mlService = new MLService();
 const subscanService = new SubscanService();
 const virusTotalService = new VirusTotalService();
+const reverseLookupService = new ReverseLookupService();
 
 // Cache TTL in seconds
 const CACHE_TTL = 300; // 5 minutes
@@ -58,10 +61,16 @@ export class QueryService {
       },
     });
 
-    // Check for look-alike (impersonation) if it's a Twitter handle
+    // Check for look-alike (impersonation) and reverse lookup if it's a Twitter handle
     let lookAlike = undefined;
+    let linkedIdentities: LinkedIdentitiesResult | undefined = undefined;
     if (type === 'TWITTER') {
-      lookAlike = await levenshteinService.checkImpersonation(normalized, 'twitter');
+      const [lookAlikeResult, reverseLookupResult] = await Promise.allSettled([
+        levenshteinService.checkImpersonation(normalized, 'twitter'),
+        reverseLookupService.findByTwitter(normalized),
+      ]);
+      lookAlike = lookAlikeResult.status === 'fulfilled' ? lookAlikeResult.value : undefined;
+      linkedIdentities = reverseLookupResult.status === 'fulfilled' ? reverseLookupResult.value : undefined;
     }
 
     // Fetch on-chain identity for addresses
@@ -69,6 +78,9 @@ export class QueryService {
       hasIdentity: boolean;
       isVerified: boolean;
       displayName?: string | null;
+      twitter?: string | null;
+      web?: string | null;
+      riot?: string | null;
       judgements?: Array<{ registrarId: number; judgement: string }>;
     } = { hasIdentity: false, isVerified: false };
 
@@ -79,7 +91,14 @@ export class QueryService {
     let links: ExternalLinks | undefined = undefined;
 
     if (type === 'ADDRESS' && chain) {
-      const chainName = (chain === 'dot' || chain === 'polkadot') ? 'polkadot' : (chain === 'ksm' || chain === 'kusama') ? 'kusama' : null;
+      // Map chain to network name for identity lookup
+      // 'substrate' (SS58 prefix 42) is treated as polkadot since it's the generic format
+      // and many Polkadot accounts use this prefix
+      const chainName = (chain === 'dot' || chain === 'polkadot' || chain === 'substrate')
+        ? 'polkadot'
+        : (chain === 'ksm' || chain === 'kusama')
+          ? 'kusama'
+          : null;
 
       if (chainName) {
         // Fetch identity, ML analysis, and transaction summary in parallel
@@ -95,6 +114,9 @@ export class QueryService {
             hasIdentity: identity.hasIdentity,
             isVerified: identity.isVerified,
             displayName: identity.identity?.displayName,
+            twitter: identity.identity?.twitter,
+            web: identity.identity?.web,
+            riot: identity.identity?.riot,
             judgements: identity.judgements,
           };
         } else {
@@ -121,21 +143,29 @@ export class QueryService {
       }
     }
 
-    // VirusTotal scan for domains
+    // VirusTotal scan and reverse lookup for domains
     if (type === 'DOMAIN') {
-      const vtResult = await virusTotalService.scanDomain(normalized);
-      if (vtResult) {
+      const [vtResult, reverseLookupResult] = await Promise.allSettled([
+        virusTotalService.scanDomain(normalized),
+        reverseLookupService.findByDomain(normalized),
+      ]);
+
+      if (vtResult.status === 'fulfilled' && vtResult.value) {
         virusTotal = {
-          verdict: vtResult.verdict,
-          positives: vtResult.positives,
-          total: vtResult.total,
-          scanUrl: vtResult.scanUrl,
-          topEngines: vtResult.topEngines,
+          verdict: vtResult.value.verdict,
+          positives: vtResult.value.positives,
+          total: vtResult.value.total,
+          scanUrl: vtResult.value.scanUrl,
+          topEngines: vtResult.value.topEngines,
         };
         links = {
           ...links,
-          virusTotal: vtResult.scanUrl,
+          virusTotal: vtResult.value.scanUrl,
         };
+      }
+
+      if (reverseLookupResult.status === 'fulfilled' && reverseLookupResult.value) {
+        linkedIdentities = reverseLookupResult.value;
       }
     }
 
@@ -175,6 +205,9 @@ export class QueryService {
         hasIdentity: identityData.hasIdentity,
         isVerified: identityData.isVerified,
         displayName: identityData.displayName,
+        twitter: identityData.twitter,
+        web: identityData.web,
+        riot: identityData.riot,
         judgements: identityData.judgements,
       },
       lookAlike,
@@ -182,6 +215,7 @@ export class QueryService {
       transactionSummary,
       virusTotal,
       links,
+      linkedIdentities,
       stats: {
         timesSearched: entity?.timesSearched || 1,
         userReports: entity?.userReportCount || 0,
@@ -220,7 +254,12 @@ export class QueryService {
     entity: { riskLevel: RiskLevel; source: string; userReportCount: number } | null,
     whitelisted: { name: string } | null,
     lookAlike: { isLookAlike: boolean; similarity?: number } | undefined,
-    identity: { hasIdentity: boolean; isVerified: boolean } = { hasIdentity: false, isVerified: false }
+    identity: {
+      hasIdentity: boolean;
+      isVerified: boolean;
+      twitter?: string | null;
+      web?: string | null;
+    } = { hasIdentity: false, isVerified: false }
   ) {
     // 1. Whitelisted = SAFE
     if (whitelisted) {
@@ -258,20 +297,25 @@ export class QueryService {
       };
     }
 
+    // Check for social links presence
+    const hasSocialLinks = !!(identity.twitter || identity.web);
+
     // 5. Verified on-chain identity = LOW_RISK (trusted but not whitelisted)
+    // Lower score if they have verified social links (more transparent)
     if (identity.isVerified) {
       return {
         riskLevel: 'LOW_RISK' as RiskLevel,
-        riskScore: 20,
+        riskScore: hasSocialLinks ? 15 : 20,
         threatCategory: null,
       };
     }
 
     // 6. Has identity but not verified = slightly better than unknown
+    // Having social links demonstrates more transparency
     if (identity.hasIdentity) {
       return {
         riskLevel: 'UNKNOWN' as RiskLevel,
-        riskScore: 40,
+        riskScore: hasSocialLinks ? 35 : 40,
         threatCategory: null,
       };
     }

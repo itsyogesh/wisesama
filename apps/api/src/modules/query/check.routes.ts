@@ -54,6 +54,19 @@ export async function checkRoutes(fastify: FastifyInstance) {
                 hasIdentity: { type: 'boolean' },
                 isVerified: { type: 'boolean' },
                 displayName: { type: ['string', 'null'] },
+                twitter: { type: ['string', 'null'] },
+                web: { type: ['string', 'null'] },
+                riot: { type: ['string', 'null'] },
+                judgements: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      registrarId: { type: 'number' },
+                      judgement: { type: 'string' },
+                    },
+                  },
+                },
               },
             },
             lookAlike: {
@@ -119,6 +132,39 @@ export async function checkRoutes(fastify: FastifyInstance) {
               properties: {
                 blockExplorer: { type: 'string' },
                 virusTotal: { type: 'string' },
+              },
+            },
+            linkedIdentities: {
+              type: 'object',
+              nullable: true,
+              properties: {
+                found: { type: 'boolean' },
+                count: { type: 'number' },
+                identities: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      address: { type: 'string' },
+                      chain: { type: 'string' },
+                      displayName: { type: ['string', 'null'] },
+                      isVerified: { type: 'boolean' },
+                      source: { type: 'string', enum: ['POLKADOT_PEOPLE', 'KUSAMA_PEOPLE', 'KILT'] },
+                      matchedField: { type: 'string', enum: ['twitter', 'web'] },
+                      judgements: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            registrarId: { type: 'number' },
+                            judgement: { type: 'string' },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+                hasMore: { type: 'boolean' },
               },
             },
             stats: {

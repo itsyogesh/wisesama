@@ -4,6 +4,7 @@ import type {
   EntityStats,
   ExternalLinks,
   IdentityResult,
+  LinkedIdentitiesResult,
   LookAlikeResult,
   MLAnalysisResult,
   RiskAssessment,
@@ -49,6 +50,7 @@ export interface CheckResponse {
   virusTotal?: VirusTotalResult;
   links?: ExternalLinks;
   stats: EntityStats;
+  linkedIdentities?: LinkedIdentitiesResult;
 }
 
 // Report submission
