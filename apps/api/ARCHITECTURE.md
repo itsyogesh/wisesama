@@ -4,7 +4,9 @@
 
 ## Overview
 
-Wisesama is a fraud detection API for the Polkadot ecosystem. It provides real-time risk assessment for addresses, domains, Twitter handles, and emails by aggregating data from the official polkadot-js/phishing repository, community reports, and on-chain identity data.
+Wisesama is a fraud detection API for the Polkadot ecosystem. It provides real-time risk assessment for addresses, domains, Twitter handles, and emails by aggregating data from the official polkadot-js/phishing repository, community reports, on-chain identity data, and behavioral analysis.
+
+> **See Also:** [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed documentation on the ML risk scoring system, feature extraction, and data sources.
 
 ## Tech Stack
 
@@ -105,18 +107,102 @@ POST /check/batch     - Check multiple entities (max 50)
 {
   "meta": { "requestId": "...", "timestamp": "...", "processingTimeMs": 123 },
   "data": {
-    "entity": "example.com",
-    "entityType": "DOMAIN",
+    "entity": "155dDX3rWoNsY4aiJFbsu6wLB91c2J2Ws5BgMfJKyM1eGnkS",
+    "entityType": "ADDRESS",
+    "chain": "polkadot",
     "assessment": {
-      "riskLevel": "FRAUD",
-      "riskScore": 95,
-      "threatCategory": "PHISHING"
+      "riskLevel": "UNKNOWN",
+      "riskScore": 45,
+      "threatCategory": null
     },
-    "blacklist": { "found": true, "source": "polkadot-js-phishing", "threatName": "..." },
+    "blacklist": { "found": false },
     "whitelist": { "found": false },
-    "identity": { "hasIdentity": false, "isVerified": false },
+    "identity": {
+      "hasIdentity": true,
+      "isVerified": false,
+      "displayName": "MyAccount",
+      "judgements": []
+    },
     "lookAlike": null,
-    "stats": { "timesSearched": 42, "userReports": 3 }
+    "mlAnalysis": {
+      "available": true,
+      "riskScore": 45,
+      "confidence": 0.72,
+      "recommendation": "review",
+      "topFeatures": [
+        { "name": "hasIdentity", "description": "Has registered on-chain identity", "score": -20, "importance": 0.95 }
+      ]
+    },
+    "transactionSummary": {
+      "totalReceived": "1234.5678",
+      "totalSent": "1000.0000",
+      "balance": "234.5678",
+      "lastActivityAt": "2025-01-15T10:30:00Z"
+    },
+    "virusTotal": null,
+    "stats": { "timesSearched": 42, "userReports": 0 },
+    "links": {
+      "subscan": "https://polkadot.subscan.io/account/155dDX3...",
+      "polkadotJs": "https://polkadot.js.org/apps/#/accounts"
+    }
+  }
+}
+```
+
+**Domain Response (includes VirusTotal and linkedIdentities):**
+```json
+{
+  "data": {
+    "entity": "polkadot.pro",
+    "entityType": "DOMAIN",
+    "virusTotal": {
+      "scanned": true,
+      "verdict": "clean",
+      "stats": { "malicious": 0, "suspicious": 0, "undetected": 70, "harmless": 10 },
+      "topDetections": []
+    },
+    "linkedIdentities": {
+      "found": true,
+      "count": 1,
+      "identities": [
+        {
+          "address": "13fSxnoq...",
+          "chain": "polkadot",
+          "displayName": "Pro Polkadot",
+          "isVerified": true,
+          "source": "POLKADOT_PEOPLE",
+          "matchedField": "web",
+          "judgements": [{ "registrarId": 1, "judgement": "Reasonable" }]
+        }
+      ],
+      "hasMore": false
+    }
+  }
+}
+```
+
+**Twitter Response (includes lookAlike and linkedIdentities):**
+```json
+{
+  "data": {
+    "entity": "@propolkadot",
+    "entityType": "TWITTER",
+    "lookAlike": { "isLookAlike": false },
+    "linkedIdentities": {
+      "found": true,
+      "count": 1,
+      "identities": [
+        {
+          "address": "13fSxnoq...",
+          "chain": "polkadot",
+          "displayName": "Pro Polkadot",
+          "isVerified": true,
+          "source": "POLKADOT_PEOPLE",
+          "matchedField": "twitter",
+          "judgements": [{ "registrarId": 1, "judgement": "Reasonable" }]
+        }
+      ]
+    }
   }
 }
 ```
@@ -268,6 +354,48 @@ Automates upstream contributions:
 
 Detects impersonation attacks by comparing Twitter handles against whitelisted accounts using string similarity (threshold: 70%).
 
+### MLService
+
+**File:** `src/services/ml.service.ts`
+
+Behavioral risk scoring using weighted heuristics:
+- Extracts 21 features from on-chain data
+- Applies rule-based scoring algorithm
+- Returns risk score (0-100), confidence, and recommendation
+- Provides explainable top risk factors
+
+> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed scoring algorithm.
+
+### SubscanService
+
+**File:** `src/services/subscan.service.ts`
+
+On-chain data extraction via Subscan API:
+- Account information (balance, nonce, identity flag)
+- Recent transfers (last 100 transactions)
+- Transaction summary (total received/sent/balance)
+- Feature extraction for ML analysis
+
+### VirusTotalService
+
+**File:** `src/services/virustotal.service.ts`
+
+Domain security scanning via VirusTotal API:
+- Queries 80+ antivirus engines
+- Returns verdict (malicious/suspicious/clean/unknown)
+- Provides top detections with engine names
+
+### ReverseLookupService
+
+**File:** `src/services/reverse-lookup.service.ts`
+
+Finds on-chain identities by their social links:
+- `findByTwitter(handle)` - Find identities that registered a Twitter handle
+- `findByDomain(domain)` - Find identities that registered a website domain
+- Queries unified `Identity` table (normalized twitter/web fields)
+- Returns up to 10 linked identities with verification status
+- Cached in Redis (30-min TTL)
+
 ### EmailService
 
 **File:** `src/services/email.service.ts`
@@ -299,11 +427,21 @@ WhitelistedEntity       # Verified safe entities
 ├── identityId → PolkadotIdentity
 └── source, verifiedAt, verifiedBy
 
-PolkadotIdentity        # On-chain identity cache
+PolkadotIdentity        # On-chain identity cache (legacy)
 ├── id, address, chainId → Chain
 ├── displayName, legalName, email, twitter, web
 ├── hasIdentity, isVerified
 └── judgements (JSON)
+
+Identity                # Unified identity table (for reverse lookups)
+├── id, address, source (POLKADOT_PEOPLE | KUSAMA_PEOPLE | KILT)
+├── chainId → Chain
+├── displayName, legalName, email
+├── twitter (normalized: lowercase, no @)
+├── web (normalized: domain only, no protocol)
+├── riot, hasIdentity, isVerified
+├── judgements (JSON)
+└── lastSyncedAt
 ```
 
 ### User & Auth
@@ -373,19 +511,29 @@ Client Request
 └────────┬────────┘
          │
          ▼
-┌─────────────────┐
-│  QueryService   │
-├─────────────────┤
-│ 1. Detect type  │  entity-detector.ts
-│ 2. Normalize    │  normalize.ts
-│ 3. Check cache  │  Redis (5 min TTL)
-│ 4. Query DB     │  Prisma
-│ 5. Get identity │  PolkadotService (if ADDRESS)
-│ 6. Check alike  │  LevenshteinService (if TWITTER)
-│ 7. Calc risk    │
-│ 8. Record stats │
-│ 9. Cache result │
-└────────┬────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  QueryService                                                │
+├─────────────────────────────────────────────────────────────┤
+│ 1. Detect type & chain    │  entity-detector.ts             │
+│ 2. Normalize to hex       │  @polkadot/util-crypto          │
+│ 3. Check cache            │  Redis (5 min TTL)              │
+├─────────────────────────────────────────────────────────────┤
+│ 4. PARALLEL DATA FETCHING (if cache miss):                  │
+│    ├─ Database lookups    │  Blacklist, whitelist, reports  │
+│    ├─ Polkadot RPC        │  Identity & judgements          │
+│    ├─ Subscan API         │  Transfers & account info       │
+│    └─ VirusTotal          │  Domain scanning (if DOMAIN)    │
+├─────────────────────────────────────────────────────────────┤
+│ 5. ML Analysis            │  MLService (if ADDRESS)         │
+│    ├─ Extract 21 features │  From Subscan data              │
+│    ├─ Apply heuristics    │  Weighted risk scoring          │
+│    └─ Generate top factors│  Explainable AI                 │
+├─────────────────────────────────────────────────────────────┤
+│ 6. Risk Calculation       │  Priority-based assessment      │
+│ 7. Check look-alike       │  LevenshteinService (if TWITTER)│
+│ 8. Record stats           │  Search analytics               │
+│ 9. Cache result           │  Redis (5 min TTL)              │
+└────────┬────────────────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────┐
@@ -395,6 +543,8 @@ Client Request
          ▼
     JSON Response
 ```
+
+> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed data flow diagram.
 
 ### Report Verification Flow
 
@@ -424,6 +574,8 @@ Admin: PUT /admin/reports/:id/verify
 | `entity:{TYPE}:{normalized}` | 5 min | Entity lookup results |
 | `identity:{chain}:{address}` | 1 hour | On-chain identity |
 | `whitelist:{TYPE}:{normalized}` | 5 min | Whitelist lookup |
+| `reverse:twitter:{handle}` | 30 min | Twitter → identities lookup |
+| `reverse:domain:{domain}` | 30 min | Domain → identities lookup |
 | `sync:status` | - | Current sync state |
 
 ---
@@ -492,6 +644,12 @@ JWT_EXPIRES_IN=7d
 # Polkadot RPC
 POLKADOT_RPC=wss://rpc.polkadot.io
 KUSAMA_RPC=wss://kusama-rpc.polkadot.io
+
+# Subscan API (for ML feature extraction)
+SUBSCAN_API_KEY=your-subscan-api-key
+
+# VirusTotal (for domain scanning)
+VIRUSTOTAL_API_KEY=your-virustotal-api-key
 
 # QStash (for CRON jobs)
 QSTASH_CURRENT_SIGNING_KEY=...
@@ -585,25 +743,44 @@ vercel --prod
 
 ## Data Sources
 
-### Primary: polkadot-js/phishing
+### Primary: polkadot-js/phishing (Blacklist)
 
 - **Repository:** https://github.com/polkadot-js/phishing
 - **Addresses:** ~280 known scam addresses
 - **Domains:** ~53,000 malicious domains
 - **Allow list:** ~30 verified safe domains
 - **Sync frequency:** Configurable via QStash CRON
+- **Impact:** Instant FRAUD verdict (riskScore: 95)
 
-### Secondary: Community Reports
+### Secondary: Subscan API (On-Chain Data)
+
+- **API:** `https://polkadot.api.subscan.io` / `https://kusama.api.subscan.io`
+- **Data:** Account info, balance, transfers, nonce
+- **Usage:** Feature extraction for ML analysis
+- **Rate limit:** API key required
+
+### Tertiary: Polkadot RPC (Identity Verification)
+
+- **RPC:** WebSocket connection to Polkadot/Kusama nodes
+- **Data:** Identity pallet, registrar judgements
+- **Impact:** Verified identity = LOW_RISK (riskScore: 20)
+- **Cache:** Redis (1-hour TTL)
+
+### Quaternary: VirusTotal (Domain Security)
+
+- **API:** `https://www.virustotal.com/api/v3`
+- **Data:** 80+ antivirus engine results
+- **Usage:** Domain threat scanning
+- **Impact:** >= 3 malicious = FRAUD verdict
+
+### Quinary: Community Reports
 
 - User-submitted fraud reports
 - Admin verification workflow
 - Optional upstream contribution via PR
+- **Impact:** >= 3 verified reports = CAUTION (riskScore: 60)
 
-### Tertiary: On-Chain Identity
-
-- Polkadot Identity Pallet data
-- Registrar judgements (Web3 Foundation, etc.)
-- Used to enhance trust assessment
+> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed data source documentation.
 
 ---
 
@@ -653,6 +830,9 @@ Returns status of:
 
 - [ ] WebSocket support for real-time alerts
 - [ ] Multi-chain expansion (Astar, Moonbeam)
-- [ ] Machine learning for pattern detection
 - [ ] Browser extension integration
 - [ ] Webhook notifications for watched addresses
+- [ ] Train actual ML model on labeled fraud dataset (currently rule-based heuristics)
+- [ ] Graph analysis for transaction clustering
+- [ ] USD volume analysis (requires price feed integration)
+- [ ] Exchange address whitelist for ML features
