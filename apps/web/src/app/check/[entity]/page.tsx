@@ -4,6 +4,10 @@ import { ResultCard } from '@/components/search/result-card';
 import { ResultSkeleton } from '@/components/search/result-skeleton';
 import { SearchBar } from '@/components/search/search-bar';
 
+// Force dynamic rendering - no page caching
+// This ensures fresh API data on every request
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: Promise<{ entity: string }>;
 }
