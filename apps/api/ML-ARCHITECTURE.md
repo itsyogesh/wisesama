@@ -114,6 +114,10 @@ The system is designed to be **explainable** - every risk score comes with the s
 ```
 POST https://polkadot.api.subscan.io/api/v2/scan/search
 POST https://polkadot.api.subscan.io/api/v2/scan/transfers
+POST https://polkadot.api.subscan.io/api/v2/scan/extrinsics
+POST https://polkadot.api.subscan.io/api/v2/scan/events
+POST https://people-polkadot.api.subscan.io/api/v2/scan/extrinsics  (People Chain)
+POST https://people-polkadot.api.subscan.io/api/v2/scan/events      (People Chain)
 ```
 
 **Data Retrieved:**
@@ -125,6 +129,16 @@ POST https://polkadot.api.subscan.io/api/v2/scan/transfers
 | Identity flag | `/scan/search` | Quick identity check |
 | Display name | `/scan/search` | Identity validation |
 | Recent transfers | `/scan/transfers` | Behavioral analysis |
+| Identity extrinsics | `/scan/extrinsics` | Identity creation timeline |
+| Judgement events | `/scan/events` | First verification date |
+
+**Identity Timeline:**
+- Queries People Chain first for `identity.setIdentity` extrinsics
+- Falls back to Relay Chain for pre-migration identities
+- Uses People Chain genesis timestamps for migration detection:
+  - Polkadot: July 19, 2024 (Unix: 1721331384)
+  - Kusama: May 13, 2024 (Unix: 1715599830)
+- Returns: `identitySetAt`, `firstVerifiedAt`, `isMigrated`, `source`
 
 **Timeout:** 10 seconds
 
@@ -415,6 +429,31 @@ When calculating the final risk assessment, signals are evaluated in priority or
   }
 }
 ```
+
+### Identity Timeline Response
+
+```json
+{
+  "identity": {
+    "hasIdentity": true,
+    "isVerified": true,
+    "displayName": "AWORKER-002",
+    "judgements": [{ "registrarId": 1, "judgement": "Reasonable" }],
+    "timeline": {
+      "identitySetAt": "2020-06-09T08:33:12.000Z",
+      "firstVerifiedAt": "2020-07-15T14:22:00.000Z",
+      "isMigrated": true,
+      "source": "relay_chain"
+    }
+  }
+}
+```
+
+**Timeline Fields:**
+- `identitySetAt` - When `identity.setIdentity` was first called (earliest)
+- `firstVerifiedAt` - When first positive `JudgementGiven` event occurred
+- `isMigrated` - True if identity was migrated from Relay Chain to People Chain
+- `source` - `"people_chain"` or `"relay_chain"` indicating where original identity was found
 
 ### Transaction Summary Response
 

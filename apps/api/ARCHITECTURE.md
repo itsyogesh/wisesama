@@ -121,7 +121,13 @@ POST /check/batch     - Check multiple entities (max 50)
       "hasIdentity": true,
       "isVerified": false,
       "displayName": "MyAccount",
-      "judgements": []
+      "judgements": [],
+      "timeline": {
+        "identitySetAt": "2020-06-09T08:33:12.000Z",
+        "firstVerifiedAt": "2020-07-15T14:22:00.000Z",
+        "isMigrated": true,
+        "source": "relay_chain"
+      }
     },
     "lookAlike": null,
     "mlAnalysis": {
@@ -307,7 +313,7 @@ Core lookup logic:
 2. Check Redis cache (5-min TTL)
 3. Query blacklist (Entity table)
 4. Query whitelist (WhitelistedEntity table)
-5. For addresses: Fetch on-chain identity
+5. For addresses: Fetch on-chain identity + timeline
 6. For Twitter: Check look-alike detection
 7. Calculate risk assessment
 8. Record search analytics
@@ -375,6 +381,10 @@ On-chain data extraction via Subscan API:
 - Recent transfers (last 100 transactions)
 - Transaction summary (total received/sent/balance)
 - Feature extraction for ML analysis
+- Identity timeline (when identity was created/verified)
+  - Queries People Chain first, falls back to Relay Chain for pre-migration identities
+  - Detects migrated identities using exact People Chain genesis timestamps
+  - Returns creation date, first verification date, and migration status
 
 ### VirusTotalService
 
@@ -521,7 +531,8 @@ Client Request
 │ 4. PARALLEL DATA FETCHING (if cache miss):                  │
 │    ├─ Database lookups    │  Blacklist, whitelist, reports  │
 │    ├─ Polkadot RPC        │  Identity & judgements          │
-│    ├─ Subscan API         │  Transfers & account info       │
+│    ├─ Subscan API         │  Transfers, account info,       │
+│    │                      │  identity timeline              │
 │    └─ VirusTotal          │  Domain scanning (if DOMAIN)    │
 ├─────────────────────────────────────────────────────────────┤
 │ 5. ML Analysis            │  MLService (if ADDRESS)         │
@@ -755,8 +766,9 @@ vercel --prod
 ### Secondary: Subscan API (On-Chain Data)
 
 - **API:** `https://polkadot.api.subscan.io` / `https://kusama.api.subscan.io`
-- **Data:** Account info, balance, transfers, nonce
-- **Usage:** Feature extraction for ML analysis
+- **People Chain API:** `https://people-polkadot.api.subscan.io` / `https://people-kusama.api.subscan.io`
+- **Data:** Account info, balance, transfers, nonce, identity extrinsics
+- **Usage:** Feature extraction for ML analysis, identity timeline
 - **Rate limit:** API key required
 
 ### Tertiary: Polkadot RPC (Identity Verification)
