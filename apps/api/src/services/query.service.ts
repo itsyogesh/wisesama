@@ -8,6 +8,7 @@ import type {
   VirusTotalResult,
   ExternalLinks,
   LinkedIdentitiesResult,
+  IdentityTimeline,
 } from '@wisesama/types';
 import { detectEntityType, normalizeEntity } from '../utils/entity-detector';
 import { LevenshteinService } from './levenshtein.service';
@@ -82,6 +83,7 @@ export class QueryService {
       web?: string | null;
       riot?: string | null;
       judgements?: Array<{ registrarId: number; judgement: string }>;
+      timeline?: IdentityTimeline;
     } = { hasIdentity: false, isVerified: false };
 
     // ML analysis for addresses (placeholder - returns unavailable until ML server is configured)
@@ -103,12 +105,13 @@ export class QueryService {
 
       console.log(`[QueryService] chainName=${chainName}`);
       if (chainName) {
-        // Fetch identity via Subscan HTTP (primary), ML analysis, and transaction summary in parallel
+        // Fetch identity via Subscan HTTP (primary), ML analysis, transaction summary, and timeline in parallel
         // Subscan HTTP is more reliable in serverless than WebSocket RPC
-        const [subscanIdentityResult, mlResult, txSummaryResult] = await Promise.allSettled([
+        const [subscanIdentityResult, mlResult, txSummaryResult, timelineResult] = await Promise.allSettled([
           subscanService.getIdentity(normalized, chainName as 'polkadot' | 'kusama'),
           this.getMLAnalysis(normalized, chainName),
           subscanService.getTransactionSummary(normalized, chainName),
+          subscanService.getIdentityTimeline(normalized, chainName as 'polkadot' | 'kusama'),
         ]);
 
         // Try Subscan identity first (HTTP, fast)
@@ -163,6 +166,11 @@ export class QueryService {
 
         if (txSummaryResult.status === 'fulfilled' && txSummaryResult.value) {
           transactionSummary = txSummaryResult.value;
+        }
+
+        // Add timeline data if available
+        if (timelineResult.status === 'fulfilled' && timelineResult.value) {
+          identityData.timeline = timelineResult.value;
         }
 
         // If no ML result but we have identity data, create basic ML analysis
@@ -243,6 +251,7 @@ export class QueryService {
         web: identityData.web,
         riot: identityData.riot,
         judgements: identityData.judgements,
+        timeline: identityData.timeline,
       },
       lookAlike,
       mlAnalysis,

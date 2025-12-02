@@ -1,8 +1,40 @@
 'use client';
 
-import { ExternalLink, CheckCircle, XCircle, HelpCircle, AlertTriangle, Twitter, Globe, MessageSquare, User, Copy, Link2 } from 'lucide-react';
+import { ExternalLink, CheckCircle, XCircle, HelpCircle, AlertTriangle, Twitter, Globe, MessageSquare, User, Copy, Link2, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import type { CheckResponse, EntityType } from '@wisesama/types';
+
+/**
+ * Format a date as relative time (e.g., "2y 3mo ago")
+ */
+function formatRelativeTime(date: Date | string): string {
+  const now = new Date();
+  const d = typeof date === 'string' ? new Date(date) : date;
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 1) return 'today';
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 30) return `${diffDays} days ago`;
+  if (diffDays < 365) {
+    const months = Math.floor(diffDays / 30);
+    return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  }
+  const years = Math.floor(diffDays / 365);
+  const months = Math.floor((diffDays % 365) / 30);
+  if (months > 0) {
+    return `${years}y ${months}mo ago`;
+  }
+  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+}
+
+/**
+ * Format a date as short date string (e.g., "Jan 15, 2023")
+ */
+function formatShortDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
 
 interface EntityDetailsCardProps {
   result: CheckResponse;
@@ -127,6 +159,32 @@ export function EntityDetailsCard({ result }: EntityDetailsCardProps) {
                   <p className="text-xs text-gray-500">
                     {identity.isVerified ? 'Verified by registrar' : 'Not verified'}
                   </p>
+                )}
+                {/* Identity Timeline */}
+                {identity.timeline && (identity.timeline.identitySetAt || identity.timeline.firstVerifiedAt) && (
+                  <div className="mt-2 space-y-1">
+                    {identity.timeline.identitySetAt && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <Calendar className="h-3 w-3 text-gray-400" />
+                        <span className="text-gray-400">Identity set:</span>
+                        <span>{formatShortDate(identity.timeline.identitySetAt)}</span>
+                        <span className="text-gray-600">({formatRelativeTime(identity.timeline.identitySetAt)})</span>
+                      </div>
+                    )}
+                    {identity.timeline.isMigrated && (
+                      <p className="text-xs text-yellow-500/70 ml-4">
+                        ↳ Originally on {identity.timeline.source === 'relay_chain' ? 'relay chain' : 'People chain'}
+                      </p>
+                    )}
+                    {identity.timeline.firstVerifiedAt && (
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <CheckCircle className="h-3 w-3 text-green-400" />
+                        <span className="text-gray-400">Verified:</span>
+                        <span>{formatShortDate(identity.timeline.firstVerifiedAt)}</span>
+                        <span className="text-gray-600">({formatRelativeTime(identity.timeline.firstVerifiedAt)})</span>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${

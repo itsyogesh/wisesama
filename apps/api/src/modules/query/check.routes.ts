@@ -67,6 +67,16 @@ export async function checkRoutes(fastify: FastifyInstance) {
                     },
                   },
                 },
+                timeline: {
+                  type: 'object',
+                  nullable: true,
+                  properties: {
+                    identitySetAt: { type: ['string', 'null'], format: 'date-time' },
+                    firstVerifiedAt: { type: ['string', 'null'], format: 'date-time' },
+                    isMigrated: { type: 'boolean' },
+                    source: { type: ['string', 'null'], enum: ['people_chain', 'relay_chain', null] },
+                  },
+                },
               },
             },
             lookAlike: {

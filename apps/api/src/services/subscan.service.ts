@@ -9,9 +9,39 @@
 
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import type { MLFeatures } from './ml.service';
-import type { TransactionSummary } from '@wisesama/types';
+import type { TransactionSummary, IdentityTimeline } from '@wisesama/types';
 
 const SUBSCAN_API_KEY = process.env.SUBSCAN_API_KEY;
+
+// People Chain genesis timestamps (Unix seconds)
+// Used to detect if an identity was migrated from Relay Chain
+const PEOPLE_CHAIN_GENESIS: Record<string, number> = {
+  polkadot: 1721331384, // July 19, 2024
+  kusama: 1715599830, // May 13, 2024
+};
+
+// Migration window: first 3 months after People Chain launch
+const MIGRATION_WINDOW_SECONDS = 90 * 24 * 60 * 60; // 90 days
+
+// People Chain API URLs
+const PEOPLE_CHAIN_URLS: Record<string, string> = {
+  polkadot: 'https://people-polkadot.api.subscan.io',
+  kusama: 'https://people-kusama.api.subscan.io',
+};
+
+/**
+ * Check if a timestamp falls within the migration window after People Chain genesis
+ */
+function isMigrationPeriod(
+  timestampSeconds: number,
+  chain: 'polkadot' | 'kusama'
+): boolean {
+  const genesis = PEOPLE_CHAIN_GENESIS[chain]!;
+  return (
+    timestampSeconds >= genesis &&
+    timestampSeconds <= genesis + MIGRATION_WINDOW_SECONDS
+  );
+}
 
 // SS58 prefixes for address conversion
 const SS58_PREFIXES: Record<string, number> = {
@@ -429,6 +459,217 @@ export class SubscanService {
       };
     } catch (error) {
       console.error('Subscan identity lookup error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get identity timeline showing when identity was created and first verified.
+   * Handles migration from Relay Chain to People Chain by checking both chains.
+   */
+  async getIdentityTimeline(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<IdentityTimeline | null> {
+    if (!SUBSCAN_API_KEY) {
+      console.warn('Subscan API key not configured for timeline lookup');
+      return null;
+    }
+
+    const ss58Address = normalizeToSS58(address, chain);
+    const peopleChainUrl = PEOPLE_CHAIN_URLS[chain];
+    const relayChainUrl = this.baseUrls[chain];
+
+
+    if (!peopleChainUrl || !relayChainUrl) {
+      return null;
+    }
+
+    try {
+      // 1. Query People Chain for setIdentity extrinsic
+      const peopleChainResult = await this.queryIdentityExtrinsic(
+        peopleChainUrl,
+        ss58Address
+      );
+
+      let identitySetAt = peopleChainResult?.timestamp || null;
+      let isMigrated = false;
+      let source: 'people_chain' | 'relay_chain' | null = peopleChainResult
+        ? 'people_chain'
+        : null;
+
+      // 2. If timestamp is in migration window, check Relay Chain for original
+      if (
+        identitySetAt &&
+        isMigrationPeriod(identitySetAt.getTime() / 1000, chain)
+      ) {
+        const relayChainResult = await this.queryIdentityExtrinsic(
+          relayChainUrl,
+          ss58Address
+        );
+
+        if (
+          relayChainResult?.timestamp &&
+          relayChainResult.timestamp < identitySetAt
+        ) {
+          identitySetAt = relayChainResult.timestamp;
+          isMigrated = true;
+          source = 'relay_chain';
+        }
+      }
+
+      // 3. If no identity found on People Chain, check Relay Chain
+      // (for very old identities that weren't migrated)
+      if (!identitySetAt) {
+        const relayChainResult = await this.queryIdentityExtrinsic(
+          relayChainUrl,
+          ss58Address
+        );
+        if (relayChainResult?.timestamp) {
+          identitySetAt = relayChainResult.timestamp;
+          source = 'relay_chain';
+        }
+      }
+
+      // 4. Query for first judgement (verification date)
+      const shouldCheckRelayJudgement =
+        isMigrated ||
+        (identitySetAt &&
+          isMigrationPeriod(identitySetAt.getTime() / 1000, chain));
+
+      const [peopleJudgement, relayJudgement] = await Promise.all([
+        this.queryJudgementEvent(peopleChainUrl, ss58Address),
+        shouldCheckRelayJudgement
+          ? this.queryJudgementEvent(relayChainUrl, ss58Address)
+          : Promise.resolve(null),
+      ]);
+
+      // Use earliest positive judgement
+      const judgements = [peopleJudgement, relayJudgement].filter(
+        (j): j is Date => j !== null
+      );
+      const firstVerifiedAt =
+        judgements.length > 0
+          ? judgements.sort((a, b) => a.getTime() - b.getTime())[0]!
+          : null;
+
+      // Return null if no identity data found at all
+      if (!identitySetAt && !firstVerifiedAt) {
+        return null;
+      }
+
+      return {
+        identitySetAt,
+        firstVerifiedAt,
+        isMigrated,
+        source,
+      };
+    } catch (error) {
+      console.error('Identity timeline lookup error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Query Subscan for the earliest identity.setIdentity extrinsic
+   */
+  private async queryIdentityExtrinsic(
+    baseUrl: string,
+    address: string
+  ): Promise<{ timestamp: Date; blockNum: number } | null> {
+    try {
+      const response = await globalThis.fetch(
+        `${baseUrl}/api/v2/scan/extrinsics`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': SUBSCAN_API_KEY!,
+          },
+          body: JSON.stringify({
+            address,
+            module: 'identity',
+            call: 'set_identity',
+            page: 0,
+            row: 1,
+            order: 'asc', // Get earliest
+          }),
+          signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
+        }
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as {
+        code?: number;
+        data?: {
+          extrinsics?: Array<{ block_timestamp: number; block_num: number }>;
+        };
+      };
+
+      if (data.code !== 0) {
+        return null;
+      }
+
+      const extrinsic = data.data?.extrinsics?.[0];
+
+      if (!extrinsic) {
+        return null;
+      }
+
+      return {
+        timestamp: new Date(extrinsic.block_timestamp * 1000),
+        blockNum: extrinsic.block_num,
+      };
+    } catch (error) {
+      console.error('Query identity extrinsic error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Query Subscan for the earliest JudgementGiven event for an address
+   */
+  private async queryJudgementEvent(
+    baseUrl: string,
+    address: string
+  ): Promise<Date | null> {
+    try {
+      const response = await globalThis.fetch(`${baseUrl}/api/v2/scan/events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': SUBSCAN_API_KEY!,
+        },
+        body: JSON.stringify({
+          address,
+          module: 'identity',
+          event_id: 'JudgementGiven',
+          page: 0,
+          row: 1,
+          order: 'asc', // Get earliest
+        }),
+        signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = (await response.json()) as {
+        data?: { events?: Array<{ block_timestamp: number }> };
+      };
+      const event = data.data?.events?.[0];
+
+      if (!event) {
+        return null;
+      }
+
+      return new Date(event.block_timestamp * 1000);
+    } catch (error) {
+      console.error('Query judgement event error:', error);
       return null;
     }
   }

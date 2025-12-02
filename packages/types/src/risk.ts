@@ -21,6 +21,13 @@ export interface WhitelistResult {
   verifiedAt?: Date;
 }
 
+export interface IdentityTimeline {
+  identitySetAt: Date | null; // When setIdentity was first called
+  firstVerifiedAt: Date | null; // When first positive judgement was received
+  isMigrated?: boolean; // True if identity was migrated from relay chain
+  source?: 'people_chain' | 'relay_chain' | null; // Where original identity was found
+}
+
 export interface IdentityResult {
   hasIdentity: boolean;
   isVerified: boolean;
@@ -32,6 +39,7 @@ export interface IdentityResult {
     registrarId: number;
     judgement: string;
   }>;
+  timeline?: IdentityTimeline;
 }
 
 export interface LookAlikeResult {
