@@ -90,6 +90,7 @@ export class QueryService {
     let virusTotal: VirusTotalResult | undefined = undefined;
     let links: ExternalLinks | undefined = undefined;
 
+    console.log(`[QueryService] type=${type}, chain=${chain}, normalized=${normalized}`);
     if (type === 'ADDRESS' && chain) {
       // Map chain to network name for identity lookup
       // 'substrate' (SS58 prefix 42) is treated as polkadot since it's the generic format
@@ -100,27 +101,60 @@ export class QueryService {
           ? 'kusama'
           : null;
 
+      console.log(`[QueryService] chainName=${chainName}`);
       if (chainName) {
-        // Fetch identity, ML analysis, and transaction summary in parallel
-        const [identityResult, mlResult, txSummaryResult] = await Promise.allSettled([
-          polkadotService.getIdentity(normalized, chainName),
+        // Fetch identity via Subscan HTTP (primary), ML analysis, and transaction summary in parallel
+        // Subscan HTTP is more reliable in serverless than WebSocket RPC
+        const [subscanIdentityResult, mlResult, txSummaryResult] = await Promise.allSettled([
+          subscanService.getIdentity(normalized, chainName as 'polkadot' | 'kusama'),
           this.getMLAnalysis(normalized, chainName),
           subscanService.getTransactionSummary(normalized, chainName),
         ]);
 
-        if (identityResult.status === 'fulfilled') {
-          const identity = identityResult.value;
+        // Try Subscan identity first (HTTP, fast)
+        if (subscanIdentityResult.status === 'fulfilled' && subscanIdentityResult.value) {
+          const identity = subscanIdentityResult.value;
           identityData = {
             hasIdentity: identity.hasIdentity,
             isVerified: identity.isVerified,
-            displayName: identity.identity?.displayName,
-            twitter: identity.identity?.twitter,
-            web: identity.identity?.web,
-            riot: identity.identity?.riot,
+            displayName: identity.displayName,
+            twitter: null, // Subscan doesn't return twitter
+            web: null,     // Subscan doesn't return web
+            riot: null,    // Subscan doesn't return riot
             judgements: identity.judgements,
           };
+
+          // If identity found, try to get full details from RPC (for twitter, web, riot)
+          if (identity.hasIdentity) {
+            try {
+              const rpcIdentity = await polkadotService.getIdentity(normalized, chainName);
+              if (rpcIdentity.hasIdentity && rpcIdentity.identity) {
+                identityData.twitter = rpcIdentity.identity.twitter;
+                identityData.web = rpcIdentity.identity.web;
+                identityData.riot = rpcIdentity.identity.riot;
+              }
+            } catch (rpcErr) {
+              // RPC failed, but we still have basic identity from Subscan
+              console.warn('RPC identity lookup failed, using Subscan data:', rpcErr);
+            }
+          }
         } else {
-          console.error('Failed to fetch identity for address:', identityResult.reason);
+          // Subscan failed, try WebSocket RPC as fallback
+          console.warn('Subscan identity failed, trying RPC fallback');
+          try {
+            const rpcIdentity = await polkadotService.getIdentity(normalized, chainName);
+            identityData = {
+              hasIdentity: rpcIdentity.hasIdentity,
+              isVerified: rpcIdentity.isVerified,
+              displayName: rpcIdentity.identity?.displayName,
+              twitter: rpcIdentity.identity?.twitter,
+              web: rpcIdentity.identity?.web,
+              riot: rpcIdentity.identity?.riot,
+              judgements: rpcIdentity.judgements,
+            };
+          } catch (rpcErr) {
+            console.error('Both Subscan and RPC identity lookup failed:', rpcErr);
+          }
         }
 
         if (mlResult.status === 'fulfilled' && mlResult.value) {

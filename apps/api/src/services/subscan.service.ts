@@ -7,10 +7,31 @@
  * Subscan API Docs: https://support.subscan.io/
  */
 
+import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import type { MLFeatures } from './ml.service';
 import type { TransactionSummary } from '@wisesama/types';
 
 const SUBSCAN_API_KEY = process.env.SUBSCAN_API_KEY;
+
+// SS58 prefixes for address conversion
+const SS58_PREFIXES: Record<string, number> = {
+  polkadot: 0,
+  kusama: 2,
+};
+
+/**
+ * Normalize address to SS58 format for the specified chain
+ * Handles both hex public keys and existing SS58 addresses
+ */
+function normalizeToSS58(address: string, chain: 'polkadot' | 'kusama'): string {
+  try {
+    const prefix = SS58_PREFIXES[chain] ?? 0;
+    const decoded = decodeAddress(address);
+    return encodeAddress(decoded, prefix);
+  } catch {
+    return address;
+  }
+}
 const SUBSCAN_TIMEOUT = 10000; // 10 seconds
 
 interface SubscanAccountInfo {
@@ -330,5 +351,85 @@ export class SubscanService {
    */
   getBlockExplorerUrl(address: string, chain: 'polkadot' | 'kusama'): string {
     return `https://${chain}.subscan.io/account/${address}`;
+  }
+
+  /**
+   * Get on-chain identity via Subscan HTTP API
+   * This is more reliable in serverless environments than WebSocket RPC
+   */
+  async getIdentity(
+    address: string,
+    chain: 'polkadot' | 'kusama'
+  ): Promise<{
+    hasIdentity: boolean;
+    isVerified: boolean;
+    displayName: string | null;
+    judgements: Array<{ registrarId: number; judgement: string }>;
+  } | null> {
+    if (!SUBSCAN_API_KEY) {
+      console.warn('Subscan API key not configured for identity lookup');
+      return null;
+    }
+
+    const baseUrl = this.baseUrls[chain];
+    if (!baseUrl) return null;
+
+    // Convert hex/any format to SS58 for Subscan API
+    const ss58Address = normalizeToSS58(address, chain);
+    console.log(`[Subscan] Identity lookup - input: ${address}, ss58: ${ss58Address}, chain: ${chain}`);
+
+    try {
+      const response = await globalThis.fetch(`${baseUrl}/api/v2/scan/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': SUBSCAN_API_KEY!,
+        },
+        body: JSON.stringify({ key: ss58Address }),
+        signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
+      });
+
+      if (!response.ok) {
+        console.error(`Subscan identity lookup failed: ${response.status}`);
+        return null;
+      }
+
+      const data = (await response.json()) as { data?: { account?: SubscanAccountInfo } };
+      const account = data.data?.account;
+      console.log(`[Subscan] Response - account_display:`, JSON.stringify(account?.account_display));
+
+      if (!account?.account_display) {
+        return {
+          hasIdentity: false,
+          isVerified: false,
+          displayName: null,
+          judgements: [],
+        };
+      }
+
+      const display = account.account_display;
+      // Identity data can be in display.people (newer API) or directly in display
+      const peopleData = (display as any).people;
+      const hasIdentity = peopleData?.identity === true || display.identity === true;
+      const rawJudgements = peopleData?.judgements || display.judgements || [];
+      const judgements = rawJudgements.map((j: { index: number; judgement: string }) => ({
+        registrarId: j.index,
+        judgement: j.judgement,
+      }));
+      const isVerified = judgements.some((j: { registrarId: number; judgement: string }) =>
+        ['Reasonable', 'KnownGood'].includes(j.judgement)
+      );
+      const displayName = peopleData?.display || display.display || null;
+
+      return {
+        hasIdentity,
+        isVerified,
+        displayName: hasIdentity ? displayName : null,
+        judgements,
+      };
+    } catch (error) {
+      console.error('Subscan identity lookup error:', error);
+      return null;
+    }
   }
 }
