@@ -6,7 +6,7 @@
 
 Wisesama is a fraud detection API for the Polkadot ecosystem. It provides real-time risk assessment for addresses, domains, Twitter handles, and emails by aggregating data from the official polkadot-js/phishing repository, community reports, on-chain identity data, and behavioral analysis.
 
-> **See Also:** [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed documentation on the ML risk scoring system, feature extraction, and data sources.
+> **See Also:** [ML-RISK-SCORING.md](./ML-RISK-SCORING.md) for detailed documentation on the ML risk scoring system, feature extraction, and data sources.
 
 ## Tech Stack
 
@@ -370,7 +370,7 @@ Behavioral risk scoring using weighted heuristics:
 - Returns risk score (0-100), confidence, and recommendation
 - Provides explainable top risk factors
 
-> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed scoring algorithm.
+> See [ML-RISK-SCORING.md](./ML-RISK-SCORING.md) for detailed scoring algorithm.
 
 ### SubscanService
 
@@ -555,7 +555,7 @@ Client Request
     JSON Response
 ```
 
-> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed data flow diagram.
+> See [ML-RISK-SCORING.md](./ML-RISK-SCORING.md) for detailed data flow diagram.
 
 ### Report Verification Flow
 
@@ -792,7 +792,7 @@ vercel --prod
 - Optional upstream contribution via PR
 - **Impact:** >= 3 verified reports = CAUTION (riskScore: 60)
 
-> See [ML-ARCHITECTURE.md](./ML-ARCHITECTURE.md) for detailed data source documentation.
+> See [ML-RISK-SCORING.md](./ML-RISK-SCORING.md) for detailed data source documentation.
 
 ---
 
