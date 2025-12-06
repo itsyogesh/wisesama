@@ -57,13 +57,9 @@ export function HeroSection() {
         />
       </div>
 
-      {/* Background blobs for purple glow effect */}
+      {/* Subtle purple glow effect - centered */}
       <div className="absolute inset-0 overflow-hidden z-[1]">
-        <div className="absolute top-1/4 left-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-0 w-48 h-48 bg-indigo-800/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-0 w-64 h-64 bg-purple-900/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 right-0 w-32 h-32 bg-indigo-800/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-purple-900/10 via-transparent to-transparent rounded-full" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-wisesama-purple/5 rounded-full blur-[120px]" />
       </div>
 
       {/* Main content */}

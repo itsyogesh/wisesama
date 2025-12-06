@@ -7,24 +7,27 @@ import { Header } from '@/components/layout/header';
 import { DataTable } from '@/components/ui/data-table';
 import { reportsApi } from '@/lib/api';
 import { truncateAddress, formatDate, getStatusColor, cn } from '@/lib/utils';
-import { Search, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface Report {
   id: string;
   entityType: string;
-  value: string;
-  reportType: string;
+  reportedValue: string;
+  threatCategory: string;
   status: string;
-  severity: string;
+  description?: string;
   reporterEmail?: string;
+  reporterName?: string;
   createdAt: string;
+  user?: { id: string; email: string };
+  entity?: { id: string; value: string; riskLevel: string };
 }
 
 const statusOptions = [
   { value: '', label: 'All' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'VERIFIED', label: 'Verified' },
-  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'verified', label: 'Verified' },
+  { value: 'rejected', label: 'Rejected' },
 ];
 
 export default function ReportsPage() {
@@ -42,20 +45,19 @@ export default function ReportsPage() {
       }),
   });
 
-  const items = data?.data?.items || [];
-  const totalPages = data?.data?.totalPages || 1;
-  const totalItems = data?.data?.total || 0;
+  const items = data?.reports || [];
+  const totalPages = data?.pagination?.totalPages || 1;
+  const totalItems = data?.pagination?.total || 0;
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity?.toUpperCase()) {
-      case 'CRITICAL':
+  const getThreatColor = (threat: string) => {
+    switch (threat?.toLowerCase()) {
+      case 'scam':
+      case 'phishing':
         return 'bg-red-500/20 text-red-400';
-      case 'HIGH':
+      case 'impersonation':
         return 'bg-orange-500/20 text-orange-400';
-      case 'MEDIUM':
+      case 'spam':
         return 'bg-yellow-500/20 text-yellow-400';
-      case 'LOW':
-        return 'bg-blue-500/20 text-blue-400';
       default:
         return 'bg-gray-500/20 text-gray-400';
     }
@@ -63,32 +65,25 @@ export default function ReportsPage() {
 
   const columns = [
     {
-      key: 'value',
+      key: 'reportedValue',
       header: 'Entity',
       render: (item: Report) => (
         <div>
           <p className="font-mono text-sm">
             {item.entityType === 'ADDRESS'
-              ? truncateAddress(item.value, 8)
-              : item.value}
+              ? truncateAddress(item.reportedValue, 8)
+              : item.reportedValue}
           </p>
           <p className="text-xs text-white/50 mt-1">{item.entityType}</p>
         </div>
       ),
     },
     {
-      key: 'reportType',
-      header: 'Type',
+      key: 'threatCategory',
+      header: 'Threat',
       render: (item: Report) => (
-        <span className="text-white/80">{item.reportType}</span>
-      ),
-    },
-    {
-      key: 'severity',
-      header: 'Severity',
-      render: (item: Report) => (
-        <span className={cn('status-badge', getSeverityColor(item.severity))}>
-          {item.severity || 'Unknown'}
+        <span className={cn('status-badge', getThreatColor(item.threatCategory))}>
+          {item.threatCategory || 'Unknown'}
         </span>
       ),
     },
@@ -106,7 +101,7 @@ export default function ReportsPage() {
       header: 'Reporter',
       render: (item: Report) => (
         <span className="text-white/60">
-          {item.reporterEmail || 'Anonymous'}
+          {item.user?.email || item.reporterEmail || 'Anonymous'}
         </span>
       ),
     },
@@ -128,12 +123,12 @@ export default function ReportsPage() {
 
       <div className="flex-1 p-6 space-y-6 overflow-auto">
         {/* Alert for pending reports */}
-        {items.filter((r: Report) => r.status === 'PENDING').length > 0 && (
+        {items.filter((r: Report) => r.status === 'pending').length > 0 && (
           <div className="flex items-center gap-3 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
             <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
             <p className="text-sm text-white">
               <span className="font-medium">
-                {items.filter((r: Report) => r.status === 'PENDING').length}{' '}
+                {items.filter((r: Report) => r.status === 'pending').length}{' '}
               </span>
               report(s) require immediate attention
             </p>

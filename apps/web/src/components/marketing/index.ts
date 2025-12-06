@@ -1,6 +1,9 @@
 export { HeroSection } from './hero-section';
 export { StatsSection } from './stats-section';
 export { FeaturesSection } from './features-section';
+export { TechnologySection } from './technology-section';
+export { EntityTypesSection } from './entity-types-section';
+export { HowItWorksSection } from './how-it-works-section';
 export { RecentSpamsTicker } from './recent-spams-ticker';
 export { RecentReportsSection } from './recent-reports-section';
 export { BlogsSection } from './blogs-section';

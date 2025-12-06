@@ -2,6 +2,9 @@ import {
   HeroSection,
   StatsSection,
   FeaturesSection,
+  TechnologySection,
+  EntityTypesSection,
+  HowItWorksSection,
   RecentSpamsTicker,
   RecentReportsSection,
   BlogsSection,
@@ -52,6 +55,9 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <RecentSpamsTicker />
+      <EntityTypesSection />
+      <TechnologySection />
+      <HowItWorksSection />
       <FeaturesSection />
       <RecentReportsSection />
       <BlogsSection posts={posts} />

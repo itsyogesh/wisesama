@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { motion } from 'motion/react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
+import { motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
 
 const containerVariants = {
   hidden: {},
@@ -20,7 +20,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: 'spring' as const, stiffness: 80, damping: 18 },
+    transition: { type: "spring" as const, stiffness: 80, damping: 18 },
   },
 };
 
@@ -29,7 +29,7 @@ const iconVariants = {
   show: {
     scale: 1,
     rotate: 0,
-    transition: { type: 'spring' as const, stiffness: 120, damping: 10 },
+    transition: { type: "spring" as const, stiffness: 120, damping: 10 },
   },
 };
 
@@ -38,16 +38,16 @@ export function FeaturesSection() {
     <section
       className="py-20 lg:py-32 relative overflow-visible bg-wisesama-bg"
       style={{
-        backgroundImage: 'url(/allbg.png)',
-        backgroundSize: 'auto',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
+        backgroundImage: "url(/allbg.png)",
+        backgroundSize: "auto",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
       }}
     >
       {/* Pink glow effect behind features */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-features-glow opacity-50 pointer-events-none"
-        style={{ filter: 'blur(95px)' }}
+        style={{ filter: "blur(95px)" }}
       />
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
@@ -80,7 +80,7 @@ export function FeaturesSection() {
               transition={{
                 repeat: Infinity,
                 duration: 20,
-                ease: 'linear',
+                ease: "linear",
               }}
             >
               <Image
@@ -138,7 +138,12 @@ export function FeaturesSection() {
             <Card className="bg-[url('/card2.png')] bg-cover bg-center rounded-2xl p-10 min-h-[400px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
               <CardContent className="flex flex-col gap-6 items-start p-0">
                 <motion.div variants={iconVariants}>
-                  <Image src="/AlertIcon.png" alt="Report" width={40} height={40} />
+                  <Image
+                    src="/AlertIcon.png"
+                    alt="Report"
+                    width={40}
+                    height={40}
+                  />
                 </motion.div>
 
                 <h3 className="font-heading text-2xl font-bold text-white">
@@ -174,7 +179,12 @@ export function FeaturesSection() {
             <Card className="bg-[url('/card3.png')] bg-cover bg-center rounded-2xl p-10 min-h-[280px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
               <CardContent className="flex flex-col gap-6 items-start p-0">
                 <motion.div variants={iconVariants}>
-                  <Image src="/AlertIcon.png" alt="Alerts" width={40} height={40} />
+                  <Image
+                    src="/AlertIcon.png"
+                    alt="Alerts"
+                    width={40}
+                    height={40}
+                  />
                 </motion.div>
 
                 <h3 className="font-heading text-2xl font-bold text-white">
@@ -182,8 +192,8 @@ export function FeaturesSection() {
                 </h3>
 
                 <p className="text-base leading-5 text-white">
-                  Create an account, check the notification box and don&apos;t miss
-                  the launch of our advanced alerts.
+                  Create an account, check the notification box and don&apos;t
+                  miss the launch of our advanced alerts.
                 </p>
 
                 <Link
@@ -209,7 +219,12 @@ export function FeaturesSection() {
               <Card className="bg-transparent border border-white rounded-2xl p-6 min-h-[380px] w-full max-w-[380px] relative overflow-visible flex flex-col justify-between transition-all">
                 <CardContent className="flex flex-col gap-6 items-start p-0">
                   <motion.div variants={iconVariants}>
-                    <Image src="/ApiIcon.png" alt="API" width={40} height={40} />
+                    <Image
+                      src="/ApiIcon.png"
+                      alt="API"
+                      width={40}
+                      height={40}
+                    />
                   </motion.div>
                   <h3 className="font-heading text-2xl font-bold text-white">
                     API Docs
@@ -243,7 +258,7 @@ export function FeaturesSection() {
                   transition={{
                     repeat: Infinity,
                     duration: 12,
-                    ease: 'linear',
+                    ease: "linear",
                   }}
                 >
                   <Image src="/Star.png" alt="" width={140} height={140} />

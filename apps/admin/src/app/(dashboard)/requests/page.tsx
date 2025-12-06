@@ -15,9 +15,10 @@ interface WhitelistRequest {
   value: string;
   name: string;
   status: string;
-  requesterEmail: string;
+  requesterEmail?: string;
   createdAt: string;
-  chain?: { name: string };
+  chain?: { code: string; name: string };
+  user?: { id: string; email: string };
 }
 
 const statusOptions = [
@@ -48,9 +49,9 @@ export default function RequestsPage() {
       }),
   });
 
-  const items = data?.data?.items || [];
-  const totalPages = data?.data?.totalPages || 1;
-  const totalItems = data?.data?.total || 0;
+  const items = data?.requests || [];
+  const totalPages = data?.pagination?.totalPages || 1;
+  const totalItems = data?.pagination?.total || 0;
 
   const columns = [
     {
@@ -87,7 +88,7 @@ export default function RequestsPage() {
       key: 'requesterEmail',
       header: 'Requester',
       render: (item: WhitelistRequest) => (
-        <span className="text-white/80">{item.requesterEmail}</span>
+        <span className="text-white/80">{item.user?.email || item.requesterEmail || 'Unknown'}</span>
       ),
     },
     {

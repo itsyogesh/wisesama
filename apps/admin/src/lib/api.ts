@@ -67,21 +67,34 @@ export const whitelistRequestsApi = {
     status?: string;
     search?: string;
   }) => {
-    const response = await apiClient.get('/api/v1/admin/whitelist-requests', { params });
+    const response = await apiClient.get('/api/v1/admin/whitelist/requests', { params });
     return response.data;
   },
 
   getById: async (id: string) => {
-    const response = await apiClient.get(`/api/v1/admin/whitelist-requests/${id}`);
+    const response = await apiClient.get(`/api/v1/admin/whitelist/requests/${id}`);
     return response.data;
   },
 
-  updateStatus: async (id: string, data: {
-    status: 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
-    reviewNotes?: string;
-    rejectionReason?: string;
+  markUnderReview: async (id: string, notes?: string) => {
+    const response = await apiClient.put(`/api/v1/admin/whitelist/requests/${id}/review`, { notes });
+    return response.data;
+  },
+
+  approve: async (id: string, data?: {
+    notes?: string;
+    name?: string;
+    category?: string;
+    website?: string;
+    twitter?: string;
+    logoUrl?: string;
   }) => {
-    const response = await apiClient.put(`/api/v1/admin/whitelist-requests/${id}/status`, data);
+    const response = await apiClient.put(`/api/v1/admin/whitelist/requests/${id}/approve`, data);
+    return response.data;
+  },
+
+  reject: async (id: string, reason: string) => {
+    const response = await apiClient.put(`/api/v1/admin/whitelist/requests/${id}/reject`, { reason });
     return response.data;
   },
 };
@@ -131,16 +144,71 @@ export const reportsApi = {
     page?: number;
     limit?: number;
     status?: string;
+    entityType?: string;
   }) => {
     const response = await apiClient.get('/api/v1/admin/reports', { params });
     return response.data;
   },
 
-  updateStatus: async (id: string, data: {
-    status: 'VERIFIED' | 'REJECTED';
-    resolutionNotes?: string;
+  getById: async (id: string) => {
+    const response = await apiClient.get(`/api/v1/admin/reports/${id}`);
+    return response.data;
+  },
+
+  verify: async (id: string, data?: {
+    addToBlacklist?: boolean;
+    contributeToUpstream?: boolean;
+    threatName?: string;
+    notes?: string;
   }) => {
-    const response = await apiClient.put(`/api/v1/admin/reports/${id}/status`, data);
+    const response = await apiClient.put(`/api/v1/admin/reports/${id}/verify`, data);
+    return response.data;
+  },
+
+  reject: async (id: string, reason: string) => {
+    const response = await apiClient.put(`/api/v1/admin/reports/${id}/reject`, { reason });
+    return response.data;
+  },
+
+  getStats: async () => {
+    const response = await apiClient.get('/api/v1/admin/reports/stats');
+    return response.data;
+  },
+};
+
+// Contributions API (GitHub PRs)
+export const contributionsApi = {
+  getAll: async (params?: {
+    page?: number;
+    limit?: number;
+    status?: string;
+  }) => {
+    const response = await apiClient.get('/api/v1/admin/contributions', { params });
+    return response.data;
+  },
+
+  getById: async (id: string) => {
+    const response = await apiClient.get(`/api/v1/admin/contributions/${id}`);
+    return response.data;
+  },
+
+  syncStatus: async (id: string) => {
+    const response = await apiClient.post(`/api/v1/admin/contributions/${id}/sync`);
+    return response.data;
+  },
+
+  syncAll: async () => {
+    const response = await apiClient.post('/api/v1/admin/contributions/sync-all');
+    return response.data;
+  },
+
+  getStats: async () => {
+    const response = await apiClient.get('/api/v1/admin/contributions/stats');
+    return response.data;
+  },
+
+  getConfig: async () => {
+    const response = await apiClient.get('/api/v1/admin/contributions/config');
     return response.data;
   },
 };

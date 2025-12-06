@@ -81,9 +81,9 @@ export default function ActivityPage() {
       }),
   });
 
-  const items = data?.data?.items || [];
-  const totalPages = data?.data?.totalPages || 1;
-  const totalItems = data?.data?.total || 0;
+  const items = data?.activities || [];
+  const totalPages = data?.pagination?.totalPages || 1;
+  const totalItems = data?.pagination?.total || 0;
 
   const columns = [
     {

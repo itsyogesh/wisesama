@@ -10,7 +10,7 @@ import {
   Shield,
   FileText,
   ClipboardList,
-  Users,
+  GitPullRequest,
   Activity,
   LogOut,
   ChevronLeft,
@@ -40,9 +40,9 @@ const navItems = [
     icon: ClipboardList,
   },
   {
-    title: 'Contributions',
+    title: 'GitHub PRs',
     href: '/contributions',
-    icon: Users,
+    icon: GitPullRequest,
   },
   {
     title: 'Activity Log',

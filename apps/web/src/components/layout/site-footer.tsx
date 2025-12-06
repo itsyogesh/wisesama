@@ -7,11 +7,16 @@ import { Facebook, Twitter, Instagram, Youtube, Send } from 'lucide-react';
 import { fadeInUp } from '@/lib/motion';
 
 const footerLinks = {
-  company: [
-    { name: 'Scan', href: '/check' },
-    { name: 'Report', href: '/report' },
+  product: [
+    { name: 'Scan Entity', href: '/check' },
+    { name: 'Report Scam', href: '/report' },
+    { name: 'Whitelist Request', href: '/whitelist-request' },
     { name: 'API Docs', href: '/docs' },
+  ],
+  resources: [
     { name: 'Blog', href: '/blog' },
+    { name: 'Whitelist Directory', href: '/whitelist' },
+    { name: 'Known Scammers', href: '/blacklist' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -30,7 +35,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-[#1A1A1A]">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Logo and Description */}
           <motion.div
             variants={fadeInUp}
@@ -61,7 +66,7 @@ export function SiteFooter() {
             </div>
           </motion.div>
 
-          {/* Company Links */}
+          {/* Product Links */}
           <motion.div
             variants={fadeInUp}
             initial="initial"
@@ -70,9 +75,32 @@ export function SiteFooter() {
             transition={{ delay: 0.1 }}
             className="space-y-4"
           >
-            <h3 className="font-heading font-semibold text-white">Company</h3>
+            <h3 className="font-heading font-semibold text-white">Product</h3>
             <div className="space-y-3">
-              {footerLinks.company.map(({ name, href }) => (
+              {footerLinks.product.map(({ name, href }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  {name}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Resources Links */}
+          <motion.div
+            variants={fadeInUp}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="space-y-4"
+          >
+            <h3 className="font-heading font-semibold text-white">Resources</h3>
+            <div className="space-y-3">
+              {footerLinks.resources.map(({ name, href }) => (
                 <Link
                   key={href}
                   href={href}

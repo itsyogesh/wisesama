@@ -34,33 +34,46 @@ export default function RequestDetailPage() {
     enabled: !!params.id,
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({
-      status,
-      reviewNotes,
-      rejectionReason,
-    }: {
-      status: 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED';
-      reviewNotes?: string;
-      rejectionReason?: string;
-    }) =>
-      whitelistRequestsApi.updateStatus(params.id as string, {
-        status,
-        reviewNotes,
-        rejectionReason,
-      }),
+  const markUnderReviewMutation = useMutation({
+    mutationFn: (notes?: string) =>
+      whitelistRequestsApi.markUnderReview(params.id as string, notes),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['whitelist-request', params.id] });
       queryClient.invalidateQueries({ queryKey: ['whitelist-requests'] });
       queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
-      toast.success('Request status updated');
-      setShowRejectModal(false);
+      toast.success('Request marked as under review');
     },
-    onError: (error) => {
-      toast.error('Failed to update request');
-      console.error(error);
-    },
+    onError: () => toast.error('Failed to update request'),
   });
+
+  const approveMutation = useMutation({
+    mutationFn: (notes?: string) =>
+      whitelistRequestsApi.approve(params.id as string, { notes }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['whitelist-request', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['whitelist-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      toast.success('Request approved successfully');
+      router.push('/requests');
+    },
+    onError: () => toast.error('Failed to approve request'),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (reason: string) =>
+      whitelistRequestsApi.reject(params.id as string, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['whitelist-request', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['whitelist-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-requests'] });
+      toast.success('Request rejected');
+      setShowRejectModal(false);
+      router.push('/requests');
+    },
+    onError: () => toast.error('Failed to reject request'),
+  });
+
+  const isPending = markUnderReviewMutation.isPending || approveMutation.isPending || rejectMutation.isPending;
 
   const request = data?.data;
 
@@ -219,13 +232,8 @@ export default function RequestDetailPage() {
                     <Button
                       className="w-full"
                       variant="secondary"
-                      onClick={() =>
-                        updateMutation.mutate({
-                          status: 'UNDER_REVIEW',
-                          reviewNotes,
-                        })
-                      }
-                      disabled={updateMutation.isPending}
+                      onClick={() => markUnderReviewMutation.mutate(reviewNotes || undefined)}
+                      disabled={isPending}
                     >
                       <Clock className="w-4 h-4" />
                       Mark Under Review
@@ -233,13 +241,8 @@ export default function RequestDetailPage() {
                   )}
                   <Button
                     className="w-full bg-green-600 hover:bg-green-700"
-                    onClick={() =>
-                      updateMutation.mutate({
-                        status: 'APPROVED',
-                        reviewNotes,
-                      })
-                    }
-                    disabled={updateMutation.isPending}
+                    onClick={() => approveMutation.mutate(reviewNotes || undefined)}
+                    disabled={isPending}
                   >
                     <Check className="w-4 h-4" />
                     Approve
@@ -248,7 +251,7 @@ export default function RequestDetailPage() {
                     className="w-full"
                     variant="destructive"
                     onClick={() => setShowRejectModal(true)}
-                    disabled={updateMutation.isPending}
+                    disabled={isPending}
                   >
                     <X className="w-4 h-4" />
                     Reject
@@ -353,16 +356,10 @@ export default function RequestDetailPage() {
               <Button
                 variant="destructive"
                 className="flex-1"
-                onClick={() =>
-                  updateMutation.mutate({
-                    status: 'REJECTED',
-                    reviewNotes,
-                    rejectionReason,
-                  })
-                }
-                disabled={!rejectionReason.trim() || updateMutation.isPending}
+                onClick={() => rejectMutation.mutate(rejectionReason)}
+                disabled={!rejectionReason.trim() || isPending}
               >
-                {updateMutation.isPending ? (
+                {rejectMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   'Reject'

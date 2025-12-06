@@ -34,9 +34,9 @@ export default function DashboardPage() {
       whitelistRequestsApi.getAll({ status: 'PENDING', limit: 5 }),
   });
 
-  const stats = statsData?.data || {};
-  const activities = activityData?.data?.items || [];
-  const pendingRequests = requestsData?.data?.items || [];
+  const stats = statsData?.data || statsData || {};
+  const activities = activityData?.activities || [];
+  const pendingRequests = requestsData?.requests || [];
 
   return (
     <div className="flex flex-col h-full">

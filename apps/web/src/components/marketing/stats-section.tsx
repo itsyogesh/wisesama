@@ -68,7 +68,7 @@ export function StatsSection() {
   return (
     <section className="py-16 bg-[#1A1A1A]">
       <div className="w-full text-center mb-10">
-        <span className="text-3xl font-bold text-white drop-shadow-[0_0_20px_rgba(236,72,153,1)]">
+        <span className="text-3xl font-bold text-white">
           Our Stats
         </span>
       </div>
