@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, AlertTriangle, HelpCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, HelpCircle, ShieldCheck, Clock } from 'lucide-react';
 import type { RiskLevel } from '@wisesama/types';
 
 interface AssessmentHeaderProps {
@@ -10,43 +10,55 @@ const assessmentConfig: Record<RiskLevel, {
   label: string;
   icon: typeof CheckCircle;
   color: string;
-  bgColor: string;
+  bgGradient: string;
+  borderColor: string;
+  glowColor: string;
   description: string;
 }> = {
   SAFE: {
     label: 'Safe',
-    icon: CheckCircle,
-    color: 'text-green-400',
-    bgColor: 'bg-green-500/10',
+    icon: ShieldCheck,
+    color: 'text-emerald-400',
+    bgGradient: 'from-emerald-500/10 via-emerald-500/5 to-transparent',
+    borderColor: 'border-emerald-500/20',
+    glowColor: 'shadow-emerald-500/10',
     description: 'This entity has been verified as safe. You can safely interact with it.',
   },
   LOW_RISK: {
     label: 'Low Risk',
     icon: CheckCircle,
     color: 'text-blue-400',
-    bgColor: 'bg-blue-500/10',
+    bgGradient: 'from-blue-500/10 via-blue-500/5 to-transparent',
+    borderColor: 'border-blue-500/20',
+    glowColor: 'shadow-blue-500/10',
     description: 'This entity shows low risk indicators. Exercise normal caution when interacting.',
   },
   UNKNOWN: {
     label: 'Unknown',
     icon: HelpCircle,
     color: 'text-gray-400',
-    bgColor: 'bg-gray-500/10',
+    bgGradient: 'from-gray-500/10 via-gray-500/5 to-transparent',
+    borderColor: 'border-gray-500/20',
+    glowColor: 'shadow-gray-500/10',
     description: 'We don\'t have enough data about this entity. Please verify independently before proceeding.',
   },
   CAUTION: {
     label: 'Caution',
     icon: AlertTriangle,
-    color: 'text-orange-400',
-    bgColor: 'bg-orange-500/10',
+    color: 'text-amber-400',
+    bgGradient: 'from-amber-500/10 via-amber-500/5 to-transparent',
+    borderColor: 'border-amber-500/20',
+    glowColor: 'shadow-amber-500/10',
     description: 'This entity shows some warning signs. Please verify carefully before any transaction.',
   },
   FRAUD: {
     label: 'FRAUD',
     icon: XCircle,
     color: 'text-red-400',
-    bgColor: 'bg-red-500/10',
-    description: 'This has been assessed as fraud!! Please do not transact or interact with this entity.',
+    bgGradient: 'from-red-500/15 via-red-500/5 to-transparent',
+    borderColor: 'border-red-500/30',
+    glowColor: 'shadow-red-500/20',
+    description: 'This has been assessed as fraud. Do not transact or interact with this entity.',
   },
 };
 
@@ -67,29 +79,54 @@ export function AssessmentHeader({ riskLevel, timestamp }: AssessmentHeaderProps
   const Icon = config.icon;
 
   return (
-    <div className={`p-6 rounded-lg ${config.bgColor}`}>
-      <div className="space-y-3">
+    <div className={`relative rounded-xl bg-gradient-to-br ${config.bgGradient} border ${config.borderColor} p-6 overflow-hidden shadow-lg ${config.glowColor}`}>
+      {/* Decorative elements */}
+      <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.03]">
+        <Icon className="w-full h-full" />
+      </div>
+
+      {/* Subtle grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+          backgroundSize: '20px 20px',
+        }}
+      />
+
+      <div className="relative space-y-4">
         {/* Label */}
-        <p className="text-xs text-gray-400 uppercase tracking-wider">Assessment Result</p>
+        <div className="flex items-center gap-2">
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+          <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-medium px-2">
+            Assessment Result
+          </p>
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+        </div>
 
         {/* Result with icon */}
-        <div className="flex items-center gap-3">
-          <Icon className={`h-8 w-8 ${config.color}`} />
-          <h2 className={`text-3xl font-bold ${config.color}`}>
+        <div className="flex items-center justify-center gap-4">
+          <div className={`p-3 rounded-xl bg-zinc-900/50 border ${config.borderColor}`}>
+            <Icon className={`h-8 w-8 ${config.color}`} />
+          </div>
+          <h2 className={`text-4xl font-heading font-bold tracking-tight ${config.color}`}>
             {config.label}
           </h2>
         </div>
 
         {/* Description */}
-        <p className="text-gray-300 text-sm leading-relaxed">
+        <p className="text-gray-400 text-sm leading-relaxed text-center max-w-md mx-auto">
           {config.description}
         </p>
 
         {/* Timestamp */}
         {timestamp && (
-          <p className="text-xs text-gray-500 mt-2">
-            as on {formatTimestamp(new Date(timestamp))}
-          </p>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Clock className="h-3 w-3 text-gray-600" />
+            <p className="text-xs text-gray-600">
+              {formatTimestamp(new Date(timestamp))}
+            </p>
+          </div>
         )}
       </div>
     </div>

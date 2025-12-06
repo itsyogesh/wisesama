@@ -1,4 +1,4 @@
-import { Info, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Info, ExternalLink, AlertTriangle, Brain, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import type { MLAnalysisResult, TransactionSummary } from '@wisesama/types';
 
 interface MLAnalysisSectionProps {
@@ -13,103 +13,145 @@ export function MLAnalysisSection({ mlAnalysis, transactionSummary, blockExplore
   }
 
   const riskScore = mlAnalysis.riskScore ?? 50;
-  const riskColor = riskScore < 30 ? '#83FF8F' : riskScore < 70 ? '#FFA500' : '#FF3939';
+  const riskColor = riskScore < 30 ? '#10B981' : riskScore < 70 ? '#F59E0B' : '#EF4444';
+  const riskGradient = riskScore < 30
+    ? 'from-emerald-500/10 to-transparent'
+    : riskScore < 70
+      ? 'from-amber-500/10 to-transparent'
+      : 'from-red-500/10 to-transparent';
 
   return (
-    <div className="rounded-xl bg-zinc-900 border border-zinc-800 overflow-hidden">
+    <div className={`rounded-xl bg-gradient-to-br ${riskGradient} border border-zinc-800 overflow-hidden`}>
       {/* Header */}
-      <div className="p-6 border-b border-zinc-800">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-medium text-gray-300">
-            Machine Learning Analysis of Wallet Transactions
-          </h3>
-          <Info className="h-4 w-4 text-gray-500" />
+      <div className="px-6 py-4 border-b border-zinc-800/50">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-zinc-800/50">
+            <Brain className="h-5 w-5 text-wisesama-purple-light" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">
+              ML Transaction Analysis
+            </h3>
+            <p className="text-[10px] text-gray-500 uppercase tracking-wider">Wallet Behavior Pattern</p>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-6">
-        {/* Probability Bar */}
+      <div className="p-6 space-y-5">
+        {/* Probability Display */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-400">Probability of fraud is</span>
-            <span className="text-lg font-semibold" style={{ color: riskColor }}>
-              {riskScore}%
-            </span>
+          <div className="flex items-end justify-between">
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Fraud Probability</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold tabular-nums" style={{ color: riskColor }}>
+                  {riskScore}
+                </span>
+                <span className="text-lg font-medium" style={{ color: riskColor }}>%</span>
+              </div>
+            </div>
+            {mlAnalysis.confidence && (
+              <div className="text-right">
+                <p className="text-xs text-gray-600">Confidence</p>
+                <p className="text-sm font-medium text-gray-400">
+                  {Math.round(mlAnalysis.confidence * 100)}%
+                </p>
+              </div>
+            )}
           </div>
-          <div className="relative h-2 rounded-full bg-zinc-800 overflow-hidden">
+
+          {/* Risk Bar */}
+          <div className="relative h-2.5 rounded-full bg-zinc-800/80 overflow-hidden">
             <div
-              className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+              className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
               style={{
                 width: `${riskScore}%`,
                 backgroundColor: riskColor,
-                boxShadow: `0 0 8px ${riskColor}40`,
+                boxShadow: `0 0 12px ${riskColor}40`,
               }}
             />
+            {/* Threshold markers */}
+            <div className="absolute top-0 bottom-0 left-[30%] w-px bg-zinc-600/50" />
+            <div className="absolute top-0 bottom-0 left-[70%] w-px bg-zinc-600/50" />
+          </div>
+          <div className="flex justify-between text-[10px] text-gray-600 px-0.5">
+            <span>Low</span>
+            <span>Medium</span>
+            <span>High</span>
           </div>
         </div>
 
-        {/* Transaction Data Grid */}
+        {/* Transaction Summary Grid */}
         {transactionSummary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-zinc-800/50">
-              <p className="text-xs text-gray-500 mb-1">Total Transactions</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-white">
-                  {transactionSummary.totalTransactions}
-                </span>
-                {blockExplorerUrl && (
-                  <a
-                    href={blockExplorerUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-purple-600/80 text-white hover:bg-purple-600 transition-colors"
-                  >
-                    Explorer
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="p-3 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
+              <div className="flex items-center gap-2 mb-1">
+                <Wallet className="h-3.5 w-3.5 text-gray-500" />
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Transactions</p>
               </div>
+              <p className="text-xl font-bold text-white tabular-nums">
+                {transactionSummary.totalTransactions}
+              </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-zinc-800/50">
-              <p className="text-xs text-gray-500 mb-1">Total Received</p>
-              <span className="text-xl font-bold text-green-400">
+            <div className="p-3 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Received</p>
+              </div>
+              <p className="text-lg font-bold text-emerald-400 tabular-nums truncate" title={transactionSummary.totalReceived}>
                 {transactionSummary.totalReceived}
-              </span>
+              </p>
             </div>
 
-            <div className="p-4 rounded-lg bg-zinc-800/50">
-              <p className="text-xs text-gray-500 mb-1">Total Sent</p>
-              <span className="text-xl font-bold text-red-400">
+            <div className="p-3 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="h-3.5 w-3.5 text-red-500" />
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Sent</p>
+              </div>
+              <p className="text-lg font-bold text-red-400 tabular-nums truncate" title={transactionSummary.totalSent}>
                 {transactionSummary.totalSent}
-              </span>
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-zinc-800/40 border border-zinc-700/30">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px] font-bold text-wisesama-purple-light">$</span>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider">Balance</p>
+              </div>
+              <p className="text-lg font-bold text-wisesama-purple-light tabular-nums truncate" title={transactionSummary.currentBalance}>
+                {transactionSummary.currentBalance}
+              </p>
             </div>
           </div>
         )}
 
-        {/* Current Balance */}
-        {transactionSummary && (
-          <div className="p-4 rounded-lg bg-zinc-800/50">
-            <p className="text-xs text-gray-500 mb-1">Current Balance</p>
-            <span className="text-2xl font-bold text-purple-400">
-              {transactionSummary.currentBalance}
-            </span>
-          </div>
+        {/* Block Explorer Link */}
+        {blockExplorerUrl && (
+          <a
+            href={blockExplorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-wisesama-purple/20 text-wisesama-purple-light border border-wisesama-purple/30 hover:bg-wisesama-purple/30 transition-colors"
+          >
+            View on Block Explorer
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
         )}
 
         {/* Top Features */}
         {mlAnalysis.topFeatures && mlAnalysis.topFeatures.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-400 flex items-center gap-2">
-              Top Features influencing ML Analysis
-              <Info className="h-3.5 w-3.5 text-gray-500" />
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider flex items-center gap-2">
+              Key Indicators
+              <Info className="h-3 w-3" />
             </h4>
             <div className="flex flex-wrap gap-2">
               {mlAnalysis.topFeatures.map((feature, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1.5 rounded-md text-xs font-medium bg-zinc-800 text-gray-300"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-800/60 text-gray-300 border border-zinc-700/30"
                 >
                   {feature.name}
                 </span>
@@ -119,14 +161,12 @@ export function MLAnalysisSection({ mlAnalysis, transactionSummary, blockExplore
         )}
 
         {/* Disclaimer */}
-        <div className="flex items-start gap-3 p-4 rounded-lg bg-orange-500/5 border border-orange-500/20">
-          <AlertTriangle className="h-5 w-5 text-orange-400 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-orange-400">ML Analysis Limitations</p>
-            <p className="text-xs text-gray-400">
-              This analysis is based on on-chain transaction patterns and may not capture all fraud indicators.
-              Always conduct your own research before making any transactions.
-              Confidence: {mlAnalysis.confidence ? `${Math.round(mlAnalysis.confidence * 100)}%` : 'N/A'}
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+          <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="text-xs font-semibold text-amber-400">Analysis Disclaimer</p>
+            <p className="text-[11px] text-gray-500 leading-relaxed">
+              Based on on-chain patterns only. Always conduct independent research before transactions.
             </p>
           </div>
         </div>

@@ -1,5 +1,8 @@
-import { AlertTriangle, Flag, Clock } from 'lucide-react';
+'use client';
+
+import { Flag, Clock, CheckCircle, Copy, Check } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import type { CheckResponse } from '@wisesama/types';
 import { RiskMeter } from './risk-meter';
 import { RiskBadge } from './risk-badge';
@@ -13,6 +16,14 @@ interface ResultCardProps {
   result: CheckResponse;
 }
 
+/**
+ * Truncate address for display
+ */
+function truncateAddress(address: string, chars = 8): string {
+  if (address.length <= chars * 2 + 3) return address;
+  return `${address.slice(0, chars)}...${address.slice(-chars)}`;
+}
+
 export function ResultCard({ result }: ResultCardProps) {
   const {
     entity,
@@ -20,11 +31,24 @@ export function ResultCard({ result }: ResultCardProps) {
     chain,
     assessment,
     stats,
-    lookAlike,
     mlAnalysis,
     transactionSummary,
     links,
+    identity,
   } = result;
+
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = async () => {
+    await navigator.clipboard.writeText(entity);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Determine if we should show identity name as title
+  const hasVerifiedIdentity = entityType === 'ADDRESS' && identity?.hasIdentity && identity?.displayName;
+  const displayTitle = hasVerifiedIdentity ? identity.displayName : entity;
+  const showAddressSubtitle = hasVerifiedIdentity;
 
   return (
     <div className="space-y-6">
@@ -33,20 +57,69 @@ export function ResultCard({ result }: ResultCardProps) {
         {/* Header */}
         <div className="p-6 border-b border-zinc-800">
           <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2 py-1 rounded text-xs font-medium bg-purple-600/80 text-white">
+            <div className="min-w-0 flex-1">
+              {/* Tags Row */}
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-wisesama-purple/20 text-wisesama-purple-light border border-wisesama-purple/30 uppercase tracking-wide">
                   {entityType}
                 </span>
                 {chain && (
-                  <span className="px-2 py-1 rounded text-xs font-medium bg-zinc-700 text-gray-300 capitalize">
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-800 text-gray-300 border border-zinc-700 capitalize">
                     {chain}
                   </span>
                 )}
+                {hasVerifiedIdentity && identity?.isVerified && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <CheckCircle className="h-3 w-3" />
+                    Verified Identity
+                  </span>
+                )}
               </div>
-              <h2 className="font-heading text-xl font-semibold break-all text-white">{entity}</h2>
+
+              {/* Title */}
+              <h2 className="font-heading text-2xl font-bold text-white leading-tight">
+                {displayTitle}
+              </h2>
+
+              {/* Address subtitle when showing identity name */}
+              {showAddressSubtitle && (
+                <div className="flex items-center gap-2 mt-2">
+                  <code className="text-sm text-gray-400 font-mono bg-zinc-800/50 px-2 py-1 rounded">
+                    {truncateAddress(entity, 10)}
+                  </code>
+                  <button
+                    onClick={copyToClipboard}
+                    className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors group"
+                    title="Copy full address"
+                  >
+                    {copied ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5 text-gray-500 group-hover:text-gray-300" />
+                    )}
+                  </button>
+                </div>
+              )}
+
+              {/* Full entity for non-identity addresses */}
+              {!showAddressSubtitle && entityType === 'ADDRESS' && (
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm text-gray-400 font-mono break-all">{entity}</p>
+                  <button
+                    onClick={copyToClipboard}
+                    className="p-1.5 rounded-md hover:bg-zinc-800 transition-colors group flex-shrink-0"
+                    title="Copy address"
+                  >
+                    {copied ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="h-3.5 w-3.5 text-gray-500 group-hover:text-gray-300" />
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
-            <RiskBadge riskLevel={assessment.riskLevel} />
+            <RiskBadge riskLevel={assessment.riskLevel} size="lg" />
           </div>
         </div>
 
@@ -68,26 +141,6 @@ export function ResultCard({ result }: ResultCardProps) {
           <EntityDetailsCard result={result} />
         </div>
       </div>
-
-      {/* Look-alike Warning */}
-      {lookAlike?.isLookAlike && (
-        <div className="rounded-xl bg-orange-500/10 border border-orange-500/40 p-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="h-6 w-6 text-orange-400 shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-heading font-semibold text-orange-400 mb-1">
-                Possible Impersonation Detected
-              </h3>
-              <p className="text-gray-300">{lookAlike.warning}</p>
-              {lookAlike.similarity && (
-                <p className="text-sm text-gray-400 mt-2">
-                  Similarity: {Math.round(lookAlike.similarity * 100)}%
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ML Analysis Section (for addresses only) */}
       {entityType === 'ADDRESS' && (

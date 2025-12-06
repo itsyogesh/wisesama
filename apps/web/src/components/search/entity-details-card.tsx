@@ -41,11 +41,23 @@ interface EntityDetailsCardProps {
 }
 
 const entityTypeLabels: Record<EntityType, string> = {
-  ADDRESS: 'Polkadot Address',
+  ADDRESS: 'Substrate Address', // Will be overridden with chain-specific label
   DOMAIN: 'Web Domain',
   TWITTER: 'Twitter Handle',
   EMAIL: 'Email Address',
 };
+
+/**
+ * Get the display label for entity type, using chain name for addresses
+ */
+function getEntityTypeLabel(entityType: EntityType, chain?: string | null): string {
+  if (entityType === 'ADDRESS' && chain) {
+    // Capitalize chain name (e.g., "kusama" -> "Kusama Address")
+    const chainName = chain.charAt(0).toUpperCase() + chain.slice(1);
+    return `${chainName} Address`;
+  }
+  return entityTypeLabels[entityType];
+}
 
 function StatusBadge({ found, positive }: { found: boolean; positive?: boolean }) {
   if (found) {
@@ -97,19 +109,19 @@ export function EntityDetailsCard({ result }: EntityDetailsCardProps) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Type and Chain */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-xs text-gray-500 mb-1">Type</p>
-          <span className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-purple-600/80 text-white">
-            {entityTypeLabels[entityType]}
+    <div className="space-y-5">
+      {/* Type and Chain - Compact inline badges */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] uppercase tracking-wider text-gray-600 font-medium">Type</span>
+          <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-wisesama-purple/20 text-wisesama-purple-light border border-wisesama-purple/30">
+            {getEntityTypeLabel(entityType, chain)}
           </span>
         </div>
         {chain && (
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Chain</p>
-            <span className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-zinc-700 text-gray-200 capitalize">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-gray-600 font-medium">Chain</span>
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-zinc-800/80 text-gray-200 border border-zinc-700/50 capitalize">
               {chain}
             </span>
           </div>
@@ -117,140 +129,221 @@ export function EntityDetailsCard({ result }: EntityDetailsCardProps) {
       </div>
 
       {/* Detail Rows */}
-      <div className="divide-y divide-zinc-800">
+      <div className="space-y-3">
         {/* Blacklist Status */}
-        <div className="py-4 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-gray-300">Blacklist Search Results</p>
-            {blacklist.found && blacklist.source && (
-              <p className="text-xs text-gray-500 mt-0.5">Source: {blacklist.source}</p>
-            )}
-            {blacklist.found && blacklist.threatName && (
-              <p className="text-xs text-gray-500">Category: {blacklist.threatName}</p>
-            )}
+        <div className="group relative rounded-xl bg-zinc-800/30 border border-zinc-800/50 p-4 hover:border-zinc-700/50 transition-colors">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-200">Blacklist Search</p>
+              <p className="text-xs text-gray-500">
+                {blacklist.found
+                  ? `Found in database${blacklist.source ? ` (${blacklist.source})` : ''}`
+                  : 'Not found in any known blacklists'}
+              </p>
+              {blacklist.found && blacklist.threatName && (
+                <p className="text-xs text-red-400/80">Threat: {blacklist.threatName}</p>
+              )}
+            </div>
+            <StatusBadge found={blacklist.found} positive={false} />
           </div>
-          <StatusBadge found={blacklist.found} positive={false} />
         </div>
 
         {/* Whitelist Status */}
-        <div className="py-4 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm text-gray-300">Whitelist Search Result</p>
-            {whitelist.found && whitelist.name && (
-              <p className="text-xs text-gray-500 mt-0.5">{whitelist.name}</p>
-            )}
-            {whitelist.found && whitelist.category && (
-              <p className="text-xs text-gray-500 capitalize">{whitelist.category}</p>
-            )}
+        <div className="group relative rounded-xl bg-zinc-800/30 border border-zinc-800/50 p-4 hover:border-zinc-700/50 transition-colors">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-gray-200">Whitelist Search</p>
+              <p className="text-xs text-gray-500">
+                {whitelist.found
+                  ? `Verified: ${whitelist.name || 'Known entity'}${whitelist.category ? ` (${whitelist.category})` : ''}`
+                  : 'Not found in verified whitelists'}
+              </p>
+            </div>
+            <StatusBadge found={whitelist.found} positive={true} />
           </div>
-          <StatusBadge found={whitelist.found} positive={true} />
         </div>
 
         {/* On-chain Identity (for addresses) */}
         {entityType === 'ADDRESS' && (
           <div className="py-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm text-gray-300">On-chain Identity</p>
-                {identity.hasIdentity && identity.displayName && (
-                  <p className="text-sm font-medium text-white mt-1">{identity.displayName}</p>
-                )}
-                {identity.hasIdentity && (
-                  <p className="text-xs text-gray-500">
-                    {identity.isVerified ? 'Verified by registrar' : 'Not verified'}
-                  </p>
-                )}
-                {/* Identity Timeline */}
-                {identity.timeline && (identity.timeline.identitySetAt || identity.timeline.firstVerifiedAt) && (
-                  <div className="mt-2 space-y-1">
-                    {identity.timeline.identitySetAt && (
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <Calendar className="h-3 w-3 text-gray-400" />
-                        <span className="text-gray-400">Identity set:</span>
-                        <span>{formatShortDate(identity.timeline.identitySetAt)}</span>
-                        <span className="text-gray-600">({formatRelativeTime(identity.timeline.identitySetAt)})</span>
-                      </div>
-                    )}
-                    {identity.timeline.isMigrated && (
-                      <p className="text-xs text-yellow-500/70 ml-4">
-                        ↳ Originally on {identity.timeline.source === 'relay_chain' ? 'relay chain' : 'People chain'}
-                      </p>
-                    )}
-                    {identity.timeline.firstVerifiedAt && (
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                        <CheckCircle className="h-3 w-3 text-green-400" />
-                        <span className="text-gray-400">Verified:</span>
-                        <span>{formatShortDate(identity.timeline.firstVerifiedAt)}</span>
-                        <span className="text-gray-600">({formatRelativeTime(identity.timeline.firstVerifiedAt)})</span>
-                      </div>
+            {/* Identity Card */}
+            <div className={`rounded-xl overflow-hidden ${
+              identity.isVerified
+                ? 'bg-gradient-to-br from-emerald-500/5 via-zinc-900 to-zinc-900 border border-emerald-500/20'
+                : identity.hasIdentity
+                  ? 'bg-gradient-to-br from-orange-500/5 via-zinc-900 to-zinc-900 border border-orange-500/20'
+                  : 'bg-zinc-800/50 border border-zinc-700/50'
+            }`}>
+              {/* Card Header */}
+              <div className="px-5 py-4 border-b border-zinc-800/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* Identity Icon */}
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      identity.isVerified
+                        ? 'bg-emerald-500/10 ring-2 ring-emerald-500/30'
+                        : identity.hasIdentity
+                          ? 'bg-orange-500/10 ring-2 ring-orange-500/30'
+                          : 'bg-zinc-700/50 ring-2 ring-zinc-600/30'
+                    }`}>
+                      {identity.isVerified ? (
+                        <CheckCircle className="h-5 w-5 text-emerald-400" />
+                      ) : identity.hasIdentity ? (
+                        <AlertTriangle className="h-5 w-5 text-orange-400" />
+                      ) : (
+                        <User className="h-5 w-5 text-gray-500" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">On-chain Identity</h4>
+                      {identity.hasIdentity && identity.displayName && (
+                        <p className="text-lg font-semibold text-white mt-0.5">{identity.displayName}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                    identity.isVerified
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                      : identity.hasIdentity
+                        ? 'bg-orange-500/10 text-orange-400 border border-orange-500/30'
+                        : 'bg-zinc-700/50 text-gray-400 border border-zinc-600/50'
+                  }`}>
+                    {identity.isVerified ? (
+                      <><CheckCircle className="h-4 w-4" /> Verified</>
+                    ) : identity.hasIdentity ? (
+                      <><AlertTriangle className="h-4 w-4" /> Unverified</>
+                    ) : (
+                      <><HelpCircle className="h-4 w-4" /> No Identity</>
                     )}
                   </div>
-                )}
+                </div>
               </div>
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                identity.isVerified
-                  ? 'bg-green-500/10 text-green-400'
-                  : identity.hasIdentity
-                    ? 'bg-orange-500/10 text-orange-400'
-                    : 'bg-gray-500/10 text-gray-400'
-              }`}>
-                {identity.isVerified ? (
-                  <><CheckCircle className="h-3.5 w-3.5" /> Verified</>
-                ) : identity.hasIdentity ? (
-                  <><AlertTriangle className="h-3.5 w-3.5" /> Unverified</>
-                ) : (
-                  <><HelpCircle className="h-3.5 w-3.5" /> No Identity</>
-                )}
-              </span>
-            </div>
 
-            {/* Social Links */}
-            {identity.hasIdentity && (identity.twitter || identity.web || identity.riot) && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {identity.twitter && (
-                  <a
-                    href={`https://twitter.com/${identity.twitter.replace('@', '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
-                  >
-                    <Twitter className="h-3.5 w-3.5" />
-                    {identity.twitter}
-                  </a>
-                )}
-                {identity.web && (
-                  <a
-                    href={identity.web.startsWith('http') ? identity.web : `https://${identity.web}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-800 text-gray-300 hover:bg-zinc-700 transition-colors"
-                  >
-                    <Globe className="h-3.5 w-3.5" />
-                    {identity.web}
-                  </a>
-                )}
-                {identity.riot && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-zinc-800 text-gray-300">
-                    <MessageSquare className="h-3.5 w-3.5" />
-                    {identity.riot}
-                  </span>
-                )}
-              </div>
-            )}
+              {/* Card Body */}
+              {identity.hasIdentity && (
+                <div className="px-5 py-4 space-y-4">
+                  {/* Verification Info */}
+                  <p className="text-sm text-gray-400">
+                    {identity.isVerified
+                      ? 'This identity has been verified by a Polkadot registrar.'
+                      : 'This identity has not been verified by a registrar.'}
+                  </p>
+
+                  {/* Timeline Section */}
+                  {identity.timeline && (identity.timeline.identitySetAt || identity.timeline.firstVerifiedAt) && (
+                    <div className="space-y-3">
+                      <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider">Timeline</h5>
+                      <div className="relative pl-4 border-l-2 border-zinc-700/50 space-y-4">
+                        {identity.timeline.identitySetAt && (
+                          <div className="relative">
+                            {/* Timeline dot */}
+                            <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-zinc-800 border-2 border-wisesama-purple" />
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-3.5 w-3.5 text-wisesama-purple-light" />
+                                <span className="text-sm font-medium text-white">Identity Created</span>
+                              </div>
+                              <p className="text-sm text-gray-400">
+                                {formatShortDate(identity.timeline.identitySetAt)}
+                                <span className="text-gray-500 ml-2">({formatRelativeTime(identity.timeline.identitySetAt)})</span>
+                              </p>
+                              {identity.timeline.isMigrated && (
+                                <p className="text-xs text-amber-400/70 flex items-center gap-1.5 mt-1">
+                                  <span className="w-1 h-1 rounded-full bg-amber-400/70" />
+                                  Migrated from {identity.timeline.source === 'relay_chain' ? 'Relay Chain' : 'People Chain'}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {identity.timeline.firstVerifiedAt && (
+                          <div className="relative">
+                            {/* Timeline dot */}
+                            <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-zinc-800 border-2 border-emerald-500" />
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
+                                <span className="text-sm font-medium text-white">Verified by Registrar</span>
+                              </div>
+                              <p className="text-sm text-gray-400">
+                                {formatShortDate(identity.timeline.firstVerifiedAt)}
+                                <span className="text-gray-500 ml-2">({formatRelativeTime(identity.timeline.firstVerifiedAt)})</span>
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Links */}
+                  {(identity.twitter || identity.web || identity.riot) && (
+                    <div className="space-y-3">
+                      <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider">Connected Accounts</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {identity.twitter && (
+                          <a
+                            href={`https://twitter.com/${identity.twitter.replace('@', '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-zinc-800/80 text-gray-200 hover:bg-zinc-700 hover:text-white transition-all border border-zinc-700/50 hover:border-zinc-600 group"
+                          >
+                            <Twitter className="h-4 w-4 text-[#1DA1F2] group-hover:scale-110 transition-transform" />
+                            {identity.twitter}
+                            <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-gray-400" />
+                          </a>
+                        )}
+                        {identity.web && (
+                          <a
+                            href={identity.web.startsWith('http') ? identity.web : `https://${identity.web}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-zinc-800/80 text-gray-200 hover:bg-zinc-700 hover:text-white transition-all border border-zinc-700/50 hover:border-zinc-600 group"
+                          >
+                            <Globe className="h-4 w-4 text-blue-400 group-hover:scale-110 transition-transform" />
+                            {identity.web.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                            <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-gray-400" />
+                          </a>
+                        )}
+                        {identity.riot && (
+                          <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-zinc-800/80 text-gray-200 border border-zinc-700/50">
+                            <MessageSquare className="h-4 w-4 text-green-400" />
+                            {identity.riot}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* No Identity State */}
+              {!identity.hasIdentity && (
+                <div className="px-5 py-4">
+                  <p className="text-sm text-gray-500">
+                    This address has no on-chain identity set. On-chain identities help establish trust and accountability.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {/* Transaction Tracing Graph */}
         {entityType === 'ADDRESS' && (
-          <div className="py-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-gray-300">Transaction Tracing Graph Analysis</p>
-              <p className="text-xs text-gray-500 mt-0.5">Not found in transaction tracing graph</p>
+          <div className="group relative rounded-xl bg-zinc-800/30 border border-zinc-800/50 p-4 hover:border-zinc-700/50 transition-colors">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-gray-200">Transaction Graph Analysis</p>
+                <p className="text-xs text-gray-500">Not found in transaction tracing graph</p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-700/50 text-gray-400 border border-zinc-600/30">
+                <HelpCircle className="h-3.5 w-3.5" />
+                N/A
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">
-              <HelpCircle className="h-3.5 w-3.5" />
-              N/A
-            </span>
           </div>
         )}
 
@@ -302,33 +395,75 @@ export function EntityDetailsCard({ result }: EntityDetailsCardProps) {
 
         {/* Look-alike Assessment (for Twitter) */}
         {entityType === 'TWITTER' && (
-          <div className="py-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-gray-300">Look-alike Assessment</p>
-              {lookAlike?.isLookAlike ? (
-                <>
-                  <p className="text-xs text-orange-400 mt-0.5">{lookAlike.warning}</p>
-                  {lookAlike.knownHandle && (
-                    <p className="text-xs text-gray-500">
-                      Possibly impersonating: @{lookAlike.knownHandle}
-                    </p>
+          <div className={`group relative rounded-xl p-4 transition-colors ${
+            lookAlike?.isLookAlike
+              ? 'bg-gradient-to-br from-orange-500/10 via-zinc-900/50 to-zinc-900/50 border border-orange-500/30'
+              : 'bg-zinc-800/30 border border-zinc-800/50 hover:border-zinc-700/50'
+          }`}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center gap-2">
+                  {lookAlike?.isLookAlike && (
+                    <AlertTriangle className="h-4 w-4 text-orange-400" />
                   )}
-                </>
-              ) : (
-                <p className="text-xs text-gray-500 mt-0.5">Not Applicable</p>
-              )}
+                  <p className="text-sm font-medium text-gray-200">Look-alike Assessment</p>
+                </div>
+
+                {lookAlike?.isLookAlike ? (
+                  <div className="space-y-3">
+                    <p className="text-xs text-gray-400">{lookAlike.warning}</p>
+
+                    {/* Handle Comparison */}
+                    {lookAlike.knownHandle && (
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/50">
+                        {/* Suspected Handle */}
+                        <div className="flex-1 text-center">
+                          <p className="text-[10px] text-orange-400/70 uppercase tracking-wider mb-1">Searched</p>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <Twitter className="h-3.5 w-3.5 text-orange-400" />
+                            <span className="text-sm font-mono text-orange-300">{result.entity}</span>
+                          </div>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="flex flex-col items-center gap-0.5 text-gray-600">
+                          <span className="text-[10px] uppercase tracking-wider">vs</span>
+                        </div>
+
+                        {/* Known Handle */}
+                        <div className="flex-1 text-center">
+                          <p className="text-[10px] text-emerald-400/70 uppercase tracking-wider mb-1">Original</p>
+                          <a
+                            href={`https://twitter.com/${lookAlike.knownHandle}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 hover:opacity-80 transition-opacity"
+                          >
+                            <Twitter className="h-3.5 w-3.5 text-emerald-400" />
+                            <span className="text-sm font-mono text-emerald-300">@{lookAlike.knownHandle}</span>
+                            <ExternalLink className="h-3 w-3 text-gray-500" />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500">No look-alike patterns detected</p>
+                )}
+              </div>
+
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium shrink-0 ${
+                lookAlike?.isLookAlike
+                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                  : 'bg-zinc-700/50 text-gray-400 border border-zinc-600/30'
+              }`}>
+                {lookAlike?.isLookAlike ? (
+                  <><AlertTriangle className="h-3.5 w-3.5" /> Warning</>
+                ) : (
+                  <><CheckCircle className="h-3.5 w-3.5" /> Clean</>
+                )}
+              </span>
             </div>
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-              lookAlike?.isLookAlike
-                ? 'bg-orange-500/10 text-orange-400'
-                : 'bg-gray-500/10 text-gray-400'
-            }`}>
-              {lookAlike?.isLookAlike ? (
-                <><AlertTriangle className="h-3.5 w-3.5" /> Warning</>
-              ) : (
-                <><CheckCircle className="h-3.5 w-3.5" /> Clean</>
-              )}
-            </span>
           </div>
         )}
 

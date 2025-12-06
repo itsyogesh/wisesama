@@ -472,7 +472,6 @@ export class SubscanService {
     chain: 'polkadot' | 'kusama'
   ): Promise<IdentityTimeline | null> {
     if (!SUBSCAN_API_KEY) {
-      console.warn('Subscan API key not configured for timeline lookup');
       return null;
     }
 
@@ -572,11 +571,16 @@ export class SubscanService {
 
   /**
    * Query Subscan for the earliest identity.setIdentity extrinsic
+   * Includes retry logic for rate limiting (429 errors)
    */
   private async queryIdentityExtrinsic(
     baseUrl: string,
-    address: string
+    address: string,
+    retryCount = 0
   ): Promise<{ timestamp: Date; blockNum: number } | null> {
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 1000; // 1 second delay between retries
+
     try {
       const response = await globalThis.fetch(
         `${baseUrl}/api/v2/scan/extrinsics`,
@@ -598,13 +602,22 @@ export class SubscanService {
         }
       );
 
+      // Handle rate limiting with retry
+      if (response.status === 429 && retryCount < MAX_RETRIES) {
+        console.log(`[Timeline] Rate limited, retrying in ${RETRY_DELAY}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+        return this.queryIdentityExtrinsic(baseUrl, address, retryCount + 1);
+      }
+
       if (!response.ok) {
         return null;
       }
 
       const data = (await response.json()) as {
         code?: number;
+        message?: string;
         data?: {
+          count?: number;
           extrinsics?: Array<{ block_timestamp: number; block_num: number }>;
         };
       };
@@ -631,11 +644,16 @@ export class SubscanService {
 
   /**
    * Query Subscan for the earliest JudgementGiven event for an address
+   * Includes retry logic for rate limiting (429 errors)
    */
   private async queryJudgementEvent(
     baseUrl: string,
-    address: string
+    address: string,
+    retryCount = 0
   ): Promise<Date | null> {
+    const MAX_RETRIES = 2;
+    const RETRY_DELAY = 1000;
+
     try {
       const response = await globalThis.fetch(`${baseUrl}/api/v2/scan/events`, {
         method: 'POST',
@@ -653,6 +671,12 @@ export class SubscanService {
         }),
         signal: AbortSignal.timeout(SUBSCAN_TIMEOUT),
       });
+
+      // Handle rate limiting with retry
+      if (response.status === 429 && retryCount < MAX_RETRIES) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+        return this.queryJudgementEvent(baseUrl, address, retryCount + 1);
+      }
 
       if (!response.ok) {
         return null;
