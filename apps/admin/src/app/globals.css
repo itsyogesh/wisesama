@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 262 100% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 64%;
+    --accent: 262 100% 59%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 61%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 262 100% 59%;
+    --radius: 0.5rem;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-accent: 262 100% 59%;
+    --sidebar-accent-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-wisesama-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-wisesama-dark-secondary rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-wisesama-purple/50;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-wisesama-dark-secondary/50 backdrop-blur-sm border border-white/5 rounded-xl;
+  }
+
+  .gradient-border {
+    @apply relative;
+  }
+
+  .gradient-border::before {
+    content: "";
+    @apply absolute inset-0 rounded-xl p-[1px];
+    background: linear-gradient(135deg, rgba(113, 46, 255, 0.5), rgba(138, 16, 111, 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .btn-primary {
+    @apply bg-wisesama-purple hover:bg-wisesama-purple-accent text-white font-medium px-4 py-2 rounded-lg transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-wisesama-dark-secondary hover:bg-wisesama-dark-secondary/80 text-white font-medium px-4 py-2 rounded-lg border border-white/10 transition-all duration-200;
+  }
+
+  .input-field {
+    @apply bg-wisesama-dark-secondary/50 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/40 focus:outline-none focus:border-wisesama-purple/50 focus:ring-1 focus:ring-wisesama-purple/30 transition-all duration-200;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply bg-yellow-500/20 text-yellow-400;
+  }
+
+  .status-approved {
+    @apply bg-green-500/20 text-green-400;
+  }
+
+  .status-rejected {
+    @apply bg-red-500/20 text-red-400;
+  }
+
+  .status-under-review {
+    @apply bg-blue-500/20 text-blue-400;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-wisesama-purple to-wisesama-pink-glow;
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(113, 46, 255, 0.3);
+  }
+
+  .glow-purple-intense {
+    box-shadow: 0 0 40px rgba(113, 46, 255, 0.5);
+  }
+}

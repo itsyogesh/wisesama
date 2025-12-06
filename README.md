@@ -34,7 +34,8 @@ Wisesama provides real-time risk assessment for Polkadot/Kusama addresses, domai
 wisesama/
 ├── apps/
 │   ├── api/                    # Fastify API server
-│   └── web/                    # Next.js frontend
+│   ├── web/                    # Next.js frontend (public)
+│   └── admin/                  # Next.js admin dashboard (protected)
 ├── packages/
 │   ├── database/               # Prisma schema & client
 │   ├── types/                  # Shared TypeScript types
@@ -47,6 +48,7 @@ wisesama/
 | Document | Description |
 |----------|-------------|
 | [API Architecture](./docs/API.md) | Full API documentation - endpoints, services, database schema |
+| [Admin Dashboard](./docs/ADMIN-DASHBOARD.md) | Admin interface for whitelist management and report review |
 | [ML & Risk Scoring](./docs/ML-RISK-SCORING.md) | Risk scoring algorithm, feature extraction, data sources |
 | [Swagger UI](http://localhost:3001/docs) | Interactive API documentation (when running locally) |
 

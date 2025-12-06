@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { decodeAddress } from '@polkadot/util-crypto';
 import { u8aToHex } from '@polkadot/util';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -620,6 +621,27 @@ const whitelistedEntities = [
 
 async function main() {
   console.log('Seeding database...');
+
+  // Create admin user
+  const adminEmail = 'admin@wisesama.com';
+  const adminPassword = 'admin123'; // Change in production!
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      passwordHash,
+      role: 'ADMIN',
+    },
+    create: {
+      email: adminEmail,
+      passwordHash,
+      role: 'ADMIN',
+      tier: 'ENTERPRISE',
+      remainingQuota: 1000000,
+    },
+  });
+  console.log(`  ✓ Admin user: ${adminEmail} (password: ${adminPassword})`);
 
   // Seed chains
   for (const chain of chains) {

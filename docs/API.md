@@ -39,7 +39,8 @@ wisesama/
 │   │   │   ├── lib/            # Redis, external clients
 │   │   │   └── utils/          # Helpers (normalization, detection)
 │   │   └── scripts/            # CLI utilities
-│   └── web/                    # Next.js frontend (separate)
+│   ├── web/                    # Next.js frontend (public)
+│   └── admin/                  # Next.js admin dashboard (see ADMIN-DASHBOARD.md)
 │
 ├── packages/
 │   ├── database/               # Prisma schema & client
@@ -240,6 +241,15 @@ Returns Polkadot Identity Pallet data (display name, judgements, social links).
 POST /auth/register   - Create account
 POST /auth/login      - Get JWT token
 GET  /auth/me         - Current user profile (requires Bearer token)
+```
+
+#### Admin Auth (`/api/v1/auth/admin`)
+
+Dedicated endpoints for the Admin Dashboard (see [ADMIN-DASHBOARD.md](./ADMIN-DASHBOARD.md)):
+
+```
+POST /auth/admin/login     - Admin login (returns JWT + user info)
+GET  /auth/admin/validate  - Validate admin JWT token
 ```
 
 #### API Keys (`/api/v1/api-keys`)

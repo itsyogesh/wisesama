@@ -128,6 +128,114 @@ export async function authRoutes(fastify: FastifyInstance) {
     },
   });
 
+  // Admin login - requires admin role
+  fastify.post('/auth/admin/login', {
+    schema: {
+      tags: ['auth'],
+      description: 'Admin login endpoint',
+      body: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', format: 'email' },
+          password: { type: 'string' },
+        },
+        required: ['email', 'password'],
+      },
+    },
+    handler: async (request, reply) => {
+      const parsed = loginSchema.safeParse(request.body);
+      if (!parsed.success) {
+        reply.status(400);
+        return { success: false, message: 'Invalid input' };
+      }
+
+      const { email, password } = parsed.data;
+
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user || !user.passwordHash) {
+        reply.status(401);
+        return { success: false, message: 'Invalid credentials' };
+      }
+
+      const valid = await bcrypt.compare(password, user.passwordHash);
+      if (!valid) {
+        reply.status(401);
+        return { success: false, message: 'Invalid credentials' };
+      }
+
+      // Check admin role
+      if (user.role !== 'ADMIN') {
+        reply.status(403);
+        return { success: false, message: 'Admin access required' };
+      }
+
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+        expiresIn: JWT_EXPIRES_IN,
+      });
+
+      return {
+        success: true,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          },
+        },
+      };
+    },
+  });
+
+  // Validate admin token
+  fastify.get('/auth/admin/validate', {
+    schema: {
+      tags: ['auth'],
+      description: 'Validate admin token',
+      headers: {
+        type: 'object',
+        properties: {
+          authorization: { type: 'string' },
+        },
+      },
+    },
+    handler: async (request, reply) => {
+      const auth = request.headers.authorization;
+      if (!auth?.startsWith('Bearer ')) {
+        reply.status(401);
+        return { success: false, message: 'Unauthorized' };
+      }
+
+      const token = auth.slice(7);
+      try {
+        const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
+        const user = await prisma.user.findUnique({
+          where: { id: payload.userId },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+          },
+        });
+
+        if (!user) {
+          reply.status(401);
+          return { success: false, message: 'User not found' };
+        }
+
+        if (user.role !== 'ADMIN') {
+          reply.status(403);
+          return { success: false, message: 'Admin access required' };
+        }
+
+        return { success: true, data: { user } };
+      } catch {
+        reply.status(401);
+        return { success: false, message: 'Invalid token' };
+      }
+    },
+  });
+
   // Get current user
   fastify.get('/auth/me', {
     schema: {

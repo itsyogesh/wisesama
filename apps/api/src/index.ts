@@ -17,6 +17,9 @@ import { adminRoutes } from './modules/admin/admin.routes';
 import { whitelistRoutes } from './modules/admin/whitelist.routes';
 import { reportsAdminRoutes } from './modules/admin/reports.routes';
 import { contributionsRoutes } from './modules/admin/contributions.routes';
+import { whitelistRequestsAdminRoutes } from './modules/admin/whitelist-requests.routes';
+import { activityAdminRoutes } from './modules/admin/activity.routes';
+import { whitelistRequestRoutes } from './modules/whitelist/request.routes';
 import { jobsRoutes } from './modules/jobs/jobs.routes';
 import { ratelimit } from './lib/redis';
 
@@ -43,11 +46,17 @@ async function buildApp() {
     runFirst: true,
   });
 
-  // Security
-  await fastify.register(helmet);
+  // Security - CORS must be registered before helmet
   await fastify.register(cors, {
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: process.env.CORS_ORIGIN?.split(',') || [
+      'http://localhost:3000',
+      'http://localhost:3002', // Admin dashboard
+    ],
     credentials: true,
+  });
+  await fastify.register(helmet, {
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   });
 
   // Rate limiting with Upstash
@@ -153,11 +162,16 @@ async function buildApp() {
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
   await fastify.register(jobsRoutes, { prefix: '/api/v1' });
 
+  // Public whitelist routes
+  await fastify.register(whitelistRequestRoutes, { prefix: '/api/v1' });
+
   // Admin routes (require admin role)
   await fastify.register(adminRoutes, { prefix: '/api/v1' });
   await fastify.register(whitelistRoutes, { prefix: '/api/v1' });
   await fastify.register(reportsAdminRoutes, { prefix: '/api/v1' });
   await fastify.register(contributionsRoutes, { prefix: '/api/v1' });
+  await fastify.register(whitelistRequestsAdminRoutes, { prefix: '/api/v1' });
+  await fastify.register(activityAdminRoutes, { prefix: '/api/v1' });
 
   return fastify;
 }

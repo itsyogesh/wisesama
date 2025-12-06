@@ -117,7 +117,6 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
         where: { id },
         include: {
           chain: { select: { code: true, name: true } },
-          identity: true,
         },
       });
 

@@ -253,42 +253,8 @@ export class PolkadotService {
       if (chainRecord) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const judgementsJson = judgements as any;
-        await prisma.polkadotIdentity.upsert({
-          where: {
-            address_chainId: {
-              address: normalizedAddress,
-              chainId: chainRecord.id,
-            },
-          },
-          create: {
-            address: normalizedAddress,
-            chainId: chainRecord.id,
-            displayName: identityInfo.displayName,
-            legalName: identityInfo.legalName,
-            email: identityInfo.email,
-            twitter: identityInfo.twitter,
-            web: identityInfo.web,
-            riot: identityInfo.riot,
-            hasIdentity: true,
-            isVerified,
-            judgements: judgementsJson,
-            lastSyncedAt: new Date(),
-          },
-          update: {
-            displayName: identityInfo.displayName,
-            legalName: identityInfo.legalName,
-            email: identityInfo.email,
-            twitter: identityInfo.twitter,
-            web: identityInfo.web,
-            riot: identityInfo.riot,
-            hasIdentity: true,
-            isVerified,
-            judgements: judgementsJson,
-            lastSyncedAt: new Date(),
-          },
-        });
 
-        // Also upsert to new unified Identity table (with normalized twitter/web for reverse lookups)
+        // Upsert to unified Identity table (with normalized twitter/web for reverse lookups)
         const identitySource = getIdentitySource(chain);
         await prisma.identity.upsert({
           where: {
