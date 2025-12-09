@@ -19,17 +19,17 @@ function BlogCard({ title, date, excerpt, slug, featured = false }: BlogCardProp
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Link href={`/blog/${slug}`} className="block h-full">
-        <div className="bg-white rounded-xl p-6 h-full flex flex-col min-h-[280px]">
+        <div className="bg-zinc-900/80 border border-white/10 rounded-xl p-6 h-full flex flex-col min-h-[280px] backdrop-blur-sm transition-colors hover:border-wisesama-purple/50">
           {/* Date */}
           <span className="text-wisesama-purple font-medium text-sm mb-3">{date}</span>
 
           {/* Title */}
-          <h3 className="font-heading font-semibold text-xl text-gray-900 mb-3 line-clamp-2">
+          <h3 className="font-heading font-semibold text-xl text-white mb-3 line-clamp-2">
             {title}
           </h3>
 
           {/* Excerpt */}
-          <p className="text-gray-600 text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
+          <p className="text-gray-400 text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
             {excerpt}
           </p>
 
@@ -38,8 +38,8 @@ function BlogCard({ title, date, excerpt, slug, featured = false }: BlogCardProp
             <button
               className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-colors ${
                 featured
-                  ? 'bg-wisesama-purple text-white hover:bg-purple-700'
-                  : 'border-2 border-gray-300 text-gray-700 hover:border-wisesama-purple hover:text-wisesama-purple'
+                  ? 'bg-wisesama-purple text-white hover:bg-purple-600'
+                  : 'border border-white/20 text-gray-300 hover:border-wisesama-purple hover:text-wisesama-purple'
               }`}
             >
               Read Full
@@ -60,7 +60,7 @@ export function BlogsSection({ posts }: BlogsSectionProps) {
   const displayPosts = posts.slice(0, 4);
 
   return (
-    <section className="py-16 bg-wisesama-bg">
+    <section className="py-16 bg-[#0B0B11]">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">

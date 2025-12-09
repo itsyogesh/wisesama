@@ -19,7 +19,7 @@ export function RecentSpamsTicker() {
   const tickerContent = [...reports, ...reports];
 
   return (
-    <section className="py-4 bg-purple-900/30 border-y border-purple-500/20 overflow-hidden">
+    <section className="py-4 bg-white/5 border-y border-white/10 backdrop-blur overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-4">
           {/* Label */}

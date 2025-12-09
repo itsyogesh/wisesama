@@ -139,7 +139,7 @@ export function EntityTypesSection() {
   return (
     <section
       ref={ref}
-      className="relative py-24 lg:py-32 bg-[#111111] overflow-hidden"
+      className="relative py-24 lg:py-32 bg-[#0B0B11] overflow-hidden"
     >
       {/* Background pattern */}
       <div className="absolute inset-0">

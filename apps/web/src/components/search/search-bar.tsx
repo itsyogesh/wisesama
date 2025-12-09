@@ -21,7 +21,7 @@ export function SearchBar({ defaultValue = '', disabled = false }: SearchBarProp
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ viewTransitionName: 'search-bar' }}>
       <div className="relative">
         <Search className={`absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 ${disabled ? 'text-gray-600' : 'text-muted-foreground'}`} />
         <input

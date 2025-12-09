@@ -1,7 +1,6 @@
 import {
   HeroSection,
   StatsSection,
-  FeaturesSection,
   TechnologySection,
   EntityTypesSection,
   HowItWorksSection,
@@ -58,7 +57,6 @@ export default function HomePage() {
       <EntityTypesSection />
       <TechnologySection />
       <HowItWorksSection />
-      <FeaturesSection />
       <RecentReportsSection />
       <BlogsSection posts={posts} />
     </>

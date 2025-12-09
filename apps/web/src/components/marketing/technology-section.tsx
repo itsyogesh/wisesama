@@ -20,43 +20,43 @@ const technologies = [
     icon: Brain,
     title: 'ML Transaction Analysis',
     description:
-      'Advanced machine learning algorithms analyze on-chain transaction patterns to detect fraud probability with confidence scores.',
+      'Heuristic scoring engine extracting 21+ behavioral features including account age, counterparty diversity, and dust patterns.',
     color: 'from-violet-500 to-purple-600',
     glowColor: 'rgba(139, 92, 246, 0.3)',
-    stats: '95%+ accuracy',
+    stats: '21+ features',
   },
   {
     icon: UserCheck,
     title: 'On-Chain Identity',
     description:
-      'Verify Polkadot/Kusama identities with registrar judgements, timeline history, and social account connections.',
+      'Deep verification using registrar judgements, identity timelines, and migration checks across Polkadot & Kusama chains.',
     color: 'from-emerald-500 to-teal-600',
     glowColor: 'rgba(16, 185, 129, 0.3)',
-    stats: 'Real-time verification',
+    stats: 'Multi-chain check',
   },
   {
     icon: AlertTriangle,
     title: 'Look-alike Detection',
     description:
-      'Levenshtein distance algorithms detect Twitter impersonation attempts against known legitimate handles.',
+      'Advanced Levenshtein distance algorithms instantly detect impersonation attempts against known ecosystem brands and handles.',
     color: 'from-amber-500 to-orange-600',
     glowColor: 'rgba(245, 158, 11, 0.3)',
-    stats: 'Impersonation alerts',
+    stats: 'Fuzzy matching',
   },
   {
     icon: Shield,
     title: 'Blacklist & Whitelist',
     description:
-      'Cross-reference against community-maintained databases of known scammers and verified legitimate entities.',
+      'Real-time cross-referencing against Polkadot-JS phishing lists and our curated whitelist of exchanges and foundations.',
     color: 'from-red-500 to-rose-600',
     glowColor: 'rgba(239, 68, 68, 0.3)',
-    stats: '10K+ entries',
+    stats: '53k+ domains',
   },
   {
     icon: Globe,
     title: 'VirusTotal Integration',
     description:
-      'Domain scanning powered by VirusTotal with 70+ security engines for phishing and malware detection.',
+      'Enterprise-grade domain scanning querying 70+ antivirus engines and threat intelligence feeds in parallel.',
     color: 'from-cyan-500 to-blue-600',
     glowColor: 'rgba(6, 182, 212, 0.3)',
     stats: '70+ engines',
@@ -65,7 +65,7 @@ const technologies = [
     icon: GitBranch,
     title: 'Transaction Graph',
     description:
-      'Trace fund flows across addresses to identify connections to known fraudulent wallets.',
+      'Trace fund flows to detect interactions with known scammer wallets, identifying money laundering attempts.',
     color: 'from-pink-500 to-fuchsia-600',
     glowColor: 'rgba(236, 72, 153, 0.3)',
     stats: 'Fund tracing',

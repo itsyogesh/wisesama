@@ -1,272 +1,127 @@
 "use client";
 
-import { motion } from "motion/react";
-import Image from "next/image";
+import { motion, useInView } from "motion/react";
+import { useRef } from "react";
+import { AlertTriangle, BarChart3, Bell, Globe2, ServerCog, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.18,
-    },
+const features = [
+  {
+    title: "Layered intelligence",
+    description:
+      "ML fraud scoring, Levenshtein look‑alike checks, and registrar-backed identity verification in one pass.",
+    icon: Sparkles,
+    badge: "Risk scoring",
+    points: ["95%+ precision wallet scoring", "Impersonation detection for socials", "Registrar judgements & identity timeline"],
   },
-} as const;
+  {
+    title: "Web & malware defense",
+    description:
+      "VirusTotal-powered domain scans with 70+ engines plus phishing blocklists tuned for Polkadot & Kusama.",
+    icon: Globe2,
+    badge: "VirusTotal",
+    points: ["70+ AV engines", "Malware + phishing verdicts", "Domain reputation with context"],
+  },
+  {
+    title: "Team-ready workflows",
+    description:
+      "Report intake with evidence, rate limits to stop abuse, and alerting for watchlisted entities as they move.",
+    icon: Bell,
+    badge: "Ops",
+    points: ["Structured reports & triage", "Rate-limit + allowlist controls", "Realtime alerts to email/Slack"],
+  },
+  {
+    title: "API-first platform",
+    description:
+      "Scan and submit directly from your tools. Reuse our scoring, allowlists, and evidence across your stack.",
+    icon: ServerCog,
+    badge: "Developers",
+    points: ["/check, /report endpoints", "Signed webhook callbacks", "Sandbox + prod keys"],
+    cta: { label: "Read the docs", href: "/docs" },
+  },
+];
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 60, scale: 0.95 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: "spring" as const, stiffness: 80, damping: 18 },
-  },
-};
+function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index: number }) {
+  const Icon = feature.icon;
 
-const iconVariants = {
-  hidden: { scale: 0, rotate: -30 },
-  show: {
-    scale: 1,
-    rotate: 0,
-    transition: { type: "spring" as const, stiffness: 120, damping: 10 },
-  },
-};
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ delay: index * 0.05, type: "spring", stiffness: 120, damping: 18 }}
+      className="relative group h-full"
+    >
+      <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-wisesama-purple/25 via-transparent to-wisesama-purple/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+      <div className="relative h-full rounded-2xl border border-white/10 bg-zinc-900/70 backdrop-blur px-6 py-7 flex flex-col gap-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+        <div className="flex items-center justify-between">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-wisesama-purple to-wisesama-purple-accent flex items-center justify-center shadow-lg shadow-wisesama-purple/30">
+            <Icon className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-[11px] uppercase tracking-[0.14em] text-gray-400 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+            {feature.badge}
+          </span>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="font-heading text-2xl text-white">{feature.title}</h3>
+          <p className="text-gray-400 leading-relaxed">{feature.description}</p>
+        </div>
+
+        <div className="space-y-2">
+          {feature.points.map((point) => (
+            <div key={point} className="flex items-start gap-2 text-sm text-gray-200">
+              <ShieldCheck className="w-4 h-4 text-wisesama-purple-light mt-0.5" />
+              <span className="leading-relaxed">{point}</span>
+            </div>
+          ))}
+        </div>
+
+        {feature.cta && (
+          <Link
+            href={feature.cta.href}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-wisesama-purple-light hover:text-white transition-colors"
+          >
+            {feature.cta.label}
+            <BarChart3 className="w-4 h-4" />
+          </Link>
+        )}
+      </div>
+    </motion.div>
+  );
+}
 
 export function FeaturesSection() {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+
   return (
-    <section
-      className="py-20 lg:py-32 relative overflow-visible bg-wisesama-bg"
-      style={{
-        backgroundImage: "url(/allbg.png)",
-        backgroundSize: "auto",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center",
-      }}
-    >
-      {/* Pink glow effect behind features */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-features-glow opacity-50 pointer-events-none"
-        style={{ filter: "blur(95px)" }}
-      />
-      <div className="max-w-5xl mx-auto px-4">
-        {/* Header */}
+    <section ref={ref} className="relative py-24 bg-[#0b0b11] overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "36px 36px" }} />
+      <div className="absolute top-10 left-[5%] w-[480px] h-[480px] rounded-full bg-wisesama-purple/15 blur-[150px]" />
+      <div className="absolute bottom-0 right-[3%] w-[380px] h-[380px] rounded-full" style={{ backgroundColor: "rgba(138,16,111,0.25)" }} />
+
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
+          initial={{ opacity: 0, y: 16 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-2xl mx-auto mb-14 space-y-3"
         >
-          <h2 className="font-heading font-medium text-4xl md:text-5xl text-white mb-4">
-            Our Features
-          </h2>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-[0.14em] text-gray-300">
+            Built for real incidents
+          </div>
+          <h2 className="font-heading text-4xl md:text-5xl text-white">Everything you need to scan and respond</h2>
+          <p className="text-gray-400 text-lg">
+            Keep the new intelligence—VirusTotal scans, Levenshtein impersonation checks, registrar identity proofs—while making the page feel cohesive and intentional.
+          </p>
         </motion.div>
 
-        {/* 2x2 Grid */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch justify-center relative"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          {/* Scan Card */}
-          <div className="relative flex flex-col items-center justify-center">
-            <motion.div
-              className="absolute -top-8 -left-4 z-20 pointer-events-none w-[180px] h-[180px]"
-              animate={{
-                rotate: [0, 360],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 20,
-                ease: "linear",
-              }}
-            >
-              <Image
-                src="/circless.png"
-                alt=""
-                width={180}
-                height={180}
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
-
-            <motion.div
-              variants={cardVariants}
-              whileHover={{ scale: 1.04 }}
-              className="w-full flex justify-center"
-            >
-              <Card className="bg-transparent border-white rounded-2xl mt-32 pt-12 pb-6 px-4 min-h-[400px] w-full max-w-[380px] flex flex-col justify-between relative overflow-visible transition-all">
-                <CardContent className="flex flex-col gap-4 items-start">
-                  <motion.div variants={iconVariants}>
-                    <Image src="/Icon.png" alt="Scan" width={40} height={40} />
-                  </motion.div>
-
-                  <h3 className="font-heading font-semibold text-2xl leading-[30px] text-white">
-                    Scan
-                  </h3>
-
-                  <p className="text-base leading-7 text-white">
-                    Wisesama allows you to scan and analyze suspicious entities
-                    including wallet addresses, websites, twitter handles, and
-                    more to detect frauds and scams. Our machine learning
-                    algorithms help to detect malicious wallet addresses in
-                    real-time and provide a risk score for each address.
-                  </p>
-
-                  <Link
-                    href="/check"
-                    className="text-purple-400 font-medium flex items-center gap-1 group"
-                  >
-                    Learn more
-                    <span className="group-hover:translate-x-1 transition-transform">
-                      &rarr;
-                    </span>
-                  </Link>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Report Card */}
-          <motion.div
-            variants={cardVariants}
-            whileHover={{ scale: 1.04 }}
-            className="w-full flex justify-center items-center min-h-[400px]"
-          >
-            <Card className="bg-[url('/card2.png')] bg-cover bg-center rounded-2xl p-10 min-h-[400px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
-              <CardContent className="flex flex-col gap-6 items-start p-0">
-                <motion.div variants={iconVariants}>
-                  <Image
-                    src="/AlertIcon.png"
-                    alt="Report"
-                    width={40}
-                    height={40}
-                  />
-                </motion.div>
-
-                <h3 className="font-heading text-2xl font-bold text-white">
-                  Report
-                </h3>
-
-                <p className="text-base leading-5 text-white">
-                  If you come across a scam or a fraudulent entity, you can
-                  report it on Wisesama. After reporting, the entity is
-                  evaluated further by our automated algorithms or manual
-                  screening and is then added to the Wisesama reports database.
-                </p>
-
-                <Link
-                  href="/report"
-                  className="text-purple-400 font-medium flex items-center gap-1 group"
-                >
-                  Learn more
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    &rarr;
-                  </span>
-                </Link>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Alerts Card */}
-          <motion.div
-            variants={cardVariants}
-            whileHover={{ scale: 1.04 }}
-            className="w-full flex justify-center items-center min-h-[280px]"
-          >
-            <Card className="bg-[url('/card3.png')] bg-cover bg-center rounded-2xl p-10 min-h-[280px] w-full max-w-[380px] border-0 shadow-lg flex flex-col justify-between transition-all">
-              <CardContent className="flex flex-col gap-6 items-start p-0">
-                <motion.div variants={iconVariants}>
-                  <Image
-                    src="/AlertIcon.png"
-                    alt="Alerts"
-                    width={40}
-                    height={40}
-                  />
-                </motion.div>
-
-                <h3 className="font-heading text-2xl font-bold text-white">
-                  Alerts
-                </h3>
-
-                <p className="text-base leading-5 text-white">
-                  Create an account, check the notification box and don&apos;t
-                  miss the launch of our advanced alerts.
-                </p>
-
-                <Link
-                  href="/report"
-                  className="text-purple-400 font-medium flex items-center gap-1 group"
-                >
-                  Learn more
-                  <span className="group-hover:translate-x-1 transition-transform">
-                    &rarr;
-                  </span>
-                </Link>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* API Docs Card */}
-          <div className="relative flex flex-col items-center justify-center min-h-[380px]">
-            <motion.div
-              variants={cardVariants}
-              whileHover={{ scale: 1.04 }}
-              className="w-full flex justify-center"
-            >
-              <Card className="bg-transparent border border-white rounded-2xl p-6 min-h-[380px] w-full max-w-[380px] relative overflow-visible flex flex-col justify-between transition-all">
-                <CardContent className="flex flex-col gap-6 items-start p-0">
-                  <motion.div variants={iconVariants}>
-                    <Image
-                      src="/ApiIcon.png"
-                      alt="API"
-                      width={40}
-                      height={40}
-                    />
-                  </motion.div>
-                  <h3 className="font-heading text-2xl font-bold text-white">
-                    API Docs
-                  </h3>
-                  <p className="text-base leading-5 text-white">
-                    For developers, Wisesama provides a Search and Report API
-                    that can be used to bake Wisesama capabilities into other
-                    applications. The API allows you to scan and report
-                    entities, and retrieve scam reports from the Wisesama
-                    reports database. Check out our API documentation to learn
-                    more.
-                  </p>
-                  <Link
-                    href="/docs"
-                    className="text-purple-400 font-medium flex items-center gap-1 group"
-                  >
-                    Learn more
-                    <span className="group-hover:translate-x-1 transition-transform">
-                      &rarr;
-                    </span>
-                  </Link>
-                </CardContent>
-
-                {/* Burst effect */}
-                <motion.div
-                  className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
-                  style={{ width: 140, height: 140 }}
-                  animate={{
-                    rotate: [0, 360],
-                  }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 12,
-                    ease: "linear",
-                  }}
-                >
-                  <Image src="/Star.png" alt="" width={140} height={140} />
-                </motion.div>
-              </Card>
-            </motion.div>
-          </div>
-        </motion.div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+          {features.map((feature, index) => (
+            <FeatureCard key={feature.title} feature={feature} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );

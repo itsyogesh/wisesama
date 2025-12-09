@@ -3,6 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { SiteHeader, SiteFooter } from '@/components/layout';
 import { Toaster } from '@/components/ui/sonner';
+import { ViewTransitions } from 'next-view-transitions';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://wisesama.com'),
@@ -79,26 +80,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <head>
-        {/* Satoshi + Clash Display from FontShare */}
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
-        <Providers>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-          <Toaster />
-        </Providers>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en" className="dark">
+        <head>
+          {/* Satoshi + Clash Display from FontShare */}
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
+          <Providers>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+            <Toaster />
+          </Providers>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

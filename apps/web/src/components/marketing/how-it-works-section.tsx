@@ -46,7 +46,7 @@ export function HowItWorksSection() {
   return (
     <section
       ref={ref}
-      className="relative py-24 lg:py-32 bg-wisesama-bg overflow-hidden"
+      className="relative py-24 lg:py-32 bg-[#0B0B11] overflow-hidden"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -167,7 +167,7 @@ export function HowItWorksSection() {
                     className="hidden lg:block absolute top-1/2 w-8 h-px"
                     style={{
                       background: step.color,
-                      [isLeft ? 'right' : 'left']: '-32px',
+                      [isLeft ? 'left' : 'right']: '-32px',
                       opacity: 0.3,
                     }}
                   />
