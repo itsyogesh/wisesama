@@ -46,3 +46,6 @@ packages/database/prisma/*.db-journal
 *.tmp
 *.bak
 .vercel
+
+# AI Docs & Files
+.gemini-clipboard

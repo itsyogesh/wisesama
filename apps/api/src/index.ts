@@ -28,6 +28,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 async function buildApp() {
   const fastify = Fastify({
+    trustProxy: process.env.TRUST_PROXY === 'true' || process.env.VERCEL === '1',
     logger: {
       level: process.env.LOG_LEVEL || 'info',
       transport:
@@ -46,15 +47,25 @@ async function buildApp() {
     runFirst: true,
   });
 
+  const isProduction = process.env.NODE_ENV === 'production';
+  const defaultCorsOrigins = ['http://localhost:3000', 'http://localhost:3002'];
+  const envCorsOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()).filter(Boolean) || [];
+  const appCorsOrigins = [process.env.APP_URL, process.env.ADMIN_APP_URL].filter(Boolean) as string[];
+  const allowedCorsOrigins = Array.from(new Set([...envCorsOrigins, ...appCorsOrigins, ...defaultCorsOrigins]));
+
   // Security - CORS must be registered before helmet
   await fastify.register(cors, {
-    origin: process.env.CORS_ORIGIN?.split(',') || [
-      'http://localhost:3000',
-      'http://localhost:3002', // Admin dashboard
-    ],
+    origin: allowedCorsOrigins,
     credentials: true,
   });
   await fastify.register(helmet, {
+    hsts: isProduction
+      ? {
+          maxAge: 60 * 60 * 24 * 180, // 180 days
+          includeSubDomains: true,
+        }
+      : false,
+    contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: 'cross-origin' },
     crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   });
