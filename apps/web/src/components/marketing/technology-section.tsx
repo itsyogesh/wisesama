@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
+import Balancer from 'react-wrap-balancer';
 import {
   Brain,
   Shield,
@@ -13,6 +14,7 @@ import {
   Fingerprint,
   Scan,
   Timer,
+  Layers,
 } from 'lucide-react';
 
 const technologies = [
@@ -218,23 +220,28 @@ export function TechnologySection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-6"
           >
-            <Scan className="w-4 h-4 text-wisesama-purple-light" />
-            <span className="text-sm font-medium text-wisesama-purple-light">
-              Multi-Layer Analysis
+            <Layers className="w-3 h-3 text-wisesama-purple" />
+            <span className="text-xs font-medium text-wisesama-purple-light uppercase tracking-wider">
+              Defense Architecture
             </span>
           </motion.div>
 
-          <h2 className="font-heading text-4xl md:text-5xl font-semibold text-white mb-4">
-            Powered by Advanced{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
-              Technology
-            </span>
+          <h2 className="font-heading font-semibold text-3xl md:text-5xl text-white mb-4">
+            <Balancer>
+              Built on a Six-Layer{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
+                Defense Matrix
+              </span>
+            </Balancer>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Six layers of protection analyzing every entity through multiple
-            detection engines to provide comprehensive threat assessment.
+            <Balancer>
+              We don't just rely on one signal. Wisesama aggregates data from
+              on-chain behavior, global threat feeds, and identity registrars to
+              eliminate false positives.
+            </Balancer>
           </p>
         </motion.div>
 

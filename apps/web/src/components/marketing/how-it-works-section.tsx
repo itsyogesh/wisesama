@@ -2,7 +2,8 @@
 
 import { motion, useInView } from 'motion/react';
 import { useRef } from 'react';
-import { Search, Cpu, Shield, FileCheck } from 'lucide-react';
+import Balancer from 'react-wrap-balancer';
+import { Search, Cpu, Shield, FileCheck, Zap } from 'lucide-react';
 
 const steps = [
   {
@@ -73,34 +74,25 @@ export function HowItWorksSection() {
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-6"
           >
-            <div className="flex gap-1">
-              {[0, 1, 2].map((i) => (
-                <motion.div
-                  key={i}
-                  className="w-1.5 h-1.5 rounded-full bg-wisesama-purple"
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                  }}
-                />
-              ))}
-            </div>
+            <Zap className="w-4 h-4 text-wisesama-purple-light" />
             <span className="text-sm font-medium text-wisesama-purple-light">
               Simple Process
             </span>
           </motion.div>
 
-          <h2 className="font-heading text-4xl md:text-5xl font-semibold text-white mb-4">
-            How It{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
-              Works
-            </span>
+          <h2 className="font-heading font-semibold text-4xl md:text-5xl text-white mb-4">
+            <Balancer>
+              How It{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
+                Works
+              </span>
+            </Balancer>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            From input to comprehensive risk assessment in under 2 seconds.
-            Here's how Wisesama protects you.
+            <Balancer>
+              From input to comprehensive risk assessment in under 2 seconds.
+              Here's how Wisesama protects you.
+            </Balancer>
           </p>
         </motion.div>
 

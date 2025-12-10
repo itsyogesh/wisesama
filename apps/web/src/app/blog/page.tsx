@@ -1,11 +1,11 @@
-import Link from 'next/link';
-import { getAllPosts, formatDate } from '@/lib/blog';
-import type { Metadata } from 'next';
+import Link from "next/link";
+import { getAllPosts, formatDate } from "@/lib/blog";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Blog | Wisesama',
+  title: "Blog | Wisesama",
   description:
-    'Stay informed about the latest crypto scams, security threats, and best practices to protect yourself in the Polkadot ecosystem.',
+    "Stay informed about the latest crypto scams, security threats, and best practices to protect yourself in the Polkadot ecosystem.",
 };
 
 export default function BlogPage() {
@@ -15,10 +15,10 @@ export default function BlogPage() {
     <div
       className="min-h-screen bg-wisesama-bg"
       style={{
-        backgroundImage: 'url(/newbg.png)',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
+        backgroundImage: "url(/newbg.png)",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
       }}
     >
       <main className="py-20 lg:py-32">
@@ -29,8 +29,8 @@ export default function BlogPage() {
               Our Blog
             </h1>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Stay informed about the latest scams, security threats, and best practices to protect
-              yourself in the crypto ecosystem.
+              Stay informed about the latest scams, security threats, and best
+              practices to protect yourself in the crypto ecosystem.
             </p>
           </div>
 
@@ -50,14 +50,18 @@ export default function BlogPage() {
                           {formatDate(post.date)}
                         </span>
                         <span className="text-gray-300">|</span>
-                        <span className="text-gray-500 text-sm">{post.readingTime}</span>
+                        <span className="text-gray-500 text-sm">
+                          {post.readingTime}
+                        </span>
                       </div>
 
                       <h2 className="font-heading font-semibold text-xl md:text-2xl text-gray-900 mb-2 group-hover:text-wisesama-purple transition-colors">
                         {post.title}
                       </h2>
 
-                      <p className="text-gray-600 line-clamp-2">{post.excerpt}</p>
+                      <p className="text-gray-600 line-clamp-2">
+                        {post.excerpt}
+                      </p>
 
                       {post.tags && post.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-4">
@@ -99,7 +103,9 @@ export default function BlogPage() {
 
           {posts.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-gray-400">No blog posts yet. Check back soon!</p>
+              <p className="text-gray-400">
+                No blog posts yet. Check back soon!
+              </p>
             </div>
           )}
         </div>

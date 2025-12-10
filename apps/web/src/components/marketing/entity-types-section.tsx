@@ -2,7 +2,8 @@
 
 import { motion, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
-import { Wallet, Globe, Twitter, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import Balancer from 'react-wrap-balancer';
+import { Wallet, Globe, Twitter, Mail, ArrowRight, CheckCircle2, Search } from 'lucide-react';
 import Link from 'next/link';
 
 const entityTypes = [
@@ -164,23 +165,27 @@ export function EntityTypesSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-800/50 border border-zinc-700/50 mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-6"
           >
-            <span className="w-2 h-2 rounded-full bg-wisesama-status-safe animate-pulse" />
-            <span className="text-sm font-medium text-gray-300">
+            <Search className="w-4 h-4 text-wisesama-purple-light" />
+            <span className="text-sm font-medium text-wisesama-purple-light">
               Scan Anything
             </span>
           </motion.div>
 
-          <h2 className="font-heading text-4xl md:text-5xl font-semibold text-white mb-4">
-            What Can You{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
-              Scan?
-            </span>
+          <h2 className="font-heading font-semibold text-4xl md:text-5xl text-white mb-4">
+            <Balancer>
+              What Can You{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
+                Scan?
+              </span>
+            </Balancer>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            From wallet addresses to social handles, we analyze every type of entity
-            in the Polkadot ecosystem for potential threats.
+            <Balancer>
+              From wallet addresses to social handles, we analyze every type of entity
+              in the Polkadot ecosystem for potential threats.
+            </Balancer>
           </p>
         </motion.div>
 

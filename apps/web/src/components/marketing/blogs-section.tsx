@@ -2,6 +2,8 @@
 
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import { Newspaper } from 'lucide-react';
+import Balancer from 'react-wrap-balancer';
 import type { BlogPostMeta } from '@/lib/blog';
 
 interface BlogCardProps {
@@ -63,13 +65,23 @@ export function BlogsSection({ posts }: BlogsSectionProps) {
     <section className="py-16 bg-[#0B0B11]">
       <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="font-heading font-medium text-3xl md:text-4xl text-white mb-4">
-            Our Blogs
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20 mb-6">
+            <Newspaper className="w-4 h-4 text-wisesama-purple-light" />
+            <span className="text-sm font-medium text-wisesama-purple-light">
+              Latest Updates
+            </span>
+          </div>
+          <h2 className="font-heading font-semibold text-4xl md:text-5xl text-white mb-4">
+            <Balancer>
+              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">Blogs</span>
+            </Balancer>
           </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Stay informed about the latest scams, security threats, and best practices to protect
-            yourself in the crypto ecosystem.
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            <Balancer>
+              Stay informed about the latest scams, security threats, and best practices to protect
+              yourself in the crypto ecosystem.
+            </Balancer>
           </p>
         </div>
 

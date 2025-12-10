@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTransitionRouter } from 'next-view-transitions';
 import { motion } from 'motion/react';
+import Balancer from 'react-wrap-balancer';
 import { AlertTriangle, Globe2, Network, Search, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -85,25 +86,53 @@ export function HeroSection() {
                 </span>
               </motion.div>
 
-              <motion.h1
-                variants={fadeInUp}
-                initial="initial"
-                animate="animate"
-                transition={{ duration: 0.6, delay: 0.05 }}
-                className="font-heading font-semibold text-4xl md:text-6xl leading-[1.05] text-white tracking-tight"
-              >
-                Verify Every Wallet, Domain, and Handle in Seconds.
-              </motion.h1>
+                                <motion.h1
 
-              <motion.p
-                variants={fadeInUp}
-                initial="initial"
-                animate="animate"
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="text-lg text-gray-400 max-w-2xl leading-relaxed"
-              >
-                Stop relying on guesswork. Wisesama combines behavioral ML, 70+ VirusTotal engines, and registrar-backed identity checks to give you a definitive risk score for any entity in the Dotsama ecosystem.
-              </motion.p>
+                                  variants={fadeInUp}
+
+                                  initial="initial"
+
+                                  animate="animate"
+
+                                  transition={{ duration: 0.6, delay: 0.05 }}
+
+                                  className="font-heading font-semibold text-4xl md:text-6xl leading-[1.05] text-white tracking-tight"
+
+                                >
+
+                                  <Balancer>
+
+                                    Verify Every Wallet, Domain, and Handle in Seconds.
+
+                                  </Balancer>
+
+                                </motion.h1>
+
+              
+
+                                <motion.p
+
+                                  variants={fadeInUp}
+
+                                  initial="initial"
+
+                                  animate="animate"
+
+                                  transition={{ duration: 0.6, delay: 0.15 }}
+
+                                  className="text-lg text-gray-400 max-w-2xl leading-relaxed"
+
+                                >
+
+                                  <Balancer>
+
+                                    Stop relying on guesswork. Wisesama combines behavioral ML, 70+ VirusTotal engines, and registrar-backed identity checks to give you a definitive risk score for any entity in the Dotsama ecosystem.
+
+                                  </Balancer>
+
+                                </motion.p>
+
+              
             </div>
 
             <motion.div

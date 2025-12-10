@@ -2,7 +2,8 @@
 
 import { motion, useInView } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
-import { AlertTriangle, Shield, Users } from 'lucide-react';
+import Balancer from 'react-wrap-balancer';
+import { AlertTriangle, Shield, Users, Activity } from 'lucide-react';
 
 interface AnimatedCounterProps {
   end: number;
@@ -94,22 +95,31 @@ export function StatsSection() {
     <section className="relative py-14 bg-wisesama-bg overflow-hidden">
       <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-10 space-y-3">
+        <div className="text-center mb-16 space-y-4">
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-[0.12em] text-gray-300"
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20"
           >
-            Live trust signals
+            <Activity className="w-4 h-4 text-wisesama-purple-light" />
+            <span className="text-sm font-medium text-wisesama-purple-light">
+              Live Trust Signals
+            </span>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-heading text-3xl md:text-4xl text-white"
+            className="font-heading font-semibold text-4xl md:text-5xl text-white"
           >
-            Our network gets stronger with every report
+            <Balancer>
+              Our Network Gets{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">
+                Stronger
+              </span>
+            </Balancer>
           </motion.h2>
         </div>
 

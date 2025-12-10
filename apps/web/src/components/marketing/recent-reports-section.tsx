@@ -3,6 +3,7 @@
 import { Copy, ShieldAlert, ShieldCheck, Activity, ExternalLink } from 'lucide-react';
 import { useRecentFlaggedEntities } from '@/hooks/use-reports';
 import { motion } from 'motion/react';
+import Balancer from 'react-wrap-balancer';
 
 function truncateAddress(address: string): string {
   if (address.length <= 24) return address;
@@ -90,18 +91,21 @@ export function RecentReportsSection() {
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-xs font-medium text-red-400 uppercase tracking-wider">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-wisesama-purple/10 border border-wisesama-purple/20">
+              <ShieldAlert className="w-4 h-4 text-wisesama-purple-light" />
+              <span className="text-sm font-medium text-wisesama-purple-light">
+                Live Threat Feed
               </span>
-              Live Threat Feed
             </div>
-            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl text-white font-semibold">
-              Latest Detected <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">Threats</span>
+            <h2 className="font-heading font-semibold text-4xl md:text-5xl text-white">
+              <Balancer>
+                Latest Detected <span className="text-transparent bg-clip-text bg-gradient-to-r from-wisesama-purple to-wisesama-purple-light">Threats</span>
+              </Balancer>
             </h2>
             <p className="text-gray-400 max-w-xl text-lg">
-              Real-time feed of malicious addresses, domains, and impersonators flagged by the Wisesama community and ML engine.
+              <Balancer>
+                Real-time feed of malicious addresses, domains, and impersonators flagged by the Wisesama community and ML engine.
+              </Balancer>
             </p>
           </div>
           
