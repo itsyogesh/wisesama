@@ -2,9 +2,24 @@
 
 import { useState } from 'react';
 import { useWhitelist } from '@/hooks/use-whitelist';
-import { Search, Globe, Twitter, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Search, Globe, Twitter, ExternalLink, ShieldCheck, Wallet, Mail } from 'lucide-react';
 import Link from 'next/link';
 import Balancer from 'react-wrap-balancer';
+
+function EntityTypeIcon({ type }: { type: string }) {
+  switch (type) {
+    case 'ADDRESS':
+      return <Wallet className="w-4 h-4" />;
+    case 'DOMAIN':
+      return <Globe className="w-4 h-4" />;
+    case 'TWITTER':
+      return <Twitter className="w-4 h-4" />;
+    case 'EMAIL':
+      return <Mail className="w-4 h-4" />;
+    default:
+      return <ShieldCheck className="w-4 h-4" />;
+  }
+}
 
 export default function WhitelistPage() {
   const [search, setSearch] = useState('');
@@ -78,7 +93,7 @@ export default function WhitelistPage() {
               {data?.entities.map((entity) => (
                 <div
                   key={entity.id}
-                  className="bg-[#1F242F] border border-white/5 rounded-xl p-6 hover:border-wisesama-purple/30 transition-colors group"
+                  className="bg-[#1F242F] border border-white/5 rounded-xl p-6 hover:border-wisesama-purple/30 transition-colors group relative overflow-hidden"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
@@ -91,9 +106,15 @@ export default function WhitelistPage() {
                       )}
                       <div>
                         <h3 className="font-heading font-semibold text-white text-lg">{entity.name}</h3>
-                        <span className="text-xs text-gray-500 uppercase tracking-wider bg-black/20 px-2 py-0.5 rounded">
-                          {entity.category}
-                        </span>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider bg-white/5 border border-white/5 px-2 py-0.5 rounded">
+                            {entity.category}
+                          </span>
+                          <span className="text-[10px] text-wisesama-purple-light uppercase tracking-wider bg-wisesama-purple/10 border border-wisesama-purple/20 px-2 py-0.5 rounded flex items-center gap-1">
+                            <EntityTypeIcon type={entity.entityType} />
+                            {entity.entityType}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     {entity.chain && (
@@ -103,12 +124,13 @@ export default function WhitelistPage() {
                     )}
                   </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="text-sm text-gray-400 font-mono break-all bg-black/20 p-2 rounded border border-white/5">
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-300 font-mono break-all bg-black/40 p-3 rounded-lg border border-white/5 group-hover:border-white/10 transition-colors">
+                      <EntityTypeIcon type={entity.entityType} />
                       {entity.value}
                     </div>
                     {entity.description && (
-                      <p className="text-sm text-gray-400 line-clamp-2">{entity.description}</p>
+                      <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">{entity.description}</p>
                     )}
                   </div>
 
@@ -118,7 +140,7 @@ export default function WhitelistPage() {
                         href={entity.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-gray-400 hover:text-wisesama-purple-light flex items-center gap-1 transition-colors"
+                        className="text-xs text-gray-400 hover:text-wisesama-purple-light flex items-center gap-1.5 transition-colors"
                       >
                         <Globe className="w-3.5 h-3.5" />
                         Website
@@ -129,7 +151,7 @@ export default function WhitelistPage() {
                         href={`https://twitter.com/${entity.twitter.replace('@', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-gray-400 hover:text-blue-400 flex items-center gap-1 transition-colors"
+                        className="text-xs text-gray-400 hover:text-blue-400 flex items-center gap-1.5 transition-colors"
                       >
                         <Twitter className="w-3.5 h-3.5" />
                         Twitter
@@ -137,10 +159,10 @@ export default function WhitelistPage() {
                     )}
                     <Link
                       href={`/check/${entity.value}`}
-                      className="ml-auto text-sm text-wisesama-purple-light hover:text-white flex items-center gap-1 transition-colors"
+                      className="ml-auto text-xs font-medium text-wisesama-purple-light hover:text-white flex items-center gap-1.5 transition-colors bg-wisesama-purple/10 hover:bg-wisesama-purple/20 px-3 py-1.5 rounded-lg"
                     >
-                      Analyze
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      Analyze Risk
+                      <ExternalLink className="w-3 h-3" />
                     </Link>
                   </div>
                 </div>
