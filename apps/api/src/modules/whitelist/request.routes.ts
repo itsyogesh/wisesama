@@ -37,6 +37,90 @@ const statusCheckSchema = z.object({
 });
 
 export async function whitelistRequestRoutes(fastify: FastifyInstance) {
+// Public whitelist listing
+  fastify.get<{
+    Querystring: {
+      page?: string;
+      limit?: string;
+      category?: string;
+      search?: string;
+    };
+  }>('/whitelist', {
+    schema: {
+      tags: ['whitelist'],
+      description: 'List whitelisted entities (public directory)',
+      querystring: {
+        type: 'object',
+        properties: {
+          page: { type: 'string', default: '1' },
+          limit: { type: 'string', default: '20' },
+          category: { type: 'string' },
+          search: { type: 'string' },
+        },
+      },
+    },
+    handler: async (request) => {
+      const page = parseInt(request.query.page || '1', 10);
+      const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);
+      const skip = (page - 1) * limit;
+      const { category, search } = request.query;
+
+      const where: any = {
+        isActive: true,
+      };
+
+      if (category) {
+        where.category = category;
+      }
+
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { value: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      const [entities, total] = await Promise.all([
+        prisma.whitelistedEntity.findMany({
+          where,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+            entityType: true,
+            value: true,
+            description: true,
+            website: true,
+            twitter: true,
+            logoUrl: true,
+            verifiedAt: true,
+            chain: {
+              select: {
+                name: true,
+                code: true,
+              },
+            },
+          },
+          orderBy: { name: 'asc' },
+          skip,
+          take: limit,
+        }),
+        prisma.whitelistedEntity.count({ where }),
+      ]);
+
+      return {
+        entities,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    },
+  });
+
   // Submit a whitelist request
   fastify.post('/whitelist/requests', {
     schema: {
