@@ -337,11 +337,10 @@ export function EntityDetailsCard({ result }: EntityDetailsCardProps) {
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-gray-200">Transaction Graph Analysis</p>
-                <p className="text-xs text-gray-500">Not found in transaction tracing graph</p>
+                <p className="text-xs text-gray-500">Advanced graph analysis is under development</p>
               </div>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-700/50 text-gray-400 border border-zinc-600/30">
-                <HelpCircle className="h-3.5 w-3.5" />
-                N/A
+                Coming Soon
               </span>
             </div>
           </div>
