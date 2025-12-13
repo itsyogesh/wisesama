@@ -106,6 +106,7 @@ export async function checkRoutes(fastify: FastifyInstance) {
                       name: { type: 'string' },
                       importance: { type: 'number' },
                       value: { type: ['string', 'number'] },
+                      score: { type: 'number' },
                     },
                   },
                 },

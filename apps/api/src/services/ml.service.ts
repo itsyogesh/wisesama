@@ -47,6 +47,7 @@ export interface MLAnalysis {
     name: string;
     importance: number;
     value: number | string;
+    score: number;
   }>;
   recommendation: 'safe' | 'review' | 'high_risk' | null;
 
@@ -99,6 +100,7 @@ export class MLService {
         name: f.name,
         importance: f.importance,
         value: f.value,
+        score: f.score,
       }));
 
     return {

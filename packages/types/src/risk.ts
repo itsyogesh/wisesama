@@ -66,6 +66,7 @@ export interface MLAnalysisResult {
     name: string;
     importance: number;
     value: number | string;
+    score: number; // Added score property
   }>;
 }
 

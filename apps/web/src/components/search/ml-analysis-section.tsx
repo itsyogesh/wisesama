@@ -1,8 +1,15 @@
 import { Info, ExternalLink, AlertTriangle, Brain, TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import type { MLAnalysisResult, TransactionSummary } from '@wisesama/types';
 
+interface MLFeature {
+  name: string;
+  importance: number;
+  value: string | number;
+  score?: number;
+}
+
 interface MLAnalysisSectionProps {
-  mlAnalysis?: MLAnalysisResult;
+  mlAnalysis?: MLAnalysisResult & { topFeatures?: MLFeature[] };
   transactionSummary?: TransactionSummary;
   blockExplorerUrl?: string;
 }
@@ -148,14 +155,30 @@ export function MLAnalysisSection({ mlAnalysis, transactionSummary, blockExplore
               <Info className="h-3 w-3" />
             </h4>
             <div className="flex flex-wrap gap-2">
-              {mlAnalysis.topFeatures.map((feature, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-800/60 text-gray-300 border border-zinc-700/30"
-                >
-                  {feature.name}
-                </span>
-              ))}
+              {mlAnalysis.topFeatures.map((feature, index) => {
+                const isPositive = (feature.score ?? 0) > 0;
+                const isTrust = (feature.score ?? 0) < 0;
+                
+                return (
+                  <div
+                    key={index}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium ${
+                      isPositive
+                        ? 'bg-red-500/10 border-red-500/20 text-red-400'
+                        : isTrust
+                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                          : 'bg-zinc-800/60 border-zinc-700/30 text-gray-300'
+                    }`}
+                  >
+                    <span>{feature.name}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] ${
+                      isPositive ? 'bg-red-500/20' : isTrust ? 'bg-emerald-500/20' : 'bg-zinc-700'
+                    }`}>
+                      {feature.value}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
