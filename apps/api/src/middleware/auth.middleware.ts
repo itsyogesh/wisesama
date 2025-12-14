@@ -1,6 +1,7 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import jwt from 'jsonwebtoken';
 import { prisma } from '@wisesama/database';
+import { sendApiKeyAlert } from '../services/email.service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 
@@ -120,6 +121,34 @@ export async function authenticateApiKey(
   if (key.remainingQuota <= 0) {
     reply.status(429).send({ error: 'API key quota exceeded' });
     return;
+  }
+
+  // Calculate usage thresholds
+  const totalQuota = key.user.tier === 'free' ? 10000 : 100000;
+  const currentUsage = totalQuota - key.remainingQuota;
+  const usagePercent = (currentUsage / totalQuota) * 100;
+  
+  // Check for alerts (80% and 100% boundaries)
+  // We check if it *just* crossed the threshold to avoid spamming
+  const remaining = key.remainingQuota;
+  const threshold80 = Math.floor(totalQuota * 0.2); // 20% remaining = 80% used
+  
+  if (remaining === threshold80) {
+    // Exactly hit 80% usage
+    sendApiKeyAlert({
+      email: key.user.email,
+      keyName: key.name || key.keyPrefix,
+      usagePercent: 80,
+      limit: totalQuota,
+    }).catch(console.error);
+  } else if (remaining === 1) {
+    // About to hit 100% usage (this is the last allowed request)
+    sendApiKeyAlert({
+      email: key.user.email,
+      keyName: key.name || key.keyPrefix,
+      usagePercent: 100,
+      limit: totalQuota,
+    }).catch(console.error);
   }
 
   // Update last used timestamp

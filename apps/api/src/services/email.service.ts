@@ -719,18 +719,16 @@ Submit a new request at: ${APP_URL}/whitelist/request
 }
 
 /**
- * Admin alert when a new whitelist request is submitted
+ * Email sent when an API key reaches usage threshold
  */
-export async function sendAdminNewRequestAlert(params: {
-  adminEmail: string;
-  requestId: string;
-  entityValue: string;
-  entityType: string;
-  name: string;
-  category: string;
-  requesterEmail: string;
+export async function sendApiKeyAlert(params: {
+  email: string;
+  keyName: string;
+  usagePercent: number;
+  limit: number;
 }): Promise<EmailResult> {
-  const { adminEmail, requestId, entityValue, entityType, name, category, requesterEmail } = params;
+  const { email, keyName, usagePercent, limit } = params;
+  const isExceeded = usagePercent >= 100;
 
   const html = `
 <!DOCTYPE html>
@@ -738,59 +736,69 @@ export async function sendAdminNewRequestAlert(params: {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Whitelist Request - Wisesama Admin</title>
+  <title>API Usage Alert - Wisesama</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
-  <div style="background: #1f2937; padding: 20px; border-radius: 12px 12px 0 0;">
-    <h1 style="color: white; margin: 0; font-size: 20px;">Wisesama Admin Alert</h1>
+  <div style="background: linear-gradient(135deg, ${isExceeded ? '#DC2626' : '#F59E0B'} 0%, ${isExceeded ? '#B91C1C' : '#D97706'} 100%); padding: 30px; border-radius: 12px 12px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 24px;">Wisesama</h1>
+    <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">API Usage Alert</p>
   </div>
 
   <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-    <div style="background: #ede9fe; border-left: 4px solid #7D3AED; padding: 15px; margin-bottom: 20px;">
-      <strong style="color: #5b21b6;">New Whitelist Request</strong>
-      <p style="margin: 5px 0 0 0; color: #6b21a8;">A new whitelist request requires review.</p>
+    <h2 style="color: #1f2937; margin-top: 0;">API Key Usage Alert</h2>
+
+    <p style="color: #4b5563; line-height: 1.6;">
+      Your API key <strong>"${keyName}"</strong> has reached <strong>${usagePercent}%</strong> of its monthly quota.
+    </p>
+
+    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+          <td style="color: #6b7280; padding: 5px 0;">Key Name:</td>
+          <td style="color: #1f2937; font-weight: 500;">${keyName}</td>
+        </tr>
+        <tr>
+          <td style="color: #6b7280; padding: 5px 0;">Current Usage:</td>
+          <td style="color: #1f2937;">${Math.round((limit * usagePercent) / 100).toLocaleString()} / ${limit.toLocaleString()}</td>
+        </tr>
+        <tr>
+          <td style="color: #6b7280; padding: 5px 0;">Status:</td>
+          <td style="color: ${isExceeded ? '#DC2626' : '#F59E0B'}; font-weight: 500;">
+            ${isExceeded ? 'Quota Exceeded' : 'Approaching Limit'}
+          </td>
+        </tr>
+      </table>
     </div>
 
-    <table style="width: 100%; border-collapse: collapse;">
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Request ID:</td>
-        <td style="color: #1f2937; font-family: monospace; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${requestId}</td>
-      </tr>
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Name:</td>
-        <td style="color: #1f2937; font-weight: 500; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${name}</td>
-      </tr>
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Entity:</td>
-        <td style="color: #1f2937; font-family: monospace; word-break: break-all; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${entityValue}</td>
-      </tr>
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Type:</td>
-        <td style="color: #1f2937; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${entityType}</td>
-      </tr>
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Category:</td>
-        <td style="color: #7D3AED; font-weight: 500; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${category}</td>
-      </tr>
-      <tr>
-        <td style="color: #6b7280; padding: 8px 0;">Requester:</td>
-        <td style="color: #1f2937; padding: 8px 0;">${requesterEmail}</td>
-      </tr>
-    </table>
+    ${isExceeded ? `
+    <p style="color: #dc2626; line-height: 1.6;">
+      <strong>Your API key has stopped working.</strong> Please upgrade your plan to increase your limits and restore service.
+    </p>
+    ` : `
+    <p style="color: #4b5563; line-height: 1.6;">
+      To ensure uninterrupted service, consider upgrading your plan or optimizing your usage.
+    </p>
+    `}
 
-    <div style="margin-top: 20px; text-align: center;">
-      <a href="${APP_URL}/admin/whitelist/requests/${requestId}" style="display: inline-block; background: #7D3AED; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
-        Review Request
+    <div style="margin-top: 25px; text-align: center;">
+      <a href="${APP_URL}/dashboard" style="display: inline-block; background: #7D3AED; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+        Manage API Keys
       </a>
     </div>
+
+    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 25px 0;">
+
+    <p style="color: #9ca3af; font-size: 12px; margin-bottom: 0;">
+      This email was sent by <a href="${APP_URL}" style="color: #E6007A;">Wisesama</a>.
+    </p>
   </div>
 </body>
 </html>
   `.trim();
 
   return sendEmail({
-    to: adminEmail,
-    subject: `[Wisesama] New Whitelist Request: ${name} (${category})`,
+    to: email,
+    subject: `[Alert] API Key Usage at ${usagePercent}%: ${keyName}`,
     html,
   });
 }
