@@ -1,14 +1,12 @@
-'use client';
-
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Info } from 'lucide-react';
+import { Menu, X, Info, LogIn, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { springTransition } from '@/lib/motion';
+import { useAuthStore } from '@/stores/use-auth-store';
 
 const navItems = [
   { name: 'Home', href: '/' },
@@ -19,11 +17,25 @@ const navItems = [
 export function SiteHeader() {
   const [showInfoBanner, setShowInfoBanner] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  
+  const { user, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === href;
     return pathname.startsWith(href);
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -116,16 +128,50 @@ export function SiteHeader() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center gap-4">
-              <Link href="/check">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <button className="w-[149px] h-[46px] bg-btn-purple rounded-[5px] font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity">
-                    Check Address
-                  </button>
-                </motion.div>
-              </Link>
+              {mounted ? (
+                isAuthenticated ? (
+                  <>
+                    <Link href="/dashboard">
+                      <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                        <LayoutDashboard className="h-4 w-4" />
+                        Dashboard
+                      </button>
+                    </Link>
+                    <div className="h-6 w-px bg-white/10" />
+                    <button 
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Log Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <button className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors">
+                        Log In
+                      </button>
+                    </Link>
+                    <Link href="/register">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <button className="px-5 py-2 bg-btn-purple rounded-lg font-heading font-semibold text-sm text-white hover:opacity-90 transition-opacity">
+                          Sign Up
+                        </button>
+                      </motion.div>
+                    </Link>
+                  </>
+                )
+              ) : (
+                // Skeleton loading state to prevent layout shift
+                <div className="flex gap-4">
+                  <div className="w-16 h-9 bg-white/5 rounded-lg animate-pulse" />
+                  <div className="w-24 h-9 bg-white/5 rounded-lg animate-pulse" />
+                </div>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -151,44 +197,57 @@ export function SiteHeader() {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="md:hidden mt-4 flex flex-col gap-4 overflow-hidden"
+                className="md:hidden mt-4 flex flex-col gap-4 overflow-hidden border-t border-white/5 pt-4"
               >
                 {navItems.map(({ name, href }) => (
                   <Link
                     key={href}
                     href={href}
                     className={cn(
-                      'font-heading font-semibold text-base tracking-wide transition-all duration-300 relative py-2',
+                      'font-heading font-semibold text-base tracking-wide transition-all duration-300 relative py-2 px-2',
                       isActive(href)
                         ? 'nav-gradient-text'
                         : 'text-gray-400 hover:text-white'
                     )}
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <motion.span
-                      whileHover={{ scale: 1.05 }}
-                      transition={springTransition}
-                    >
-                      {name}
-                    </motion.span>
-                    {isActive(href) && (
-                      <motion.div
-                        layoutId="activeNavMobile"
-                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-wisesama-purple-accent"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    )}
+                    {name}
                   </Link>
                 ))}
-                <Link href="/check" onClick={() => setMobileMenuOpen(false)}>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <button className="w-full h-[46px] bg-btn-purple rounded-[5px] font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity">
-                      Check Address
-                    </button>
-                  </motion.div>
-                </Link>
+                
+                <div className="border-t border-white/10 pt-4 flex flex-col gap-3">
+                  {mounted && isAuthenticated ? (
+                    <>
+                      <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                        <button className="flex w-full items-center gap-3 px-2 py-2 text-gray-300 hover:text-white">
+                          <LayoutDashboard className="h-5 w-5" />
+                          Dashboard
+                        </button>
+                      </Link>
+                      <button 
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-3 px-2 py-2 text-red-400 hover:bg-red-500/10 rounded-lg"
+                      >
+                        <LogOut className="h-5 w-5" />
+                        Log Out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                        <button className="flex w-full items-center gap-3 px-2 py-2 text-gray-300 hover:text-white">
+                          <LogIn className="h-5 w-5" />
+                          Log In
+                        </button>
+                      </Link>
+                      <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                        <button className="w-full h-12 bg-btn-purple rounded-lg font-heading font-semibold text-base text-white hover:opacity-90 transition-opacity">
+                          Sign Up
+                        </button>
+                      </Link>
+                    </>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
