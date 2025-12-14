@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTransitionRouter } from 'next-view-transitions';
+import { useParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
 interface SearchBarProps {
@@ -10,8 +11,12 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ defaultValue = '', disabled = false }: SearchBarProps) {
-  const [value, setValue] = useState(defaultValue);
-  const router = useRouter();
+  const router = useTransitionRouter();
+  const params = useParams();
+  
+  // Use defaultValue if provided, otherwise fallback to URL params
+  const initialValue = defaultValue || (params?.entity ? decodeURIComponent(params.entity as string) : '');
+  const [value, setValue] = useState(initialValue);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
