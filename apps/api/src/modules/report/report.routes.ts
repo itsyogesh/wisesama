@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@wisesama/database';
 import type { ThreatCategory, EntityType } from '@wisesama/types';
 import { sendReportConfirmation, sendAdminNewReportAlert } from '../../services/email.service';
+import { authenticate } from '../../middleware/auth.middleware';
 
 const reportSchema = z.object({
   value: z.string().min(1),
@@ -208,8 +209,16 @@ export async function reportRoutes(fastify: FastifyInstance) {
     },
   });
 
+import { authenticate } from '../../middleware/auth.middleware';
+
+// ... (existing imports)
+
+export async function reportRoutes(fastify: FastifyInstance) {
+  // ... (existing submit/list routes)
+
   // Get user's own reports (requires authentication)
-  fastify.get<{ Querystring: { page?: string; limit?: string } }>('/reports/my', {
+  fastify.get<{ Querystring: { page?: string; limit?: string } }>('/reports/me', {
+    preHandler: authenticate, // Use standard middleware
     schema: {
       tags: ['report'],
       description: "Get current user's reports",
@@ -223,30 +232,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
       },
     },
     handler: async (request, reply) => {
-      // Check for auth header
-      const authHeader = request.headers.authorization;
-      if (!authHeader?.startsWith('Bearer ')) {
-        reply.status(401);
-        return { error: 'Authentication required' };
-      }
-
-      // For now, support email-based lookup via query param
-      // In production, decode JWT token to get userId
-      const userEmail = request.headers['x-user-email'] as string;
-      if (!userEmail) {
-        reply.status(401);
-        return { error: 'User identification required' };
-      }
-
-      const user = await prisma.user.findUnique({
-        where: { email: userEmail },
-        select: { id: true },
-      });
-
-      if (!user) {
-        reply.status(404);
-        return { error: 'User not found' };
-      }
+      const user = request.user!; // Authenticated by middleware
 
       const page = parseInt(request.query.page || '1', 10);
       const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);

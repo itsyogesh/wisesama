@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/use-auth-store';
-import { LayoutDashboard, Key, Settings, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Key, Settings, LogOut, ChevronRight, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const sidebarItems = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'My Reports', href: '/dashboard/reports', icon: FileText },
   { name: 'API Keys', href: '/dashboard/api-keys', icon: Key },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
