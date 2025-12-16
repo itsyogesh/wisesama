@@ -209,16 +209,9 @@ export async function reportRoutes(fastify: FastifyInstance) {
     },
   });
 
-import { authenticate } from '../../middleware/auth.middleware';
-
-// ... (existing imports)
-
-export async function reportRoutes(fastify: FastifyInstance) {
-  // ... (existing submit/list routes)
-
   // Get user's own reports (requires authentication)
   fastify.get<{ Querystring: { page?: string; limit?: string } }>('/reports/me', {
-    preHandler: authenticate, // Use standard middleware
+    preHandler: authenticate,
     schema: {
       tags: ['report'],
       description: "Get current user's reports",
@@ -232,7 +225,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
       },
     },
     handler: async (request, reply) => {
-      const user = request.user!; // Authenticated by middleware
+      const user = request.user!;
 
       const page = parseInt(request.query.page || '1', 10);
       const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);
