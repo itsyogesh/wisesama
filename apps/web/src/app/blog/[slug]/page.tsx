@@ -34,6 +34,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       publishedTime: post.date,
       authors: post.author ? [post.author] : undefined,
+      images: [
+        {
+          url: `/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
+            post.excerpt.slice(0, 100) + '...'
+          )}`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [
+        `/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
+          post.excerpt.slice(0, 100) + '...'
+        )}`,
+      ],
     },
   };
 }
@@ -46,6 +66,32 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    datePublished: post.date,
+    dateModified: post.date,
+    description: post.excerpt,
+    author: {
+      '@type': 'Person',
+      name: post.author || 'Wisesama Team',
+    },
+    url: `https://wisesama.com/blog/${slug}`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Wisesama',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://wisesama.com/logo.svg',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://wisesama.com/blog/${slug}`,
+    },
+  };
+
   return (
     <div
       className="min-h-screen bg-wisesama-bg"
@@ -57,6 +103,10 @@ export default async function BlogPostPage({ params }: Props) {
         backgroundAttachment: 'fixed',
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <main className="py-20 lg:py-32">
         <div className="container mx-auto px-4 max-w-3xl">
           {/* Back Link */}

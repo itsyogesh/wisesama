@@ -15,10 +15,36 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { entity } = await params;
   const decodedEntity = decodeURIComponent(entity);
+  const title = `Risk Report: ${decodedEntity}`;
+  const description = `Detailed risk assessment, on-chain identity, and trust score for ${decodedEntity} on Wisesama.`;
 
   return {
-    title: `Check: ${decodedEntity}`,
-    description: `Risk assessment for ${decodedEntity} in the Polkadot ecosystem`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: `/og?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
+            decodedEntity
+          )}`,
+          width: 1200,
+          height: 630,
+          alt: `Risk Report for ${decodedEntity}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [
+        `/og?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
+          decodedEntity
+        )}`,
+      ],
+    },
   };
 }
 
