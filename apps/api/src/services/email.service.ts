@@ -417,6 +417,83 @@ export async function sendAdminNewReportAlert(params: {
 }
 
 /**
+ * Admin alert when a new whitelist request is submitted
+ */
+export async function sendAdminNewRequestAlert(params: {
+  adminEmail: string;
+  requestId: string;
+  entityValue: string;
+  entityType: string;
+  name: string;
+  category: string;
+  requesterEmail: string;
+}): Promise<EmailResult> {
+  const { adminEmail, requestId, entityValue, entityType, name, category, requesterEmail } = params;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Whitelist Request - Wisesama Admin</title>
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
+  <div style="background: #1f2937; padding: 20px; border-radius: 12px 12px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 20px;">Wisesama Admin Alert</h1>
+  </div>
+
+  <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <div style="background: #ede9fe; border-left: 4px solid #7D3AED; padding: 15px; margin-bottom: 20px;">
+      <strong style="color: #5b21b6;">New Whitelist Request</strong>
+      <p style="margin: 5px 0 0 0; color: #6b21a8;">A new whitelist request requires review.</p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Request ID:</td>
+        <td style="color: #1f2937; font-family: monospace; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${requestId}</td>
+      </tr>
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Name:</td>
+        <td style="color: #1f2937; font-weight: 500; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${name}</td>
+      </tr>
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Entity:</td>
+        <td style="color: #1f2937; font-family: monospace; word-break: break-all; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${entityValue}</td>
+      </tr>
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Type:</td>
+        <td style="color: #1f2937; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${entityType}</td>
+      </tr>
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">Category:</td>
+        <td style="color: #7D3AED; font-weight: 500; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">${category}</td>
+      </tr>
+      <tr>
+        <td style="color: #6b7280; padding: 8px 0;">Requester:</td>
+        <td style="color: #1f2937; padding: 8px 0;">${requesterEmail}</td>
+      </tr>
+    </table>
+
+    <div style="margin-top: 20px; text-align: center;">
+      <a href="${APP_URL}/admin/whitelist/requests/${requestId}" style="display: inline-block; background: #7D3AED; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
+        Review Request
+      </a>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[Wisesama] New Whitelist Request: ${name} (${category})`,
+    html,
+  });
+}
+
+/**
  * Email sent when a whitelist request is submitted
  */
 export async function sendWhitelistRequestConfirmation(params: {
