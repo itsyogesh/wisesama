@@ -6,9 +6,10 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // ?title=<title>
+    // ?title=<title>&description=<description>&type=<home|check>
     const title = searchParams.get('title')?.slice(0, 100) || 'Wisesama';
     const description = searchParams.get('description')?.slice(0, 200) || 'Polkadot Fraud Detection';
+    const type = searchParams.get('type') || 'home';
 
     // Font loading
     const clashBoldData = await fetch(new URL('../../../public/fonts/ClashDisplay-Bold.ttf', import.meta.url)).then((res) => res.arrayBuffer());
@@ -106,40 +107,72 @@ export async function GET(request: Request) {
               </div>
             </div>
 
-            {/* Illustration Card */}
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: 320,
-              backgroundColor: 'rgba(19, 19, 26, 0.9)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 24,
-              padding: 24,
-              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-              marginTop: 'auto',
-              marginBottom: 40
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(113, 46, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D0AAFF' }}>⚡</div>
-                  <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Feed</div>
-                </div>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }} />
-              </div>
-              
-              {/* Mock List Items */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: 1 - (i * 0.25) }}>
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: i === 1 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {i === 1 ? '!' : '?'}
-                    </div>
-                    <div style={{ flex: 1, height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
-                    <div style={{ width: 40, height: 8, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
+            {/* Illustration Card based on Type */}
+            {type === 'check' ? (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: 320,
+                backgroundColor: 'rgba(19, 19, 26, 0.9)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 24,
+                padding: 24,
+                boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                marginTop: 'auto',
+                marginBottom: 40
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981' }}>🛡️</div>
+                    <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Risk Report</div>
                   </div>
-                ))}
+                </div>
+                
+                {/* Mock Risk Score */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0' }}>
+                  <div style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>98%</div>
+                  <div style={{ fontSize: 14, color: '#A1A1AA' }}>Safety Score</div>
+                </div>
+                
+                <div style={{ height: 4, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: '98%', backgroundColor: '#10B981' }} />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: 320,
+                backgroundColor: 'rgba(19, 19, 26, 0.9)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 24,
+                padding: 24,
+                boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                marginTop: 'auto',
+                marginBottom: 40
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(113, 46, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D0AAFF' }}>⚡</div>
+                    <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Feed</div>
+                  </div>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }} />
+                </div>
+                
+                {/* Mock List Items */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: 1 - (i * 0.25) }}>
+                      <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: i === 1 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {i === 1 ? '!' : '?'}
+                      </div>
+                      <div style={{ flex: 1, height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
+                      <div style={{ width: 40, height: 8, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
