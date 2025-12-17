@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: post.author ? [post.author] : undefined,
       images: [
         {
-          url: `/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
+          url: `/og/blog?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
             post.excerpt.slice(0, 100) + '...'
           )}`,
           width: 1200,
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: post.title,
       description: post.excerpt,
       images: [
-        `/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
+        `/og/blog?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(
           post.excerpt.slice(0, 100) + '...'
         )}`,
       ],

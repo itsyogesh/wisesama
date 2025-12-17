@@ -6,15 +6,14 @@ export const runtime = 'edge';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const title = searchParams.get('title')?.slice(0, 100) || 'Wisesama';
-    const description = searchParams.get('description')?.slice(0, 200) || 'Polkadot Fraud Detection';
+    const title = searchParams.get('title')?.slice(0, 100) || 'Blog';
+    const description = searchParams.get('description')?.slice(0, 200) || 'Insights from Wisesama.';
 
     const fonts = await getFonts();
 
     return new ImageResponse(
       (
         <div style={{ height: '100%', width: '100%', display: 'flex', ...SHARED_STYLES }}>
-          {/* Left: Text */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px', maxWidth: '60%' }}>
             <div style={{
               fontSize: 80,
@@ -28,25 +27,19 @@ export async function GET(request: Request) {
             }}>
               {title}
             </div>
-            <div style={{
-              fontSize: 32,
-              fontWeight: 400,
-              color: '#A1A1AA',
-              lineHeight: 1.5,
-            }}>
+            <div style={{ fontSize: 32, fontWeight: 400, color: '#A1A1AA', lineHeight: 1.5 }}>
               {description}
             </div>
             <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#712EFF', boxShadow: '0 0 10px #712EFF' }} />
-              <div style={{ fontSize: 24, color: '#712EFF', fontWeight: 600 }}>Intelligent Risk Defense</div>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#D946EF', boxShadow: '0 0 10px #D946EF' }} />
+              <div style={{ fontSize: 24, color: '#D946EF', fontWeight: 600 }}>Latest Insights</div>
             </div>
           </div>
 
-          {/* Right: Logo & Illustration */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '60px', flex: 1, alignItems: 'flex-end' }}>
             <Logo />
             
-            {/* Live Feed Card */}
+            {/* Blog Card */}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -61,19 +54,14 @@ export async function GET(request: Request) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(113, 46, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D0AAFF' }}>⚡</div>
-                  <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Feed</div>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(217, 70, 239, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F0ABFC' }}>📰</div>
+                  <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Article</div>
                 </div>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 8px #10B981' }} />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[1, 2, 3].map((i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, opacity: 1 - (i * 0.25) }}>
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: i === 1 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{i === 1 ? '!' : '?'}</div>
-                    <div style={{ flex: 1, height: 8, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
-                    <div style={{ width: 40, height: 8, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
-                  </div>
-                ))}
+                <div style={{ height: 8, width: '80%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
+                <div style={{ height: 8, width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
+                <div style={{ height: 8, width: '90%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
               </div>
             </div>
           </div>

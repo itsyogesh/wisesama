@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [
         {
-          url: `/og?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
+          url: `/og/check?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
             decodedEntity
           )}`,
           width: 1200,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title,
       description,
       images: [
-        `/og?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
+        `/og/check?title=${encodeURIComponent('Risk Report')}&description=${encodeURIComponent(
           decodedEntity
         )}`,
       ],
