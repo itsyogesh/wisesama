@@ -57,7 +57,12 @@ export async function GET(request: Request) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981', fontSize: 18 }}>🛡️</div>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981' }}>
+                    {/* Replaced Emoji with SVG */}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                   <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: '"Satoshi"', fontWeight: 700 }}>Report</div>
                 </div>
               </div>
@@ -65,7 +70,7 @@ export async function GET(request: Request) {
                 <div style={{ fontSize: 64, fontWeight: 700, color: 'white', fontFamily: '"Clash Display"' }}>98%</div>
                 <div style={{ fontSize: 16, color: '#A1A1AA', fontFamily: '"Satoshi"' }}>Safety Score</div>
               </div>
-              <div style={{ height: 6, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden', marginTop: 10 }}>
+              <div style={{ height: 6, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden', marginTop: 10, display: 'flex' }}>
                 <div style={{ height: '100%', width: '98%', backgroundColor: '#10B981' }} />
               </div>
             </div>
