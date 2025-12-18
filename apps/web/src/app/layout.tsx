@@ -4,7 +4,6 @@ import { Providers } from './providers';
 import { SiteHeader, SiteFooter } from '@/components/layout';
 import { Toaster } from '@/components/ui/sonner';
 import { ViewTransitions } from 'next-view-transitions';
-import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://wisesama.com'),
@@ -100,7 +99,6 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <SiteFooter />
             <Toaster />
-            <Analytics />
           </Providers>
         </body>
       </html>
