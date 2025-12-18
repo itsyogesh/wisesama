@@ -1,8 +1,8 @@
 export async function getFonts() {
   const clashBold = await fetch(new URL('../../../public/fonts/ClashDisplay-Bold.ttf', import.meta.url)).then((res) => res.arrayBuffer());
   const clashRegular = await fetch(new URL('../../../public/fonts/ClashDisplay-Regular.ttf', import.meta.url)).then((res) => res.arrayBuffer());
-  const satoshiBold = await fetch(new URL('../../../public/fonts/Satoshi-Bold.otf', import.meta.url)).then((res) => res.arrayBuffer());
-  const satoshiRegular = await fetch(new URL('../../../public/fonts/Satoshi-Regular.otf', import.meta.url)).then((res) => res.arrayBuffer());
+  const satoshiBold = await fetch(new URL('../../../public/fonts/Satoshi-Bold.ttf', import.meta.url)).then((res) => res.arrayBuffer());
+  const satoshiRegular = await fetch(new URL('../../../public/fonts/Satoshi-Regular.ttf', import.meta.url)).then((res) => res.arrayBuffer());
   
   return [
     { name: 'Clash Display', data: clashBold, style: 'normal' as const, weight: 700 as const },
