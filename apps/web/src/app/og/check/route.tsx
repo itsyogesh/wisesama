@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     return new ImageResponse(
       (
         <div style={{ height: '100%', width: '100%', display: 'flex', ...SHARED_STYLES }}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px', maxWidth: '60%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px', maxWidth: '55%' }}>
             <div style={{
               fontSize: 80,
               fontWeight: 700,
@@ -24,15 +24,18 @@ export async function GET(request: Request) {
               background: 'linear-gradient(90deg, #FFFFFF 0%, #A1A1AA 100%)',
               backgroundClip: 'text',
               color: 'transparent',
+              fontFamily: '"Clash Display"',
             }}>
               {title}
             </div>
-            <div style={{ fontSize: 32, fontWeight: 400, color: '#A1A1AA', lineHeight: 1.5 }}>
+            <div style={{ fontSize: 32, fontWeight: 400, color: '#A1A1AA', lineHeight: 1.5, fontFamily: '"Satoshi"' }}>
               {description}
             </div>
-            <div style={{ marginTop: 40, display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#10B981', boxShadow: '0 0 10px #10B981' }} />
-              <div style={{ fontSize: 24, color: '#10B981', fontWeight: 600 }}>Verified Risk Analysis</div>
+              <div style={{ fontSize: 24, color: '#10B981', fontWeight: 600, fontFamily: '"Satoshi"' }}>Verified Risk Analysis</div>
+              <div style={{ width: 1, height: 20, backgroundColor: '#333', margin: '0 8px' }} />
+              <div style={{ fontSize: 24, color: '#666', fontFamily: '"Satoshi"' }}>wisesama.com</div>
             </div>
           </div>
 
@@ -43,26 +46,26 @@ export async function GET(request: Request) {
             <div style={{
               display: 'flex',
               flexDirection: 'column',
-              width: 320,
+              width: 380,
               backgroundColor: 'rgba(19, 19, 26, 0.9)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 24,
               padding: 24,
               boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
               marginTop: 'auto',
-              marginBottom: 40
+              marginBottom: 20
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981' }}>🛡️</div>
-                  <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Report</div>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(16, 185, 129, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10B981', fontSize: 18 }}>🛡️</div>
+                  <div style={{ fontSize: 14, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: '"Satoshi"', fontWeight: 700 }}>Report</div>
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 0' }}>
-                <div style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>98%</div>
-                <div style={{ fontSize: 14, color: '#A1A1AA' }}>Safety Score</div>
+                <div style={{ fontSize: 64, fontWeight: 700, color: 'white', fontFamily: '"Clash Display"' }}>98%</div>
+                <div style={{ fontSize: 16, color: '#A1A1AA', fontFamily: '"Satoshi"' }}>Safety Score</div>
               </div>
-              <div style={{ height: 4, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: 6, width: '100%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden', marginTop: 10 }}>
                 <div style={{ height: '100%', width: '98%', backgroundColor: '#10B981' }} />
               </div>
             </div>
