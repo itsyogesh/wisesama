@@ -33,7 +33,7 @@ export async function GET(request: Request) {
               color: 'transparent',
               fontFamily: '"Clash Display"',
             }}>
-              {title}
+              {rawTitle}
             </div>
             <div style={{ display: 'flex', fontSize: 28, fontWeight: 400, color: '#A1A1AA', lineHeight: 1.5, fontFamily: '"Satoshi"' }}>
               {description}
@@ -102,12 +102,6 @@ export async function GET(request: Request) {
           </div>
         </div>
       ),
-      { width: OG_WIDTH, height: OG_HEIGHT, fonts }
-    );
-  } catch (e) {
-    return new Response(`Failed to generate the image`, { status: 500 });
-  }
-}
       { width: OG_WIDTH, height: OG_HEIGHT, fonts }
     );
   } catch (e) {
