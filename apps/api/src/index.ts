@@ -48,7 +48,7 @@ async function buildApp() {
   });
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const defaultCorsOrigins = ['http://localhost:3000', 'http://localhost:3002'];
+  const defaultCorsOrigins = ['http://localhost:3000', 'http://localhost:3002', 'https://www.wisesama.com', 'https://wisesama.com'];
   const envCorsOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()).filter(Boolean) || [];
   const appCorsOrigins = [process.env.APP_URL, process.env.ADMIN_APP_URL].filter(Boolean) as string[];
   const allowedCorsOrigins = Array.from(new Set([...envCorsOrigins, ...appCorsOrigins, ...defaultCorsOrigins]));
