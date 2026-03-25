@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "sync": "dotenv -e .env.local -- tsx scripts/sync-phishing.ts",
+    "backfill-identities": "dotenv -e .env.local -- tsx scripts/backfill-identities.ts",
     "make-admin": "dotenv -e .env.local -- tsx scripts/make-admin.ts",
     "clean": "rm -rf dist node_modules .turbo"
   },
