@@ -239,4 +239,114 @@ export async function adminRoutes(fastify: FastifyInstance) {
       };
     }
   );
+
+  // List identities (paginated, searchable)
+  fastify.get<{
+    Querystring: {
+      page?: string;
+      limit?: string;
+      search?: string;
+      chain?: string;
+      verified?: string;
+    };
+  }>(
+    '/admin/identities',
+    {
+      preHandler: [authenticate, requireAdmin],
+      schema: {
+        tags: ['admin'],
+        description: 'List synced on-chain identities with search and filters',
+        security: [{ bearerAuth: [] }],
+        querystring: {
+          type: 'object',
+          properties: {
+            page: { type: 'string', default: '1' },
+            limit: { type: 'string', default: '20' },
+            search: { type: 'string' },
+            chain: { type: 'string', enum: ['polkadot', 'kusama'] },
+            verified: { type: 'string', enum: ['true', 'false'] },
+          },
+        },
+      },
+    },
+    async (request) => {
+      const page = parseInt(request.query.page || '1', 10);
+      const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);
+      const { search, chain, verified } = request.query;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const where: any = { hasIdentity: true };
+
+      if (search) {
+        where.OR = [
+          { displayName: { contains: search, mode: 'insensitive' } },
+          { address: { contains: search, mode: 'insensitive' } },
+          { twitter: { contains: search, mode: 'insensitive' } },
+          { github: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      if (chain) {
+        where.source = chain === 'polkadot' ? 'POLKADOT_PEOPLE' : 'KUSAMA_PEOPLE';
+      }
+
+      if (verified) {
+        where.isVerified = verified === 'true';
+      }
+
+      const [identities, total] = await Promise.all([
+        prisma.identity.findMany({
+          where,
+          include: { chain: true },
+          orderBy: [{ isVerified: 'desc' }, { displayName: 'asc' }],
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+        prisma.identity.count({ where }),
+      ]);
+
+      return {
+        identities,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
+  );
+
+  // Get single identity by ID
+  fastify.get<{ Params: { id: string } }>(
+    '/admin/identities/:id',
+    {
+      preHandler: [authenticate, requireAdmin],
+      schema: {
+        tags: ['admin'],
+        description: 'Get a single identity by ID',
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+          required: ['id'],
+        },
+      },
+    },
+    async (request, reply) => {
+      const identity = await prisma.identity.findUnique({
+        where: { id: request.params.id },
+        include: { chain: true },
+      });
+
+      if (!identity) {
+        reply.status(404);
+        return { error: 'Identity not found' };
+      }
+
+      return identity;
+    }
+  );
 }

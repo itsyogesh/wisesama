@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import {
   LayoutDashboard,
   Shield,
+  Fingerprint,
   FileText,
   ClipboardList,
   GitPullRequest,
@@ -28,6 +29,11 @@ const navItems = [
     title: 'Whitelist',
     href: '/whitelist',
     icon: Shield,
+  },
+  {
+    title: 'Identities',
+    href: '/identities',
+    icon: Fingerprint,
   },
   {
     title: 'Requests',

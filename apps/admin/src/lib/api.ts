@@ -234,3 +234,31 @@ export const statsApi = {
     return response.data;
   },
 };
+
+// Identities API
+export const identitiesApi = {
+  getAll: async (params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    chain?: string;
+    verified?: string;
+  }) => {
+    const response = await apiClient.get('/api/v1/admin/identities', { params });
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await apiClient.get(`/api/v1/admin/identities/${id}`);
+    return response.data;
+  },
+  getSyncStatus: async () => {
+    const response = await apiClient.get('/api/v1/admin/sync/identities/status');
+    return response.data;
+  },
+  triggerSync: async (chain: string = 'all') => {
+    const response = await apiClient.post('/api/v1/admin/sync/identities', null, {
+      params: { chain },
+    });
+    return response.data;
+  },
+};
