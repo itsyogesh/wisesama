@@ -1,8 +1,9 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { hexToString } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { prisma } from '@wisesama/database';
 import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
+import { parseField } from '../utils/sanitize';
+import { normalizeTwitter, normalizeWeb, normalizeGithub } from '../utils/normalize';
 
 // SS58 prefixes for each chain (for address normalization)
 const SS58_PREFIXES: Record<string, number> = {
@@ -12,23 +13,6 @@ const SS58_PREFIXES: Record<string, number> = {
 
 // Cache TTL: 1 hour for identity lookups
 const IDENTITY_CACHE_TTL = 3600;
-
-// Normalization functions for reverse lookup indexes
-function normalizeTwitter(handle: string | null): string | null {
-  if (!handle) return null;
-  return handle.toLowerCase().replace(/^@/, '').trim() || null;
-}
-
-function normalizeWeb(url: string | null): string | null {
-  if (!url) return null;
-  const parts = url
-    .toLowerCase()
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
-    .split('/');
-  const domain = parts[0]?.trim();
-  return domain || null;
-}
 
 // Map chain name to IdentitySource enum
 function getIdentitySource(chain: string): 'POLKADOT_PEOPLE' | 'KUSAMA_PEOPLE' {
@@ -51,6 +35,9 @@ const PEOPLE_CHAIN_RPC_ENDPOINTS: Record<string, string> = {
   polkadot: process.env.POLKADOT_PEOPLE_RPC || 'wss://polkadot-people-rpc.polkadot.io',
   kusama: process.env.KUSAMA_PEOPLE_RPC || 'wss://kusama-people-rpc.polkadot.io',
 };
+
+// Exported for use by identity-sync service
+export { getIdentitySource, getChainCode, SS58_PREFIXES };
 
 export class PolkadotService {
   private clients: Map<string, ApiPromise> = new Map();
@@ -84,10 +71,10 @@ export class PolkadotService {
   }
 
   /**
-   * Get People chain client for identity queries
-   * Identity pallet has been migrated from relay chains to People parachains
+   * Get People chain client for identity queries.
+   * Public so identity-sync service can reuse the connection.
    */
-  private async getPeopleChainClient(chain: string): Promise<ApiPromise> {
+  async getPeopleChainClient(chain: string): Promise<ApiPromise> {
     const cacheKey = `${chain}-people`;
     if (this.peopleChainClients.has(cacheKey)) {
       const client = this.peopleChainClients.get(cacheKey)!;
@@ -127,40 +114,70 @@ export class PolkadotService {
       twitter: string | null;
       web: string | null;
       riot: string | null;
+      github: string | null;
+      discord: string | null;
+      matrix: string | null;
     } | null;
     judgements: Array<{ registrarId: number; judgement: string }>;
   }> {
-    // Normalize address to chain-specific format for consistent caching
-    // This ensures addresses like 5Dnj... (substrate) and 12j2... (polkadot)
-    // are treated as the same account
     const ss58Prefix = SS58_PREFIXES[chain] ?? 0;
     let normalizedAddress: string;
     try {
       const decoded = decodeAddress(address);
       normalizedAddress = encodeAddress(decoded, ss58Prefix);
     } catch {
-      // If decoding fails, use original address
       normalizedAddress = address;
     }
 
-    // Check Redis cache first (using normalized address)
+    // Check Redis cache first
     const cacheKey = cacheKeys.identity(normalizedAddress, chain);
     const cached = await cacheGet<Awaited<ReturnType<typeof this.getIdentity>>>(cacheKey);
     if (cached) {
-      // Return with original address for consistency with input
       return { ...cached, address };
     }
 
+    // Check DB for bulk-synced data (< 24h old)
+    const identitySource = getIdentitySource(chain);
+    const dbIdentity = await prisma.identity.findUnique({
+      where: { address_source: { address: normalizedAddress, source: identitySource } },
+    });
+
+    if (dbIdentity && dbIdentity.lastSyncedAt) {
+      const ageMs = Date.now() - dbIdentity.lastSyncedAt.getTime();
+      if (ageMs < 24 * 60 * 60 * 1000) {
+        const result = {
+          address,
+          chain,
+          hasIdentity: dbIdentity.hasIdentity,
+          isVerified: dbIdentity.isVerified,
+          identity: dbIdentity.hasIdentity ? {
+            displayName: dbIdentity.displayName,
+            legalName: dbIdentity.legalName,
+            email: dbIdentity.email,
+            twitter: dbIdentity.twitter,
+            web: dbIdentity.web,
+            riot: dbIdentity.riot,
+            github: dbIdentity.github,
+            discord: dbIdentity.discord,
+            matrix: dbIdentity.matrix,
+          } : null,
+          judgements: Array.isArray(dbIdentity.judgements)
+            ? (dbIdentity.judgements as Array<{ registrarId: number; judgement: string }>)
+            : [],
+        };
+        await cacheSet(cacheKey, result, IDENTITY_CACHE_TTL);
+        return result;
+      }
+    }
+
+    // Fallback: fetch from People Chain RPC
     try {
-      // Use People chain for identity queries (identity migrated from relay chains)
       const api = await this.getPeopleChainClient(chain);
 
-      // Query identity - check if identity pallet exists
-      if (!api.query.identity || !api.query.identity.identityOf) {
+      if (!api.query.identity?.identityOf) {
         throw new Error(`Identity pallet not available on ${chain} People chain`);
       }
 
-      // Query using normalized address for consistent results
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const identityOf = await api.query.identity.identityOf(normalizedAddress) as any;
 
@@ -171,124 +188,55 @@ export class PolkadotService {
           hasIdentity: false,
           isVerified: false,
           identity: null,
-          judgements: [],
+          judgements: [] as Array<{ registrarId: number; judgement: string }>,
         };
-        // Cache the no-identity result
         await cacheSet(cacheKey, noIdentityResult, IDENTITY_CACHE_TTL);
         return noIdentityResult;
       }
 
-      // Unwrap the Option - returns [Registration, Option<Deposit>] tuple or just Registration
       const identityData = identityOf.unwrap();
-
-      // Handle both tuple and direct registration formats
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const rawData = identityData as any;
       const registration = Array.isArray(rawData) ? rawData[0] : rawData;
-      const info = registration.info;
 
-      // Parse judgements
-      const judgements = registration.judgements.map(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (item: any) => {
-          const [registrarId, judgement] = item;
-          return {
-            registrarId: Number(registrarId.toString()),
-            judgement: judgement.type || judgement.toString(),
-          };
-        }
-      );
+      // Import parseRegistration from identity-sync service would create circular dep,
+      // so we inline the parsing here using the shared parseField utility
+      const { identityInfo, judgements, isVerified, additional } = parseRegistrationData(registration);
 
-      // Check if verified (has at least one positive judgement)
-      const isVerified = judgements.some(
-        (j: { registrarId: number; judgement: string }) =>
-          ['Reasonable', 'KnownGood'].includes(j.judgement)
-      );
-
-      // Parse identity data fields - handle Raw hex data
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const parseField = (field: any): string | null => {
-        if (!field) return null;
-
-        // Check if it's a Raw type with hex data
-        if (field.isRaw && field.asRaw?.toHex) {
-          const hex = field.asRaw.toHex();
-          if (hex && hex !== '0x') {
-            return hexToString(hex);
-          }
-        }
-
-        // Try toHuman() for human-readable format
-        if (field.toHuman) {
-          const human = field.toHuman();
-          if (human && typeof human === 'object') {
-            const humanObj = human as { Raw?: string };
-            if (humanObj.Raw) {
-              // Raw might be hex-encoded
-              if (humanObj.Raw.startsWith('0x')) {
-                return hexToString(humanObj.Raw);
-              }
-              return humanObj.Raw;
-            }
-          }
-          if (typeof human === 'string' && human !== 'None') {
-            return human;
-          }
-        }
-
-        return null;
-      };
-
-      const identityInfo = {
-        displayName: parseField(info.display),
-        legalName: parseField(info.legal),
-        email: parseField(info.email),
-        twitter: parseField(info.twitter),
-        web: parseField(info.web),
-        riot: parseField(info.riot),
-      };
-
-      // Cache in database (using normalized address for consistency)
+      // Upsert to DB
       const chainRecord = await prisma.chain.findUnique({ where: { code: getChainCode(chain) } });
       if (chainRecord) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const judgementsJson = judgements as any;
-
-        // Upsert to unified Identity table (with normalized twitter/web for reverse lookups)
-        const identitySource = getIdentitySource(chain);
         await prisma.identity.upsert({
-          where: {
-            address_source: {
-              address: normalizedAddress,
-              source: identitySource,
-            },
-          },
+          where: { address_source: { address: normalizedAddress, source: identitySource } },
           create: {
             address: normalizedAddress,
             source: identitySource,
             chainId: chainRecord.id,
-            displayName: identityInfo.displayName,
-            legalName: identityInfo.legalName,
-            email: identityInfo.email,
+            ...identityInfo,
             twitter: normalizeTwitter(identityInfo.twitter),
             web: normalizeWeb(identityInfo.web),
-            riot: identityInfo.riot,
+            github: normalizeGithub(additional.github),
+            discord: additional.discord,
+            matrix: additional.matrix,
+            additionalFields: additional.all,
             hasIdentity: true,
             isVerified,
-            judgements: judgementsJson,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            judgements: judgements as any,
             lastSyncedAt: new Date(),
           },
           update: {
-            chainId: chainRecord.id,
-            displayName: identityInfo.displayName,
-            legalName: identityInfo.legalName,
-            email: identityInfo.email,
+            ...identityInfo,
             twitter: normalizeTwitter(identityInfo.twitter),
             web: normalizeWeb(identityInfo.web),
-            riot: identityInfo.riot,
+            github: normalizeGithub(additional.github),
+            discord: additional.discord,
+            matrix: additional.matrix,
+            additionalFields: additional.all,
             hasIdentity: true,
             isVerified,
-            judgements: judgementsJson,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            judgements: judgements as any,
             lastSyncedAt: new Date(),
           },
         });
@@ -299,17 +247,108 @@ export class PolkadotService {
         chain,
         hasIdentity: true,
         isVerified,
-        identity: identityInfo,
+        identity: {
+          ...identityInfo,
+          github: additional.github,
+          discord: additional.discord,
+          matrix: additional.matrix,
+        },
         judgements,
       };
 
-      // Cache the result in Redis
       await cacheSet(cacheKey, result, IDENTITY_CACHE_TTL);
-
       return result;
     } catch (error) {
       console.error('Failed to fetch identity:', error);
       throw error;
     }
   }
+}
+
+/**
+ * Parse a registration from the identity pallet.
+ * Shared inline function (avoids circular dependency with identity-sync service).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseRegistrationData(registration: any) {
+  const info = registration.info;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const judgements = registration.judgements.map((item: any) => {
+    const [registrarId, judgement] = item;
+    return {
+      registrarId: Number(registrarId.toString()),
+      judgement: judgement.type || judgement.toString(),
+    };
+  });
+
+  const isVerified = judgements.some(
+    (j: { registrarId: number; judgement: string }) =>
+      ['Reasonable', 'KnownGood'].includes(j.judgement)
+  );
+
+  const identityInfo = {
+    displayName: parseField(info.display),
+    legalName: parseField(info.legal),
+    email: parseField(info.email),
+    twitter: parseField(info.twitter),
+    web: parseField(info.web),
+    riot: parseField(info.riot),
+  };
+
+  // Parse additional fields (github, discord, matrix, etc.)
+  const additional = parseAdditionalFields(info.additional);
+
+  return { identityInfo, judgements, isVerified, additional };
+}
+
+/**
+ * Parse info.additional Vec<[Data, Data]> key-value tuples.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseAdditionalFields(additional: any): {
+  github: string | null;
+  discord: string | null;
+  matrix: string | null;
+  all: Record<string, string>;
+} {
+  const all: Record<string, string> = {};
+  let github: string | null = null;
+  let discord: string | null = null;
+  let matrix: string | null = null;
+
+  if (!additional) return { github, discord, matrix, all };
+
+  try {
+    // additional is a Vec of tuples - iterate via forEach or array conversion
+    const entries = additional.toHuman ? additional.toHuman() : additional;
+    if (!Array.isArray(entries)) return { github, discord, matrix, all };
+
+    for (const tuple of entries) {
+      if (!Array.isArray(tuple) || tuple.length < 2) continue;
+
+      // Each entry is [{ Raw: key }, { Raw: value }] in human format
+      const rawKey = typeof tuple[0] === 'object' ? tuple[0]?.Raw : tuple[0];
+      const rawValue = typeof tuple[1] === 'object' ? tuple[1]?.Raw : tuple[1];
+
+      const key = typeof rawKey === 'string' ? rawKey.toLowerCase().trim() : null;
+      const value = typeof rawValue === 'string' ? rawValue.trim() : null;
+
+      if (!key || !value) continue;
+
+      all[key] = value;
+
+      if (key === 'github' || key === 'gh') {
+        github = value;
+      } else if (key === 'discord') {
+        discord = value;
+      } else if (key === 'matrix' || key === 'element') {
+        matrix = value;
+      }
+    }
+  } catch (err) {
+    console.error('[PolkadotService] Error parsing additional fields:', err);
+  }
+
+  return { github, discord, matrix, all };
 }
