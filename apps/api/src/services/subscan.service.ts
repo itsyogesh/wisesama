@@ -378,10 +378,21 @@ export class SubscanService {
   }
 
   /**
-   * Get block explorer URL for an address
+   * Get block explorer URL for an address.
+   * Converts hex public keys to SS58 format for user-readable URLs.
    */
   getBlockExplorerUrl(address: string, chain: 'polkadot' | 'kusama'): string {
-    return `https://${chain}.subscan.io/account/${address}`;
+    let displayAddress = address;
+    // If hex public key, convert to chain-specific SS58 for readable URL
+    if (address.startsWith('0x')) {
+      try {
+        const ss58Address = normalizeToSS58(address, chain);
+        displayAddress = ss58Address;
+      } catch {
+        // Fall back to hex if conversion fails
+      }
+    }
+    return `https://${chain}.subscan.io/account/${displayAddress}`;
   }
 
   /**

@@ -49,11 +49,11 @@ export function parseAdditionalFields(additional: any): {
 
       all[key] = value;
 
-      if (key === 'github' || key === 'gh') {
+      if (['github', 'gh', 'git', 'github.com'].includes(key)) {
         github = value;
-      } else if (key === 'discord') {
+      } else if (['discord', 'disc'].includes(key)) {
         discord = value;
-      } else if (key === 'matrix' || key === 'element') {
+      } else if (['matrix', 'element', 'riot'].includes(key)) {
         matrix = value;
       }
     }
