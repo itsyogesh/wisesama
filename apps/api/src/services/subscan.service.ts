@@ -10,6 +10,7 @@
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import type { MLFeatures } from './ml.service';
 import type { TransactionSummary, IdentityTimeline } from '@wisesama/types';
+import { sanitizeString } from '../utils/sanitize';
 
 const SUBSCAN_API_KEY = process.env.SUBSCAN_API_KEY;
 
@@ -449,7 +450,7 @@ export class SubscanService {
       const isVerified = judgements.some((j: { registrarId: number; judgement: string }) =>
         ['Reasonable', 'KnownGood'].includes(j.judgement)
       );
-      const displayName = peopleData?.display || display.display || null;
+      const displayName = sanitizeString(peopleData?.display || display.display || null);
 
       return {
         hasIdentity,

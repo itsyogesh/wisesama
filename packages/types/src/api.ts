@@ -128,8 +128,22 @@ export interface BatchCheckRequest {
   entities: string[];
 }
 
+export interface BatchCheckResultSuccess {
+  entity: string;
+  success: true;
+  data: CheckResponse;
+}
+
+export interface BatchCheckResultError {
+  entity: string;
+  success: false;
+  error: string;
+}
+
+export type BatchCheckResult = BatchCheckResultSuccess | BatchCheckResultError;
+
 export interface BatchCheckResponse {
-  results: Array<CheckResponse | { entity: string; error: string }>;
+  results: BatchCheckResult[];
   totalProcessed: number;
   totalFailed: number;
 }

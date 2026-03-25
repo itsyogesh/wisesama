@@ -57,6 +57,9 @@ export async function checkRoutes(fastify: FastifyInstance) {
                 twitter: { type: ['string', 'null'] },
                 web: { type: ['string', 'null'] },
                 riot: { type: ['string', 'null'] },
+                github: { type: ['string', 'null'] },
+                discord: { type: ['string', 'null'] },
+                matrix: { type: ['string', 'null'] },
                 judgements: {
                   type: 'array',
                   items: {
@@ -70,11 +73,12 @@ export async function checkRoutes(fastify: FastifyInstance) {
                 timeline: {
                   type: 'object',
                   nullable: true,
+                  description: 'Identity history. Note: firstVerifiedAt can be non-null even when hasIdentity is false — this indicates a previously-verified identity that was later cleared or migrated.',
                   properties: {
-                    identitySetAt: { type: ['string', 'null'], format: 'date-time' },
-                    firstVerifiedAt: { type: ['string', 'null'], format: 'date-time' },
-                    isMigrated: { type: 'boolean' },
-                    source: { type: ['string', 'null'], enum: ['people_chain', 'relay_chain', null] },
+                    identitySetAt: { type: ['string', 'null'], format: 'date-time', description: 'When setIdentity was first called on-chain' },
+                    firstVerifiedAt: { type: ['string', 'null'], format: 'date-time', description: 'When first positive registrar judgement was received. May persist after identity is cleared.' },
+                    isMigrated: { type: 'boolean', description: 'True if identity was migrated from relay chain to People Chain' },
+                    source: { type: ['string', 'null'], enum: ['people_chain', 'relay_chain', null], description: 'Where the original identity record was found' },
                   },
                 },
               },
@@ -235,14 +239,15 @@ export async function checkRoutes(fastify: FastifyInstance) {
       const results = await Promise.all(
         parsed.data.entities.map(async (entity) => {
           try {
-            return await queryService.checkEntity(entity);
+            const data = await queryService.checkEntity(entity);
+            return { entity, success: true as const, data };
           } catch {
-            return { entity, error: 'Failed to check entity' };
+            return { entity, success: false as const, error: 'Failed to check entity' };
           }
         })
       );
 
-      const failed = results.filter((r) => 'error' in r).length;
+      const failed = results.filter((r) => !r.success).length;
 
       return {
         results,
