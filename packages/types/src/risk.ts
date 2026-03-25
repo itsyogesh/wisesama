@@ -35,6 +35,9 @@ export interface IdentityResult {
   twitter?: string | null;
   web?: string | null;
   riot?: string | null;
+  github?: string | null;
+  discord?: string | null;
+  matrix?: string | null;
   judgements?: Array<{
     registrarId: number;
     judgement: string;
@@ -101,7 +104,7 @@ export interface LinkedIdentity {
   displayName: string | null;
   isVerified: boolean;
   source: IdentitySource;
-  matchedField: 'twitter' | 'web';
+  matchedField: 'twitter' | 'web' | 'github' | 'discord' | 'matrix';
   judgements?: Array<{
     registrarId: number;
     judgement: string;

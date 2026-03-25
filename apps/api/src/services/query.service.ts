@@ -82,6 +82,9 @@ export class QueryService {
       twitter?: string | null;
       web?: string | null;
       riot?: string | null;
+      github?: string | null;
+      discord?: string | null;
+      matrix?: string | null;
       judgements?: Array<{ registrarId: number; judgement: string }>;
       timeline?: IdentityTimeline;
     } = { hasIdentity: false, isVerified: false };
@@ -127,7 +130,7 @@ export class QueryService {
             judgements: identity.judgements,
           };
 
-          // If identity found, try to get full details from RPC (for twitter, web, riot)
+          // If identity found, try to get full details from RPC (for twitter, web, riot, github, etc.)
           if (identity.hasIdentity) {
             try {
               const rpcIdentity = await polkadotService.getIdentity(normalized, chainName);
@@ -135,6 +138,9 @@ export class QueryService {
                 identityData.twitter = rpcIdentity.identity.twitter;
                 identityData.web = rpcIdentity.identity.web;
                 identityData.riot = rpcIdentity.identity.riot;
+                identityData.github = rpcIdentity.identity.github;
+                identityData.discord = rpcIdentity.identity.discord;
+                identityData.matrix = rpcIdentity.identity.matrix;
               }
             } catch (rpcErr) {
               // RPC failed, but we still have basic identity from Subscan
@@ -153,6 +159,9 @@ export class QueryService {
               twitter: rpcIdentity.identity?.twitter,
               web: rpcIdentity.identity?.web,
               riot: rpcIdentity.identity?.riot,
+              github: rpcIdentity.identity?.github,
+              discord: rpcIdentity.identity?.discord,
+              matrix: rpcIdentity.identity?.matrix,
               judgements: rpcIdentity.judgements,
             };
           } catch (rpcErr) {
@@ -250,6 +259,9 @@ export class QueryService {
         twitter: identityData.twitter,
         web: identityData.web,
         riot: identityData.riot,
+        github: identityData.github,
+        discord: identityData.discord,
+        matrix: identityData.matrix,
         judgements: identityData.judgements,
         timeline: identityData.timeline,
       },
@@ -302,6 +314,7 @@ export class QueryService {
       isVerified: boolean;
       twitter?: string | null;
       web?: string | null;
+      github?: string | null;
     } = { hasIdentity: false, isVerified: false }
   ) {
     // 1. Whitelisted = SAFE
@@ -341,7 +354,7 @@ export class QueryService {
     }
 
     // Check for social links presence
-    const hasSocialLinks = !!(identity.twitter || identity.web);
+    const hasSocialLinks = !!(identity.twitter || identity.web || identity.github);
 
     // 5. Verified on-chain identity = LOW_RISK (trusted but not whitelisted)
     // Lower score if they have verified social links (more transparent)

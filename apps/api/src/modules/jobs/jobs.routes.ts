@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { Receiver } from '@upstash/qstash';
 import { phishingSyncService } from '../../services/phishing-sync.service';
+import { identitySyncService } from '../../services/identity-sync.service';
 
 // QStash signature verification
 const receiver = new Receiver({
@@ -97,6 +98,95 @@ export async function jobsRoutes(fastify: FastifyInstance) {
         request.log.error({ error }, 'Manual sync failed');
         reply.status(500);
         return { error: 'Sync failed' };
+      }
+    }
+  );
+
+  // Identity sync job - called by QStash CRON
+  // Syncs all identities from Polkadot and Kusama People Chains
+  fastify.post(
+    '/jobs/sync-identities',
+    {
+      schema: {
+        tags: ['jobs'],
+        description: 'Sync all on-chain identities from People Chains (called by QStash)',
+        hide: true,
+      },
+      config: {
+        rawBody: true,
+      },
+    },
+    async (request, reply) => {
+      // Verify QStash signature in production
+      if (process.env.NODE_ENV === 'production' || process.env.QSTASH_CURRENT_SIGNING_KEY) {
+        const signature = request.headers['upstash-signature'] as string;
+        const body = (request as unknown as { rawBody: string }).rawBody || JSON.stringify(request.body) || '';
+        const protocol = (request.headers['x-forwarded-proto'] as string) || 'https';
+        const host = (request.headers['x-forwarded-host'] as string) || (request.headers.host as string);
+        const requestUrl = `${protocol}://${host}${request.url}`;
+
+        try {
+          const isValid = await receiver.verify({ signature, body, url: requestUrl });
+          if (!isValid) {
+            reply.status(401);
+            return { error: 'Invalid signature' };
+          }
+        } catch (err) {
+          request.log.error({ err }, 'QStash signature verification failed for identity sync');
+          reply.status(401);
+          return { error: 'Signature verification failed' };
+        }
+      }
+
+      try {
+        request.log.info('Starting identity sync job');
+
+        // Sync both chains sequentially to avoid overwhelming RPC
+        const polkadotResult = await identitySyncService.syncChain('polkadot');
+        const kusamaResult = await identitySyncService.syncChain('kusama');
+
+        const result = {
+          success: true,
+          polkadot: polkadotResult,
+          kusama: kusamaResult,
+          totalSynced: polkadotResult.synced + kusamaResult.synced,
+          totalErrors: polkadotResult.errors + kusamaResult.errors,
+        };
+
+        request.log.info({ result }, 'Identity sync completed');
+        return result;
+      } catch (error) {
+        request.log.error({ error }, 'Identity sync failed');
+        reply.status(500);
+        return { error: 'Identity sync failed' };
+      }
+    }
+  );
+
+  // Manual identity sync trigger (dev only)
+  fastify.post(
+    '/jobs/sync-identities/trigger',
+    {
+      schema: {
+        tags: ['jobs'],
+        description: 'Manually trigger identity sync (for testing)',
+      },
+    },
+    async (request, reply) => {
+      if (process.env.NODE_ENV === 'production') {
+        reply.status(403);
+        return { error: 'Manual trigger disabled in production. Use /admin/sync/identities.' };
+      }
+
+      try {
+        const chain = (request.query as { chain?: string }).chain || 'polkadot';
+        request.log.info({ chain }, 'Manual identity sync triggered');
+        const result = await identitySyncService.syncChain(chain);
+        return { success: true, ...result };
+      } catch (error) {
+        request.log.error({ error }, 'Manual identity sync failed');
+        reply.status(500);
+        return { error: 'Identity sync failed' };
       }
     }
   );
