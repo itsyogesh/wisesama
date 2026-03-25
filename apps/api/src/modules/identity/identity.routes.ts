@@ -1,7 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import { PolkadotService } from '../../services/polkadot.service';
+import { ReverseLookupService } from '../../services/reverse-lookup.service';
 
 const polkadotService = new PolkadotService();
+const reverseLookupService = new ReverseLookupService();
 
 export async function identityRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { address: string }; Querystring: { chain?: string } }>(
@@ -44,6 +46,9 @@ export async function identityRoutes(fastify: FastifyInstance) {
                   twitter: { type: ['string', 'null'] },
                   web: { type: ['string', 'null'] },
                   riot: { type: ['string', 'null'] },
+                  github: { type: ['string', 'null'] },
+                  discord: { type: ['string', 'null'] },
+                  matrix: { type: ['string', 'null'] },
                 },
               },
               judgements: {
@@ -72,6 +77,62 @@ export async function identityRoutes(fastify: FastifyInstance) {
           reply.status(500);
           return { error: 'Failed to fetch identity' };
         }
+      },
+    }
+  );
+
+  // GitHub reverse lookup — find on-chain addresses linked to a GitHub username
+  fastify.get<{ Params: { username: string } }>(
+    '/identity/github/:username',
+    {
+      schema: {
+        tags: ['identity'],
+        description: 'Find on-chain addresses linked to a GitHub username (via identity additional fields)',
+        params: {
+          type: 'object',
+          properties: {
+            username: { type: 'string', description: 'GitHub username' },
+          },
+          required: ['username'],
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              found: { type: 'boolean' },
+              count: { type: 'number' },
+              identities: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    address: { type: 'string' },
+                    chain: { type: 'string' },
+                    displayName: { type: ['string', 'null'] },
+                    isVerified: { type: 'boolean' },
+                    source: { type: 'string' },
+                    matchedField: { type: 'string' },
+                    judgements: {
+                      type: 'array',
+                      items: {
+                        type: 'object',
+                        properties: {
+                          registrarId: { type: 'number' },
+                          judgement: { type: 'string' },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              hasMore: { type: 'boolean' },
+            },
+          },
+        },
+      },
+      handler: async (request) => {
+        const { username } = request.params;
+        return reverseLookupService.findByGithub(username);
       },
     }
   );

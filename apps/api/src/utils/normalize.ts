@@ -68,3 +68,43 @@ export function isValidAddress(address: string): boolean {
     return false;
   }
 }
+
+/**
+ * Normalize a Twitter handle for identity storage/lookup.
+ * Strips @ prefix, lowercases.
+ */
+export function normalizeTwitter(handle: string | null): string | null {
+  if (!handle) return null;
+  return handle.toLowerCase().replace(/^@/, '').trim() || null;
+}
+
+/**
+ * Normalize a web URL for identity storage/lookup.
+ * Strips protocol, www prefix, path. Lowercases.
+ */
+export function normalizeWeb(url: string | null): string | null {
+  if (!url) return null;
+  const parts = url
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .split('/');
+  const domain = parts[0]?.trim();
+  return domain || null;
+}
+
+/**
+ * Normalize a GitHub username for identity storage/lookup.
+ * Handles: @username, https://github.com/username, plain username.
+ */
+export function normalizeGithub(value: string | null): string | null {
+  if (!value) return null;
+  const cleaned = value
+    .trim()
+    .replace(/^https?:\/\/(www\.)?github\.com\//, '')
+    .replace(/^@/, '')
+    .split('/')[0] // strip anything after username (e.g. /repos)
+    ?.toLowerCase()
+    .trim();
+  return cleaned || null;
+}

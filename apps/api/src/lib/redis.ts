@@ -52,4 +52,5 @@ export const cacheKeys = {
   syncStatus: () => 'sync:status',
   reverseTwitter: (handle: string) => `reverse:twitter:${handle}`,
   reverseDomain: (domain: string) => `reverse:domain:${domain}`,
+  reverseGithub: (username: string) => `reverse:github:${username}`,
 };
