@@ -133,6 +133,14 @@ model Identity {
   web         String? // Normalized: lowercase, no protocol/www
   riot        String?
 
+  // Additional social fields (from info.additional key-value pairs)
+  github           String? // Normalized: lowercase, no @ or URL prefix
+  discord          String?
+  matrix           String? // Matrix/Element handle
+  image            String? // From info.image
+  pgpFingerprint   String? // From info.pgpFingerprint
+  additionalFields Json    @default("{}") // All additional k/v pairs as catch-all
+
   // KILT-specific fields (for future use)
   kiltDid           String?
   kiltCredentialUri String?
@@ -155,6 +163,9 @@ model Identity {
   @@index([web]) // For reverse lookups
   @@index([twitter, isVerified])
   @@index([web, isVerified])
+  @@index([github])
+  @@index([github, isVerified])
+  @@index([lastSyncedAt])
 }
 
 enum UserRole {
