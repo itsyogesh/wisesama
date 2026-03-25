@@ -14,7 +14,7 @@ Wisesama proposes to become the next registrar on Polkadot People Chain, offerin
 
 - **What:** Register Wisesama as a new registrar on People Chain via `identity.addRegistrar`
 - **Why:** The ecosystem needs more active registrars. W3F Registrar #0 shut down in April 2024. Registrar #2 stopped accepting requests in January 2026. Manual verification by remaining registrars takes days or weeks. Identity adoption remains low despite the deposit dropping ~100x after migration to People Chain.
-- **How:** Programmatic verification of social accounts (Twitter/X, GitHub, domain via DNS, email) combined with cross-referencing against phishing databases and behavioral risk scoring before issuing judgements
+- **How:** OAuth-backed social verification (Twitter/X, GitHub) + domain DNS verification + wallet ownership via SIWS (Sign In With Substrate), combined with cross-referencing against phishing databases and behavioral risk scoring before issuing judgements
 - **Fee:** 0 DOT (free verification, consistent with multiple existing registrars)
 - **Who:** Built by Yogesh Kumar, W3F grant recipient, builder of [Relaycode](https://relaycode.org) and contributor to [Opentribe](https://opentribe.xyz)
 
@@ -54,13 +54,32 @@ Current registrars verify that you own a Twitter account or a domain. They do no
 
 ## What Wisesama Offers as Registrar
 
-### Automated social verification
+### OAuth-backed social verification
 
-- **Twitter/X:** Verify handle ownership via bio content check or signed message
-- **GitHub:** Verify account ownership via gist creation or repository file
-- **Domain:** Verify ownership via DNS TXT record (e.g., `wisesama-verify=<challenge>`)
-- **Email:** Verify ownership via confirmation link with signed token
-- **Matrix/Element:** Verify via DM-based challenge-response
+Unlike existing registrars that rely on bio checks, gist creation, or manual screenshot review, Wisesama uses **OAuth-based verification** -- the industry standard for proving account ownership. This is the same mechanism that major platforms use for "Sign in with Twitter" or "Sign in with GitHub."
+
+Wisesama's authentication stack is built on [Better Auth](https://www.better-auth.com/), an open-source TypeScript auth framework, extended with SIWS (Sign In With Substrate) for Polkadot wallet integration.
+
+**Verification flow:**
+
+1. **Wallet ownership** -- User connects their Polkadot wallet via SIWS (Sign In With Substrate). This is a cryptographic signature proving the user controls the private key -- unforgeable.
+2. **Twitter/X** -- User authenticates via Twitter OAuth. Wisesama receives the verified handle directly from Twitter's API -- no bio checks, no scraping, no heuristics. The user provably owns the account.
+3. **GitHub** -- User authenticates via GitHub OAuth. Wisesama receives the verified username and stable numeric user ID (survives renames). Again, cryptographic proof of ownership.
+4. **Domain** -- Verify ownership via DNS TXT record (e.g., `wisesama-verify=<challenge>`). This remains a DNS-based check as there is no OAuth equivalent for domain verification.
+5. **Email** -- Verify ownership via confirmation link with signed token.
+
+**Why OAuth is superior to existing registrar verification methods:**
+
+| Method | Traditional Registrars | Wisesama (OAuth) |
+|--------|----------------------|------------------|
+| Twitter | "Put this code in your bio" → manual check | Twitter OAuth callback → verified handle, unforgeable |
+| GitHub | "Create a gist with this content" → manual check | GitHub OAuth callback → verified username + stable ID |
+| Proof strength | Heuristic (bio can be changed after check) | Cryptographic (OAuth token is verified server-side) |
+| User effort | Copy-paste codes, wait for manual review | Click "Connect Twitter", click "Connect GitHub" |
+| Speed | Hours to days | Seconds |
+| Spoofability | Moderate (bio checks can be gamed) | None (OAuth is unforgeable) |
+
+This makes Wisesama the **first Polkadot registrar to use OAuth-backed social verification**, providing a higher standard of proof than any existing registrar while being faster and easier for users.
 
 ### Fraud detection cross-reference
 
@@ -76,7 +95,7 @@ This is a capability no other registrar currently offers. A registrar that not o
 
 ### Fast turnaround
 
-Automated verification completes in minutes, not days. The entire flow -- from requesting judgement to receiving it on-chain -- targets sub-5-minute completion for straightforward cases.
+OAuth verification completes in **seconds**, not days. The user clicks "Connect Twitter", authorizes, and Wisesama has verified ownership instantly. The entire flow -- wallet connection, social OAuth, identity submission, and on-chain judgement -- targets **under 60 seconds** for straightforward cases. This is possible because OAuth eliminates the need for challenge-response delays or manual review.
 
 ### Free judgements
 
@@ -158,18 +177,34 @@ api.wisesama.com (Fastify API)
 ### Registrar-specific additions (to be built)
 
 ```
+Auth & Verification Layer (Better Auth)
+    |
+    +-- SIWS Provider (Sign In With Substrate)
+    |     - Cryptographic wallet ownership proof
+    |     - User signs a challenge message with their Polkadot wallet
+    |     - Supports Polkadot-JS, Talisman, SubWallet, Nova
+    |
+    +-- OAuth Providers
+    |     - Twitter/X OAuth 2.0 → verified handle
+    |     - GitHub OAuth → verified username + stable numeric ID
+    |     - Google OAuth → verified email (optional)
+    |
+    +-- Domain Verification
+    |     - DNS TXT record check (wisesama-verify=<challenge>)
+    |
+    +-- Session Management
+          - Better Auth sessions link wallet + social accounts
+          - Persistent proof: user authenticated once, verification stored
+
 Registrar Engine (new)
     |
     +-- Judgement Request Watcher
     |     - Subscribe to identity.judgementRequested events on People Chain
     |     - Queue verification tasks for incoming requests
     |
-    +-- Verification Pipeline
-    |     - Twitter: bio/pinned tweet challenge verification
-    |     - GitHub: gist/repo file challenge verification
-    |     - Domain: DNS TXT record check
-    |     - Email: signed confirmation link
-    |     - Matrix: DM challenge-response
+    +-- Verification Resolver
+    |     - Check if user already authenticated via OAuth (instant approval)
+    |     - For external judgement requests: prompt user to verify via wisesama.com
     |
     +-- Fraud Check Gate
     |     - Run all existing Wisesama analysis engines
@@ -198,7 +233,7 @@ The registrar account will:
 
 | Judgement | Criteria | Automation |
 |-----------|----------|------------|
-| **Reasonable** | At least 2 of the following confirmed: (1) display name matches social profiles, (2) domain ownership verified via DNS TXT record, (3) Twitter/X handle verified, (4) GitHub profile verified, (5) email verified | Fully automated |
+| **Reasonable** | Wallet ownership confirmed via SIWS + at least 1 social account verified via OAuth (Twitter or GitHub). OAuth verification is cryptographic proof of ownership -- stronger than traditional registrar checks. | Fully automated |
 | **KnownGood** | All verifiable fields confirmed + manual review for high-profile entities (validators, council members, organizations) | Semi-automated + manual |
 | **Erroneous** | Identity is found in phishing databases, associated with known scam operations, or contains provably false claims | Automated with manual confirmation |
 | **LowQuality** | Identity fields are present but cannot be verified (e.g., unresolvable domain, protected Twitter account, no verifiable fields) | Automated |
@@ -293,7 +328,7 @@ A: Wisesama is fully open source, built by a W3F grant recipient with a track re
 A: The registrar can be removed via another General Admin referendum, exactly as W3F Registrar #0 was handled. Existing judgements remain on-chain. Because the code is open source, the community can fork and operate the service independently.
 
 **Q: How is this different from existing registrars?**
-A: Three key differences: (1) fraud detection before judgement -- no other registrar cross-references against phishing databases and runs behavioral risk scoring, (2) fully automated end-to-end pipeline with no manual bottleneck, (3) companion identity management UI that replaces the Polkadot-JS Apps workflow.
+A: Four key differences: (1) **OAuth-backed social verification** -- Twitter and GitHub ownership is proven via OAuth, not bio checks or gist creation. This is cryptographic proof, unforgeable, and completes in seconds. (2) **Fraud detection before judgement** -- no other registrar cross-references against phishing databases and runs behavioral risk scoring. (3) **SIWS wallet integration** -- users prove wallet ownership via Sign In With Substrate, part of the same auth flow. (4) **Companion identity management UI** that replaces the Polkadot-JS Apps workflow.
 
 **Q: Will Wisesama provide judgements for Kusama too?**
 A: Kusama registrar approval requires a separate governance proposal on Kusama. This is planned for Phase 7 (Q4 2026) after the Polkadot registrar is operational and proven.
@@ -323,6 +358,8 @@ A: The automated pipeline can handle hundreds of verification requests per day. 
 - ECH0.RE Registrar Ref #1803: [polkadot.subsquare.io/referenda/1803](https://polkadot.subsquare.io/referenda/1803)
 - Polkaregistry Discussion: [polkadot.polkassembly.io/post/362](https://polkadot.polkassembly.io/post/362)
 - PolkaIdentity Discussion: [polkadot.polkassembly.io/post/2394](https://polkadot.polkassembly.io/post/2394)
+- Better Auth: [better-auth.com](https://www.better-auth.com/) | [GitHub](https://github.com/better-auth/better-auth)
+- SIWS (Sign In With Substrate): [github.com/nickvdyy/better-siws](https://github.com/nickvdyy/better-siws)
 
 ---
 
