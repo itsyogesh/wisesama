@@ -98,6 +98,54 @@ export async function adminRoutes(fastify: FastifyInstance) {
     }
   );
 
+  // Dashboard stats — combined overview for admin dashboard
+  fastify.get(
+    '/admin/stats',
+    {
+      preHandler: [authenticate, requireAdmin],
+      schema: {
+        tags: ['admin'],
+        description: 'Get combined dashboard statistics',
+        security: [{ bearerAuth: [] }],
+      },
+    },
+    async () => {
+      const [
+        totalWhitelisted,
+        addressesWhitelisted,
+        domainsWhitelisted,
+        twitterWhitelisted,
+        pendingRequests,
+        openReports,
+        totalUsers,
+        totalChains,
+        totalIdentities,
+      ] = await Promise.all([
+        prisma.whitelistedEntity.count({ where: { isActive: true } }),
+        prisma.whitelistedEntity.count({ where: { isActive: true, entityType: 'ADDRESS' } }),
+        prisma.whitelistedEntity.count({ where: { isActive: true, entityType: 'DOMAIN' } }),
+        prisma.whitelistedEntity.count({ where: { isActive: true, entityType: 'TWITTER' } }),
+        prisma.whitelistRequest.count({ where: { status: 'PENDING' } }),
+        prisma.report.count({ where: { status: 'pending' } }),
+        prisma.user.count(),
+        prisma.chain.count({ where: { isActive: true } }),
+        prisma.identity.count({ where: { hasIdentity: true } }),
+      ]);
+
+      return {
+        totalWhitelisted,
+        addressesWhitelisted,
+        domainsWhitelisted,
+        twitterWhitelisted,
+        pendingRequests,
+        openReports,
+        totalUsers,
+        totalChains,
+        totalIdentities,
+      };
+    }
+  );
+
   // Trigger identity sync from People Chains
   fastify.post(
     '/admin/sync/identities',
