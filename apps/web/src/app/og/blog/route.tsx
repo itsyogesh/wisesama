@@ -14,70 +14,86 @@ export async function GET(request: Request) {
     return new ImageResponse(
       (
         <div style={{ height: '100%', width: '100%', display: 'flex', ...SHARED_STYLES }}>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '80px', maxWidth: '55%' }}>
-            <div style={{
-              fontSize: 72, // Reduced from 80
-              fontWeight: 700,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              marginBottom: 24,
-              background: 'linear-gradient(90deg, #FFFFFF 0%, #A1A1AA 100%)',
-              backgroundClip: 'text',
-              color: 'transparent',
-              fontFamily: '"Clash Display"',
-            }}>
-              {title}
+          {/* Left */}
+          <div style={{ display: 'flex', flexDirection: 'column', width: '60%', height: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, padding: '0 72px' }}>
+              <div style={{
+                fontSize: 56,
+                fontWeight: 600,
+                letterSpacing: '0',
+                lineHeight: 1.15,
+                marginBottom: 20,
+                color: '#FFFFFF',
+                fontFamily: '"Clash Display"',
+              }}>
+                {title}
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 400, color: '#8B8B9E', lineHeight: 1.5, fontFamily: '"Satoshi"' }}>
+                {description}
+              </div>
             </div>
-            <div style={{ fontSize: 28, fontWeight: 400, color: '#A1A1AA', lineHeight: 1.5, fontFamily: '"Satoshi"' }}>
-              {description}
-            </div>
-            <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#D946EF', boxShadow: '0 0 10px #D946EF' }} />
-              <div style={{ fontSize: 24, color: '#D946EF', fontWeight: 600, fontFamily: '"Satoshi"' }}>Latest Insights</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 72px 48px 72px' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#D946EF', boxShadow: '0 0 12px #D946EF' }} />
+              <div style={{ fontSize: 22, color: '#D946EF', fontWeight: 600, fontFamily: '"Satoshi"' }}>Latest Insights</div>
               <div style={{ width: 1, height: 20, backgroundColor: '#333', margin: '0 8px' }} />
-              <div style={{ fontSize: 24, color: '#666', fontFamily: '"Satoshi"' }}>wisesama.com</div>
+              <div style={{ fontSize: 22, color: '#555', fontFamily: '"Satoshi"' }}>wisesama.com</div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '60px', flex: 1, alignItems: 'flex-end' }}>
-            <Logo />
-            
-            {/* Blog Card */}
+          {/* Right */}
+          <div style={{ display: 'flex', flexDirection: 'column', width: '40%', height: '100%', padding: '48px' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Logo />
+            </div>
+
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
-              width: 420, // Increased width
-              height: 400, // Increased height
-              backgroundColor: 'rgba(19, 19, 26, 0.95)', // Increased opacity
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 24,
-              padding: 32, // Increased padding
-              boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-              marginTop: 'auto',
-              marginBottom: 20
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                maxWidth: 380,
+                backgroundColor: 'rgba(19, 19, 26, 0.95)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 24,
+                padding: 28,
+                boxShadow: '0 24px 48px rgba(0,0,0,0.4), 0 0 80px rgba(217, 70, 239, 0.06)',
+                gap: 20,
+              }}>
+                {/* Article Badge */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, backgroundColor: 'rgba(217, 70, 239, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#F0ABFC' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M7 7H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M7 12H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M7 17H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <div style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(217, 70, 239, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D946EF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
                     </svg>
                   </div>
-                  <div style={{ fontSize: 16, color: '#A1A1AA', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: '"Satoshi"', fontWeight: 700 }}>Article</div>
+                  <div style={{ fontSize: 14, color: '#8B8B9E', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: '"Satoshi"', fontWeight: 700 }}>Article</div>
+                </div>
+
+                {/* Content Lines */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ height: 14, width: '90%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 7 }} />
+                  <div style={{ height: 14, width: '70%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 7 }} />
+                  <div style={{ height: 10, width: '100%', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 5, marginTop: 8 }} />
+                  <div style={{ height: 10, width: '85%', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 5 }} />
+                  <div style={{ height: 10, width: '92%', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: 5 }} />
+                </div>
+
+                {/* Read indicator */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#D946EF' }} />
+                    <div style={{ fontSize: 13, color: '#666', fontFamily: '"Satoshi"' }}>5 min read</div>
+                  </div>
+                  <div style={{ fontSize: 13, color: '#444', fontFamily: '"Satoshi"' }}>wisesama.com/blog</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 20 }}>
-                <div style={{ height: 16, width: '90%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 8, fontFamily: '"Clash Display"' }} />
-                <div style={{ height: 12, width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 6, fontFamily: '"Satoshi"' }} />
-                <div style={{ height: 12, width: '85%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 6, fontFamily: '"Satoshi"' }} />
-                <div style={{ height: 12, width: '95%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 6, fontFamily: '"Satoshi"' }} />
-              </div>
-               <div style={{ marginTop: 'auto', fontSize: 14, color: '#666', fontFamily: '"Satoshi"', textAlign: 'right' }}>
-                  wisesama.com/blog
-                </div>
             </div>
           </div>
         </div>
