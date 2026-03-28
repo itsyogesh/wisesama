@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Core entity types
@@ -176,8 +176,9 @@ enum UserRole {
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
-  passwordHash  String?
-  walletAddress String? // Polkadot wallet for Web3 auth
+  name          String?
+  image         String?
+  emailVerified Boolean  @default(false)
   role          UserRole @default(USER)
 
   // Quota
@@ -188,11 +189,61 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  // Better Auth relations
+  sessions Session[]
+  accounts Account[]
+
+  // App relations
   apiKeys           ApiKey[]
   reports           Report[]
   searches          Search[]
   watchedAddresses  WatchedAddress[]
   whitelistRequests WhitelistRequest[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
 }
 
 model ApiKey {

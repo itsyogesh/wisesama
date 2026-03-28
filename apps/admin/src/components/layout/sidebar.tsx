@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/use-auth';
+import { useSession, signOut, type WisesamaUser } from '@/lib/auth-client';
 import {
   LayoutDashboard,
   Shield,
@@ -59,7 +59,9 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { logout, user } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user as WisesamaUser | undefined;
+  const logout = () => signOut();
   const [collapsed, setCollapsed] = useState(false);
 
   return (

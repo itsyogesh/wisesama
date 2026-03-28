@@ -1,10 +1,11 @@
 'use client';
 
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession, type WisesamaUser } from '@/lib/auth-client';
 import { User, Shield } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { user } = useAuthStore();
+  const { data: session } = useSession();
+  const user = session?.user as WisesamaUser | undefined;
 
   return (
     <div className="p-8">

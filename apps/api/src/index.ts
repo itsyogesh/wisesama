@@ -6,10 +6,11 @@ import rawBody from 'fastify-raw-body';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
+import { auth } from './lib/auth';
+import { fromNodeHeaders } from 'better-auth/node';
 import { checkRoutes } from './modules/query/check.routes';
 import { identityRoutes } from './modules/identity/identity.routes';
 import { reportRoutes } from './modules/report/report.routes';
-import { authRoutes } from './modules/auth/auth.routes';
 import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { statsRoutes } from './modules/stats/stats.routes';
@@ -72,8 +73,8 @@ async function buildApp() {
 
   // Rate limiting with Upstash
   fastify.addHook('onRequest', async (request, reply) => {
-    // Skip rate limiting for health checks and docs
-    if (request.url === '/api/v1/health' || request.url.startsWith('/docs')) {
+    // Skip rate limiting for health checks, docs, and auth routes
+    if (request.url === '/api/v1/health' || request.url.startsWith('/docs') || request.url.startsWith('/api/auth')) {
       return;
     }
 
@@ -141,7 +142,8 @@ async function buildApp() {
       reply.statusCode >= 200 &&
       reply.statusCode < 300 &&
       typeof payload === 'string' &&
-      !request.url.startsWith('/docs')
+      !request.url.startsWith('/docs') &&
+      !request.url.startsWith('/api/auth')
     ) {
       try {
         const data = JSON.parse(payload);
@@ -163,13 +165,38 @@ async function buildApp() {
     return payload;
   });
 
+  // Better Auth handler — follows official Fastify integration docs
+  fastify.route({
+    method: ['GET', 'POST'],
+    url: '/api/auth/*',
+    async handler(request, reply) {
+      try {
+        const url = new URL(request.url, `http://${request.headers.host}`);
+        const headers = fromNodeHeaders(request.headers);
+        const req = new Request(url.toString(), {
+          method: request.method,
+          headers,
+          ...(request.body ? { body: JSON.stringify(request.body) } : {}),
+        });
+
+        const response = await auth.handler(req);
+
+        reply.status(response.status);
+        response.headers.forEach((value, key) => reply.header(key, value));
+        reply.send(response.body ? await response.text() : null);
+      } catch (error) {
+        request.log.error(error, 'Authentication error');
+        reply.status(500).send({ error: 'Internal authentication error' });
+      }
+    },
+  });
+
   // Routes
   await fastify.register(healthRoutes, { prefix: '/api/v1' });
   await fastify.register(statsRoutes, { prefix: '/api/v1' });
   await fastify.register(checkRoutes, { prefix: '/api/v1' });
   await fastify.register(identityRoutes, { prefix: '/api/v1' });
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
-  await fastify.register(authRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
   await fastify.register(jobsRoutes, { prefix: '/api/v1' });
 

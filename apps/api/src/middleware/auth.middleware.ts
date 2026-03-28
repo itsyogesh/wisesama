@@ -1,9 +1,8 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import jwt from 'jsonwebtoken';
 import { prisma } from '@wisesama/database';
+import { auth } from '../lib/auth';
+import { fromNodeHeaders } from 'better-auth/node';
 import { sendApiKeyAlert } from '../services/email.service';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-in-production';
 
 export interface AuthUser {
   id: string;
@@ -20,49 +19,41 @@ declare module 'fastify' {
 }
 
 /**
- * Middleware to verify JWT token and attach user to request
+ * Middleware to verify Better Auth session and attach user to request.
+ * Reads session from cookie (set by Better Auth on sign-in).
  */
 export async function authenticate(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<void> {
-  const auth = request.headers.authorization;
-
-  if (!auth?.startsWith('Bearer ')) {
-    reply.status(401).send({ error: 'Missing or invalid authorization header' });
-    return;
-  }
-
-  const token = auth.slice(7);
-
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
-
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        tier: true,
-        remainingQuota: true,
-      },
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
     });
 
-    if (!user) {
-      reply.status(401).send({ error: 'User not found' });
+    if (!session?.user) {
+      reply.status(401).send({ error: 'Missing or invalid session' });
       return;
     }
 
-    request.user = user;
-  } catch (error) {
-    reply.status(401).send({ error: 'Invalid or expired token' });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = session.user as any;
+
+    request.user = {
+      id: user.id,
+      email: user.email,
+      role: user.role || 'USER',
+      tier: user.tier || 'free',
+      remainingQuota: user.remainingQuota ?? 100,
+    };
+  } catch {
+    reply.status(401).send({ error: 'Invalid or expired session' });
   }
 }
 
 /**
- * Middleware to check if authenticated user is an admin
- * Must be used after authenticate middleware
+ * Middleware to check if authenticated user is an admin.
+ * Must be used after authenticate middleware.
  */
 export async function requireAdmin(
   request: FastifyRequest,
@@ -80,7 +71,8 @@ export async function requireAdmin(
 }
 
 /**
- * Helper to verify API key authentication
+ * Middleware supporting both API key (x-api-key header) and session auth.
+ * API key takes priority; falls back to session auth if no API key provided.
  */
 export async function authenticateApiKey(
   request: FastifyRequest,
@@ -89,11 +81,9 @@ export async function authenticateApiKey(
   const apiKey = request.headers['x-api-key'] as string | undefined;
 
   if (!apiKey) {
-    // Fall back to JWT auth
     return authenticate(request, reply);
   }
 
-  // Hash the API key to compare with stored hash
   const crypto = await import('crypto');
   const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex');
 
@@ -117,24 +107,16 @@ export async function authenticateApiKey(
     return;
   }
 
-  // Check quota
   if (key.remainingQuota <= 0) {
     reply.status(429).send({ error: 'API key quota exceeded' });
     return;
   }
 
-  // Calculate usage thresholds
   const totalQuota = key.user.tier === 'free' ? 10000 : 100000;
-  const currentUsage = totalQuota - key.remainingQuota;
-  const usagePercent = (currentUsage / totalQuota) * 100;
-  
-  // Check for alerts (80% and 100% boundaries)
-  // We check if it *just* crossed the threshold to avoid spamming
   const remaining = key.remainingQuota;
-  const threshold80 = Math.floor(totalQuota * 0.2); // 20% remaining = 80% used
-  
+  const threshold80 = Math.floor(totalQuota * 0.2);
+
   if (remaining === threshold80) {
-    // Exactly hit 80% usage
     sendApiKeyAlert({
       email: key.user.email,
       keyName: key.name || key.keyPrefix,
@@ -142,7 +124,6 @@ export async function authenticateApiKey(
       limit: totalQuota,
     }).catch(console.error);
   } else if (remaining === 1) {
-    // About to hit 100% usage (this is the last allowed request)
     sendApiKeyAlert({
       email: key.user.email,
       keyName: key.name || key.keyPrefix,
@@ -151,7 +132,6 @@ export async function authenticateApiKey(
     }).catch(console.error);
   }
 
-  // Update last used timestamp
   await prisma.apiKey.update({
     where: { id: key.id },
     data: {

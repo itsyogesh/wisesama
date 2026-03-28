@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession } from '@/lib/auth-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
@@ -24,11 +24,9 @@ interface MyReportsResponse {
   };
 }
 
-async function fetchMyReports(token: string, page = 1): Promise<MyReportsResponse> {
+async function fetchMyReports(page = 1): Promise<MyReportsResponse> {
   const res = await fetch(`${API_URL}/api/v1/reports/me?page=${page}&limit=20`, {
-    headers: { 
-      Authorization: `Bearer ${token}`,
-    },
+    credentials: 'include',
   });
 
   if (!res.ok) {
@@ -40,11 +38,11 @@ async function fetchMyReports(token: string, page = 1): Promise<MyReportsRespons
 }
 
 export function useMyReports(page = 1) {
-  const { token, user } = useAuthStore();
+  const { data: session } = useSession();
 
   return useQuery({
     queryKey: ['my-reports', page],
-    queryFn: () => fetchMyReports(token!, page),
-    enabled: !!token && !!user,
+    queryFn: () => fetchMyReports(page),
+    enabled: !!session?.user,
   });
 }
