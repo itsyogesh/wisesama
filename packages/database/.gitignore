@@ -1,3 +1,4 @@
 
 # Prisma v7 generated client
 src/generated/
+.vercel
