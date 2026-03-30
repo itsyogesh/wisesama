@@ -84,7 +84,18 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en" className="dark">
         <head>
-          {/* Google Analytics 4 */}
+          {/* Satoshi + Clash Display from FontShare */}
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
+            rel="stylesheet"
+          />
+          <link
+            href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+            rel="stylesheet"
+          />
+        </head>
+        <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
+          {/* Google Analytics 4 — placed in body for correct afterInteractive strategy */}
           {process.env.NEXT_PUBLIC_GA_ID && (
             <>
               <Script
@@ -101,17 +112,6 @@ export default function RootLayout({
               </Script>
             </>
           )}
-          {/* Satoshi + Clash Display from FontShare */}
-          <link
-            href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
-            rel="stylesheet"
-          />
-          <link
-            href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
-            rel="stylesheet"
-          />
-        </head>
-        <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
           <Providers>
             <SiteHeader />
             <main className="flex-1">{children}</main>
