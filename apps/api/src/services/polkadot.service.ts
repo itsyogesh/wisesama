@@ -178,8 +178,11 @@ export class PolkadotService {
         throw new Error(`Identity pallet not available on ${chain} People chain`);
       }
 
+      // Pass raw AccountId bytes to avoid SS58 checksum mismatches
+      // between relay chain and People Chain type registries
+      const accountId = decodeAddress(normalizedAddress);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const identityOf = await api.query.identity.identityOf(normalizedAddress) as any;
+      const identityOf = await api.query.identity.identityOf(accountId) as any;
 
       if (identityOf.isNone) {
         const noIdentityResult = {
