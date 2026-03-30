@@ -37,6 +37,8 @@ coverage
 # Prisma
 packages/database/prisma/*.db
 packages/database/prisma/*.db-journal
+packages/database/generated
+packages/database/src/generated
 
 # Cache
 .cache

@@ -1,10 +1,10 @@
 import 'dotenv/config';
-import { PrismaClient } from './generated/prisma';
+import { PrismaClient } from '../generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
-// Re-export for consumers
-export { PrismaClient } from './generated/prisma';
-export { Prisma } from './generated/prisma';
+// Re-export types and client for consumers
+export { PrismaClient } from '../generated/prisma/client';
+export * from '../generated/prisma/client';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;

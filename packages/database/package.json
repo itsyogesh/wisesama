@@ -15,11 +15,11 @@
     "build": "prisma generate",
     "dev": "prisma generate --watch",
     "db:generate": "dotenv -e ../../.env -- prisma generate",
-    "db:push": "dotenv -e ../../.env -- prisma generate && dotenv -e ../../.env -- prisma db push",
+    "db:push": "dotenv -e ../../.env -- prisma db push",
     "db:migrate": "dotenv -e ../../.env -- prisma migrate dev",
     "db:studio": "dotenv -e ../../.env -- prisma studio",
     "db:seed": "dotenv -e ../../.env -- tsx prisma/seed.ts",
-    "clean": "rm -rf dist src/generated node_modules .turbo"
+    "clean": "rm -rf dist generated src/generated node_modules .turbo"
   },
   "devDependencies": {
     "@types/node": "^22.9.1",
