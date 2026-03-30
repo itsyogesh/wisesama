@@ -259,8 +259,19 @@ export class PolkadotService {
       await cacheSet(cacheKey, result, IDENTITY_CACHE_TTL);
       return result;
     } catch (error) {
-      console.error('Failed to fetch identity:', error);
-      throw error;
+      console.error('Failed to fetch identity from RPC:', error);
+      // Gracefully degrade: return no-identity instead of 500
+      const noIdentityResult = {
+        address,
+        chain,
+        hasIdentity: false,
+        isVerified: false,
+        identity: null,
+        judgements: [] as Array<{ registrarId: number; judgement: string }>,
+      };
+      // Cache the failure briefly (5 min) to avoid hammering a broken RPC
+      await cacheSet(cacheKey, noIdentityResult, 300).catch(() => {});
+      return noIdentityResult;
     }
   }
 }
