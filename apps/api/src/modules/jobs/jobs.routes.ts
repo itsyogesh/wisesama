@@ -139,22 +139,18 @@ export async function jobsRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        request.log.info('Starting identity sync job');
+        // Accept chain from body or query to allow per-chain invocations
+        // (running both chains in one serverless function risks timeout)
+        const reqBody = (request.body as { chain?: string }) || {};
+        const reqQuery = (request.query as { chain?: string }) || {};
+        const chain = reqBody.chain || reqQuery.chain || 'polkadot';
 
-        // Sync both chains sequentially to avoid overwhelming RPC
-        const polkadotResult = await identitySyncService.syncChain('polkadot');
-        const kusamaResult = await identitySyncService.syncChain('kusama');
+        request.log.info({ chain }, 'Starting identity sync job');
 
-        const result = {
-          success: true,
-          polkadot: polkadotResult,
-          kusama: kusamaResult,
-          totalSynced: polkadotResult.synced + kusamaResult.synced,
-          totalErrors: polkadotResult.errors + kusamaResult.errors,
-        };
+        const result = await identitySyncService.syncChain(chain);
 
-        request.log.info({ result }, 'Identity sync completed');
-        return result;
+        request.log.info({ chain, result }, 'Identity sync completed');
+        return { success: true, chain, ...result };
       } catch (error) {
         request.log.error({ error }, 'Identity sync failed');
         reply.status(500);
