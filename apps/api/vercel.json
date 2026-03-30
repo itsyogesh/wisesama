@@ -4,10 +4,10 @@
   "buildCommand": "cd ../.. && pnpm turbo build --filter=@wisesama/api...",
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/(.*)", "destination": "/api/index" }
   ],
   "functions": {
-    "api/index.js": {
+    "api/index.mjs": {
       "maxDuration": 300
     }
   }
