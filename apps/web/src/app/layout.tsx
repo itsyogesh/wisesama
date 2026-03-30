@@ -1,3 +1,4 @@
+import Script from 'next/script';
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
@@ -83,6 +84,23 @@ export default function RootLayout({
     <ViewTransitions>
       <html lang="en" className="dark">
         <head>
+          {/* Google Analytics 4 */}
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <>
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="ga4-init" strategy="afterInteractive">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+                `}
+              </Script>
+            </>
+          )}
           {/* Satoshi + Clash Display from FontShare */}
           <link
             href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap"
