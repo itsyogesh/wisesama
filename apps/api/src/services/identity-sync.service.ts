@@ -119,11 +119,6 @@ export class IdentitySyncService {
       throw new Error(`Identity pallet not available on ${chain} People chain`);
     }
 
-    // Fetch all identity entries
-    console.log(`[IdentitySync] Fetching identityOf entries...`);
-    const entries = await api.query.identity.identityOf.entries();
-    console.log(`[IdentitySync] Found ${entries.length} entries on ${chain}`);
-
     const chainRecord = await prisma.chain.findUnique({ where: { code: chainCode } });
     if (!chainRecord) {
       throw new Error(`Chain record not found for code: ${chainCode}`);
@@ -131,13 +126,32 @@ export class IdentitySyncService {
 
     let synced = 0;
     let errors = 0;
+    let total = 0;
 
-    // Process in batches
-    const BATCH_SIZE = 50;
-    for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-      const batch = entries.slice(i, i + BATCH_SIZE);
+    // Fetch entries in pages to avoid serverless timeout on large result sets
+    const PAGE_SIZE = 200;
+    let lastKey: string | undefined;
 
-      const promises = batch.map(async ([storageKey, optionValue]) => {
+    console.log(`[IdentitySync] Fetching identityOf entries in pages of ${PAGE_SIZE}...`);
+
+    while (true) {
+      const entries = await api.query.identity.identityOf.entriesPaged({
+        args: [],
+        pageSize: PAGE_SIZE,
+        startKey: lastKey,
+      });
+
+      if (entries.length === 0) break;
+
+      total += entries.length;
+      lastKey = entries[entries.length - 1]![0].toHex();
+
+      // Process this page in parallel batches
+      const BATCH_SIZE = 50;
+      for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+        const batch = entries.slice(i, i + BATCH_SIZE);
+
+        const promises = batch.map(async ([storageKey, optionValue]) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const accountId = (storageKey.args as any)[0];
@@ -205,12 +219,13 @@ export class IdentitySyncService {
         }
       });
 
-      await Promise.all(promises);
-
-      if ((i + BATCH_SIZE) % 500 === 0 || i + BATCH_SIZE >= entries.length) {
-        console.log(`[IdentitySync] Progress: ${Math.min(i + BATCH_SIZE, entries.length)}/${entries.length} (synced=${synced}, errors=${errors})`);
+        await Promise.all(promises);
       }
+
+      console.log(`[IdentitySync] Page done: total=${total} synced=${synced} errors=${errors}`);
     }
+
+    console.log(`[IdentitySync] All pages fetched: ${total} entries on ${chain}`);
 
     // Cleanup: mark identities not touched during this sync as cleared
     const removed = await this.cleanupStaleIdentities(identitySource, syncStartedAt);
@@ -218,7 +233,7 @@ export class IdentitySyncService {
     const duration = Date.now() - startTime;
     console.log(`[IdentitySync] Completed ${chain}: ${synced} synced, ${removed} removed, ${errors} errors in ${duration}ms`);
 
-    return { total: entries.length, synced, errors, removed, duration };
+    return { total, synced, errors, removed, duration };
   }
 
   /**
