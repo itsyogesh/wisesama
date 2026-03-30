@@ -74,7 +74,11 @@ export async function discordRoutes(fastify: FastifyInstance) {
       if (interaction.type === INTERACTION_TYPE.APPLICATION_COMMAND) {
         const commandName = interaction.data?.name;
         const options = interaction.data?.options ?? [];
-        const appId = process.env.DISCORD_APP_ID!;
+        const appId = process.env.DISCORD_APP_ID;
+        if (!appId) {
+          reply.status(500);
+          return { error: 'Discord app ID not configured' };
+        }
         const username = interaction.member?.user?.username ?? interaction.user?.username;
 
         switch (commandName) {

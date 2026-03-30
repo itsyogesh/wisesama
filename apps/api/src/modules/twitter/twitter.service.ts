@@ -9,11 +9,14 @@ import { formatCheckTweet, formatReportTweet } from './twitter.formatter';
 
 const queryService = new QueryService();
 
+const MAX_REPLIES_PER_POLL = 5;
+
 const REDIS_KEYS = {
   lastMentionId: 'wisesama:twitter:last_mention_id',
   replied: (tweetId: string) => `wisesama:twitter:replied:${tweetId}`,
   entityCooldown: (entity: string) => `wisesama:twitter:entity_cooldown:${entity}`,
   dailyAlerts: 'wisesama:twitter:daily_alerts',
+  dailyReplies: 'wisesama:twitter:daily_replies',
 };
 
 const X_API = 'https://api.x.com/2';
@@ -91,6 +94,9 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
 
   for (const tweet of data.data) {
     processed++;
+
+    // Cap replies per poll cycle to prevent spam abuse
+    if (replied >= MAX_REPLIES_PER_POLL) break;
 
     try {
       // Skip if already replied
@@ -263,7 +269,7 @@ function generateOAuth1Header(method: string, url: string, _body: unknown, creds
   const params: Record<string, string> = {
     oauth_consumer_key: creds.consumerKey,
     oauth_nonce: nonce,
-    oauth_signature_method: 'HMAC-SHA256',
+    oauth_signature_method: 'HMAC-SHA1',
     oauth_timestamp: timestamp,
     oauth_token: creds.accessToken,
     oauth_version: '1.0',
@@ -278,8 +284,8 @@ function generateOAuth1Header(method: string, url: string, _body: unknown, creds
   const baseString = `${method.toUpperCase()}&${percentEncode(url)}&${percentEncode(paramString)}`;
   const signingKey = `${percentEncode(creds.consumerSecret)}&${percentEncode(creds.accessTokenSecret)}`;
 
-  // HMAC-SHA256 signature
-  const signature = createHmac('sha256', signingKey).update(baseString).digest('base64');
+  // HMAC-SHA1 signature (required by Twitter OAuth 1.0a)
+  const signature = createHmac('sha1', signingKey).update(baseString).digest('base64');
 
   params['oauth_signature'] = signature;
 

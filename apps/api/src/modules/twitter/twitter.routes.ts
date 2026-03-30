@@ -2,10 +2,19 @@ import type { FastifyInstance } from 'fastify';
 import { Receiver } from '@upstash/qstash';
 import { pollAndProcessMentions } from './twitter.service';
 
-const receiver = new Receiver({
-  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
-  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
-});
+let _receiver: Receiver | null = null;
+
+function getReceiver(): Receiver {
+  if (!_receiver) {
+    const currentSigningKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
+    const nextSigningKey = process.env.QSTASH_NEXT_SIGNING_KEY;
+    if (!currentSigningKey || !nextSigningKey) {
+      throw new Error('QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY are required');
+    }
+    _receiver = new Receiver({ currentSigningKey, nextSigningKey });
+  }
+  return _receiver;
+}
 
 export async function twitterRoutes(fastify: FastifyInstance) {
   // QStash cron endpoint — polls X for new @wisesama_help mentions
@@ -31,7 +40,7 @@ export async function twitterRoutes(fastify: FastifyInstance) {
         const requestUrl = `${protocol}://${host}${request.url}`;
 
         try {
-          const isValid = await receiver.verify({ signature, body, url: requestUrl });
+          const isValid = await getReceiver().verify({ signature, body, url: requestUrl });
           if (!isValid) {
             request.log.warn('Invalid QStash signature for twitter-poll');
             reply.status(401);
