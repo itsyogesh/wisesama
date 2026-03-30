@@ -2,11 +2,26 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from '@wisesama/database';
 
+// Build trusted origins list dynamically for Vercel preview support
+const trustedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3002',
+  'https://wisesama.com',
+  'https://www.wisesama.com',
+  'https://admin.wisesama.com',
+  'https://wisesama-admin.vercel.app',
+  ...(process.env.APP_URL ? [process.env.APP_URL] : []),
+  ...(process.env.ADMIN_APP_URL ? [process.env.ADMIN_APP_URL] : []),
+  ...(process.env.CORS_ORIGIN?.split(',').map(o => o.trim()).filter(Boolean) ?? []),
+];
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   basePath: '/api/auth',
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3001',
+  baseURL: process.env.BETTER_AUTH_URL || process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3001',
   emailAndPassword: { enabled: true },
   socialProviders: {
     github: {
@@ -20,14 +35,7 @@ export const auth = betterAuth({
       enabled: !!(process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_SECRET),
     },
   },
-  trustedOrigins: [
-    'http://localhost:3000',
-    'http://localhost:3002',
-    'https://wisesama.com',
-    'https://www.wisesama.com',
-    'https://admin.wisesama.com',
-    'https://wisesama-admin.vercel.app',
-  ],
+  trustedOrigins,
   user: {
     additionalFields: {
       role: {

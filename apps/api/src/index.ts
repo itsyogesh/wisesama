@@ -118,10 +118,11 @@ async function buildApp() {
       ],
       components: {
         securitySchemes: {
-          bearerAuth: {
-            type: 'http',
-            scheme: 'bearer',
-            bearerFormat: 'JWT',
+          cookieAuth: {
+            type: 'apiKey',
+            in: 'cookie',
+            name: 'better-auth.session_token',
+            description: 'Session cookie set by Better Auth (POST /api/auth/sign-in)',
           },
           apiKey: {
             type: 'apiKey',
