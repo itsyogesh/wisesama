@@ -37,7 +37,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List all whitelist requests with filtering',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -108,7 +108,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get detailed whitelist request information',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -172,7 +172,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Mark a whitelist request as under review',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -240,7 +240,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Approve a whitelist request and create whitelist entity',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -391,7 +391,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Reject a whitelist request',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -481,7 +481,7 @@ export async function whitelistRequestsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get whitelist request statistics',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {

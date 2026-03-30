@@ -12,7 +12,7 @@ export async function activityAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List activity logs with filtering',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -92,7 +92,7 @@ export async function activityAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get activity statistics',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {

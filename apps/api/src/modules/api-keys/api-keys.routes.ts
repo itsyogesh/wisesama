@@ -30,7 +30,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['api-keys'],
         description: 'Create a new API key',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         body: {
           type: 'object',
           properties: {
@@ -107,7 +107,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['api-keys'],
         description: 'List all API keys for the current user',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         response: {
           200: {
             type: 'object',
@@ -163,7 +163,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['api-keys'],
         description: 'Revoke an API key',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {

@@ -13,7 +13,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Trigger a manual phishing list sync',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {
@@ -33,7 +33,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Run sync immediately and wait for result',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         response: {
           200: {
             type: 'object',
@@ -60,7 +60,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get phishing list sync status',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         response: {
           200: {
             type: 'object',
@@ -106,7 +106,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get combined dashboard statistics',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {
@@ -154,7 +154,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Sync all on-chain identities from People Chains (Polkadot + Kusama)',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -215,7 +215,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get identity sync status and counts',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {
@@ -256,7 +256,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List synced on-chain identities with search and filters',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -325,7 +325,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get a single identity by ID',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {

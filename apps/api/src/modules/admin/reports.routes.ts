@@ -26,7 +26,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List all reports with filtering',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -98,7 +98,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get detailed report information',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -155,7 +155,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Verify a report as confirmed fraud',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -308,7 +308,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Reject a report',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -381,7 +381,7 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get report statistics',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {

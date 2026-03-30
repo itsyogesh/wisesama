@@ -33,7 +33,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List all whitelisted entities',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -100,7 +100,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get a single whitelisted entity',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -137,7 +137,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Create a new whitelisted entity',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         body: {
           type: 'object',
           properties: {
@@ -217,7 +217,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Update a whitelisted entity',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -289,7 +289,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Delete a whitelisted entity',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -322,7 +322,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Bulk import whitelisted entities',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         body: {
           type: 'object',
           properties: {
@@ -420,7 +420,7 @@ export async function whitelistRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get all whitelist categories with counts',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {

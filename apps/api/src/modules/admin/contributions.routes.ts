@@ -16,7 +16,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get GitHub contribution configuration status',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {
@@ -36,7 +36,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'List all community contributions (PRs to polkadot-js/phishing)',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
@@ -89,7 +89,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get contribution details',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -138,7 +138,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Sync contribution PR status from GitHub',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
         params: {
           type: 'object',
           properties: {
@@ -191,7 +191,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Sync all open contribution PR statuses from GitHub',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async (request, reply) => {
@@ -237,7 +237,7 @@ export async function contributionsRoutes(fastify: FastifyInstance) {
       schema: {
         tags: ['admin'],
         description: 'Get contribution statistics',
-        security: [{ bearerAuth: [] }],
+        security: [{ cookieAuth: [] }],
       },
     },
     async () => {

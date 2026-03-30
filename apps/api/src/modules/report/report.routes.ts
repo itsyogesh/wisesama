@@ -215,7 +215,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
     schema: {
       tags: ['report'],
       description: "Get current user's reports",
-      security: [{ bearerAuth: [] }],
+      security: [{ cookieAuth: [] }],
       querystring: {
         type: 'object',
         properties: {
