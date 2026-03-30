@@ -1,12 +1,13 @@
 'use client';
 
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession, type WisesamaUser } from '@/lib/auth-client';
 import { useApiKeys } from '@/hooks/use-api-keys';
 import { ShieldCheck, Zap, Activity } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const { data: session } = useSession();
+  const user = session?.user as WisesamaUser | undefined;
   const { data: keys } = useApiKeys();
 
   const activeKeys = keys?.filter((k) => k.isActive).length || 0;

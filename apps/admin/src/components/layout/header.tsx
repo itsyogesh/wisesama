@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
+import { useSession } from '@/lib/auth-client';
 import { Bell, Search } from 'lucide-react';
 
 interface HeaderProps {
@@ -9,7 +9,8 @@ interface HeaderProps {
 }
 
 export function Header({ title, description }: HeaderProps) {
-  const { user } = useAuth();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   return (
     <header className="h-16 border-b border-border bg-background/80 backdrop-blur-sm px-6 flex items-center justify-between sticky top-0 z-10">

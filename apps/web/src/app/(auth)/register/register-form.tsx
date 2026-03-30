@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { signUp } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { Loader2, Mail, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
 import Balancer from 'react-wrap-balancer';
@@ -18,12 +18,9 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
-
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
 
   const {
     register,
@@ -36,21 +33,18 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const result = await signUp.email({
+        email: data.email,
+        password: data.password,
+        name: '',
       });
 
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.error || 'Failed to create account');
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to create account');
       }
 
-      login(json.user, json.accessToken);
       toast.success('Account created successfully!');
-      router.push('/');
+      router.push('/dashboard');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Something went wrong');
     } finally {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession } from '@/lib/auth-client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.wisesama.com';
 
@@ -15,12 +15,12 @@ export interface ApiKey {
 }
 
 export interface CreateApiKeyResponse extends ApiKey {
-  key: string; // The full key, only returned on creation
+  key: string;
 }
 
-async function fetchApiKeys(token: string): Promise<ApiKey[]> {
+async function fetchApiKeys(): Promise<ApiKey[]> {
   const res = await fetch(`${API_URL}/api/v1/api-keys`, {
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
 
   if (!res.ok) {
@@ -31,13 +31,11 @@ async function fetchApiKeys(token: string): Promise<ApiKey[]> {
   return json.data?.keys || json.keys || [];
 }
 
-async function createApiKey(token: string, name?: string): Promise<CreateApiKeyResponse> {
+async function createApiKey(name?: string): Promise<CreateApiKeyResponse> {
   const res = await fetch(`${API_URL}/api/v1/api-keys`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ name }),
   });
 
@@ -50,10 +48,10 @@ async function createApiKey(token: string, name?: string): Promise<CreateApiKeyR
   return json.data || json;
 }
 
-async function revokeApiKey(token: string, id: string): Promise<void> {
+async function revokeApiKey(id: string): Promise<void> {
   const res = await fetch(`${API_URL}/api/v1/api-keys/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
   });
 
   if (!res.ok) {
@@ -62,21 +60,20 @@ async function revokeApiKey(token: string, id: string): Promise<void> {
 }
 
 export function useApiKeys() {
-  const { token } = useAuthStore();
+  const { data: session } = useSession();
 
   return useQuery({
     queryKey: ['api-keys'],
-    queryFn: () => fetchApiKeys(token!),
-    enabled: !!token,
+    queryFn: fetchApiKeys,
+    enabled: !!session?.user,
   });
 }
 
 export function useCreateApiKey() {
   const queryClient = useQueryClient();
-  const { token } = useAuthStore();
 
   return useMutation({
-    mutationFn: (name?: string) => createApiKey(token!, name),
+    mutationFn: (name?: string) => createApiKey(name),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
     },
@@ -85,10 +82,9 @@ export function useCreateApiKey() {
 
 export function useRevokeApiKey() {
   const queryClient = useQueryClient();
-  const { token } = useAuthStore();
 
   return useMutation({
-    mutationFn: (id: string) => revokeApiKey(token!, id),
+    mutationFn: (id: string) => revokeApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
     },

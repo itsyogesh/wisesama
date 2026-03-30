@@ -7,17 +7,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-// Add auth token to requests
-apiClient.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
+  withCredentials: true, // Send session cookie with every request
 });
 
 // Handle auth errors
@@ -26,8 +16,6 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('admin_token');
-        localStorage.removeItem('admin_user');
         window.location.href = '/login';
       }
     }
@@ -42,22 +30,6 @@ export async function apiRequest<T>(
   const response = await apiClient.request<T>(config);
   return response.data;
 }
-
-// Auth API
-export const authApi = {
-  login: async (email: string, password: string) => {
-    const response = await apiClient.post('/api/v1/auth/admin/login', {
-      email,
-      password,
-    });
-    return response.data;
-  },
-
-  validateToken: async () => {
-    const response = await apiClient.get('/api/v1/auth/admin/validate');
-    return response.data;
-  },
-};
 
 // Whitelist Requests API
 export const whitelistRequestsApi = {

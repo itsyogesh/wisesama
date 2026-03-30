@@ -6,10 +6,11 @@ import rawBody from 'fastify-raw-body';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
+import { auth } from './lib/auth';
+import FastifyBetterAuth from 'fastify-better-auth';
 import { checkRoutes } from './modules/query/check.routes';
 import { identityRoutes } from './modules/identity/identity.routes';
 import { reportRoutes } from './modules/report/report.routes';
-import { authRoutes } from './modules/auth/auth.routes';
 import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
 import { healthRoutes } from './modules/health/health.routes';
 import { statsRoutes } from './modules/stats/stats.routes';
@@ -72,8 +73,8 @@ async function buildApp() {
 
   // Rate limiting with Upstash
   fastify.addHook('onRequest', async (request, reply) => {
-    // Skip rate limiting for health checks and docs
-    if (request.url === '/api/v1/health' || request.url.startsWith('/docs')) {
+    // Skip rate limiting for health checks, docs, and auth routes
+    if (request.url === '/api/v1/health' || request.url.startsWith('/docs') || request.url.startsWith('/api/auth')) {
       return;
     }
 
@@ -141,7 +142,8 @@ async function buildApp() {
       reply.statusCode >= 200 &&
       reply.statusCode < 300 &&
       typeof payload === 'string' &&
-      !request.url.startsWith('/docs')
+      !request.url.startsWith('/docs') &&
+      !request.url.startsWith('/api/auth')
     ) {
       try {
         const data = JSON.parse(payload);
@@ -163,13 +165,16 @@ async function buildApp() {
     return payload;
   });
 
+  // Better Auth — via fastify-better-auth plugin
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await fastify.register(FastifyBetterAuth, { auth } as any);
+
   // Routes
   await fastify.register(healthRoutes, { prefix: '/api/v1' });
   await fastify.register(statsRoutes, { prefix: '/api/v1' });
   await fastify.register(checkRoutes, { prefix: '/api/v1' });
   await fastify.register(identityRoutes, { prefix: '/api/v1' });
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
-  await fastify.register(authRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
   await fastify.register(jobsRoutes, { prefix: '/api/v1' });
 

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Info, LogIn, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { springTransition } from '@/lib/motion';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession, signOut } from '@/lib/auth-client';
 
 const navItems = [
   { name: 'Home', href: '/' },
@@ -23,7 +23,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session } = useSession();
+  const user = session?.user;
+  const isAuthenticated = !!user;
+  const logout = () => signOut();
 
   useEffect(() => {
     setMounted(true);

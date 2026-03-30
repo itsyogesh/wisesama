@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/stores/use-auth-store';
+import { useSession, signOut } from '@/lib/auth-client';
 import { LayoutDashboard, Key, Settings, LogOut, ChevronRight, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,21 +15,29 @@ const sidebarItems = [
 ];
 
 export default function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { data: session, isPending } = useSession();
+  const user = session?.user;
   const router = useRouter();
   const pathname = usePathname();
-  const [isClient, setIsClient] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    if (!isAuthenticated) {
-      router.push('/login');
+    if (!isPending) {
+      if (!user) {
+        router.push('/login');
+      } else {
+        setChecked(true);
+      }
     }
-  }, [isAuthenticated, router]);
+  }, [isPending, user, router]);
 
-  if (!isClient || !isAuthenticated) {
-    return null; // Or a loading spinner
+  if (!checked) {
+    return null;
   }
+
+  const logout = () => {
+    signOut().then(() => router.push('/'));
+  };
 
   return (
     <div className="min-h-screen bg-black flex">
