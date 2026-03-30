@@ -51,3 +51,6 @@ packages/database/src/generated
 
 # AI Docs & Files
 .gemini-clipboard
+
+# Production env (pulled from Vercel)
+*.env.production

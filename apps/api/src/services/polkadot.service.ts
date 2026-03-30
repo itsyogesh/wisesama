@@ -1,4 +1,4 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ApiPromise, WsProvider, HttpProvider } from '@polkadot/api';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { prisma } from '@wisesama/database';
 import { cacheGet, cacheSet, cacheKeys } from '../lib/redis';
@@ -30,10 +30,10 @@ const RPC_ENDPOINTS: Record<string, string> = {
   kusama: process.env.KUSAMA_RPC || 'wss://kusama-rpc.polkadot.io',
 };
 
-// People chain RPC endpoints (for identity queries - identity migrated from relay chain)
+// People chain HTTP RPC endpoints (for identity queries — HTTP works in serverless, WS doesn't)
 const PEOPLE_CHAIN_RPC_ENDPOINTS: Record<string, string> = {
-  polkadot: process.env.POLKADOT_PEOPLE_RPC || 'wss://polkadot-people-rpc.polkadot.io',
-  kusama: process.env.KUSAMA_PEOPLE_RPC || 'wss://kusama-people-rpc.polkadot.io',
+  polkadot: process.env.POLKADOT_PEOPLE_RPC || 'https://polkadot-people-rpc.polkadot.io',
+  kusama: process.env.KUSAMA_PEOPLE_RPC || 'https://kusama-people-rpc.polkadot.io',
 };
 
 // Exported for use by identity-sync service
@@ -72,17 +72,13 @@ export class PolkadotService {
 
   /**
    * Get People chain client for identity queries.
+   * Uses HttpProvider (stateless) — works reliably in serverless unlike WebSocket.
    * Public so identity-sync service can reuse the connection.
    */
   async getPeopleChainClient(chain: string): Promise<ApiPromise> {
     const cacheKey = `${chain}-people`;
     if (this.peopleChainClients.has(cacheKey)) {
-      const client = this.peopleChainClients.get(cacheKey)!;
-      if (client.isConnected) {
-        return client;
-      }
-      await client.disconnect();
-      this.peopleChainClients.delete(cacheKey);
+      return this.peopleChainClients.get(cacheKey)!;
     }
 
     const endpoint = PEOPLE_CHAIN_RPC_ENDPOINTS[chain];
@@ -90,10 +86,8 @@ export class PolkadotService {
       throw new Error(`Unknown chain for People parachain: ${chain}`);
     }
 
-    const provider = new WsProvider(endpoint);
+    const provider = new HttpProvider(endpoint);
     const api = await ApiPromise.create({ provider });
-
-    await api.isReady;
 
     this.peopleChainClients.set(cacheKey, api);
     return api;
