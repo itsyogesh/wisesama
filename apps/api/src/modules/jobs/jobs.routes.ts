@@ -102,14 +102,16 @@ export async function jobsRoutes(fastify: FastifyInstance) {
     }
   );
 
-  // Identity sync job - called by QStash CRON
-  // Syncs all identities from Polkadot and Kusama People Chains
+  // Identity sync job — called by QStash cron (one invocation per chain)
+  // QStash schedules (configured via Upstash dashboard):
+  //   polkadot: cron 0 0 * * *    → POST /jobs/sync-identities  body: {"chain":"polkadot"}
+  //   kusama:   cron 15 0 * * *   → POST /jobs/sync-identities  body: {"chain":"kusama"}
   fastify.post(
     '/jobs/sync-identities',
     {
       schema: {
         tags: ['jobs'],
-        description: 'Sync all on-chain identities from People Chains (called by QStash)',
+        description: 'Sync on-chain identities for a single chain from People Chain (called by QStash)',
         hide: true,
       },
       config: {
