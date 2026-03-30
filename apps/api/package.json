@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "dotenv -e .env.local -- tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm",
-    "start": "node dist/index.mjs",
+    "build": "echo 'Vercel native Fastify - no build step needed'",
+    "start": "tsx src/index.ts",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
