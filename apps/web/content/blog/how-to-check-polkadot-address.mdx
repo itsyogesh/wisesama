@@ -1,0 +1,77 @@
+---
+title: "How to Check if a Polkadot Wallet Address Is a Scam"
+date: "2026-03-28"
+excerpt: "A step-by-step guide to verifying wallet addresses in the Polkadot ecosystem before sending funds, using Wisesama and on-chain identity."
+author: "Wisesama Team"
+tags: ["tutorial", "polkadot", "security", "wallet", "guide"]
+---
+
+Before sending DOT or KSM to any address, you should verify that the recipient is legitimate. Scammers frequently impersonate known projects, validators, and treasury accounts. Here's how to check.
+
+## Step 1: Scan the Address on Wisesama
+
+The fastest way to check any Polkadot or Kusama address is to scan it on [Wisesama](https://wisesama.com).
+
+1. Go to [wisesama.com](https://wisesama.com)
+2. Paste the wallet address into the search bar
+3. Click "Scan Now"
+
+Within seconds, you'll get a comprehensive risk assessment including the address's risk level, on-chain identity, transaction history, and whether it appears on any blacklists.
+
+### What the Risk Levels Mean
+
+- **Safe (Green)** - The address belongs to a verified, whitelisted entity. Still verify the details match what you expect.
+- **Unknown (Gray)** - No data available. This doesn't mean it's safe. Proceed with caution.
+- **Caution (Orange)** - Risk indicators detected. This could be community reports, suspicious transaction patterns, or similarity to known scam addresses.
+- **Fraud (Red)** - Confirmed malicious. Do not send funds to this address.
+
+## Step 2: Check On-Chain Identity
+
+Polkadot has a built-in identity system on the People Chain. Legitimate projects and validators typically register and verify their identity on-chain.
+
+When you scan an address on Wisesama, the identity section shows:
+
+- **Display name** - The name registered on-chain
+- **Verification status** - Whether a registrar has verified the identity (look for "Reasonable" or "Known Good" judgements)
+- **Social links** - Twitter, website, GitHub, and other linked accounts
+- **Timeline** - When the identity was first set and verified
+
+An address with no on-chain identity isn't necessarily a scam, but verified addresses with registrar judgements are significantly more trustworthy.
+
+## Step 3: Verify the Domain
+
+If someone sent you a link alongside the address, check the domain too. Phishing sites often use domains that look almost identical to legitimate ones.
+
+Wisesama scans domains against 70+ security engines via VirusTotal and checks for look-alike patterns against known ecosystem domains.
+
+Common red flags:
+- Domains with extra characters (e.g., `polkadot-claim.xyz` instead of `polkadot.network`)
+- Recently registered domains
+- Domains flagged by multiple security engines
+
+## Step 4: Check Transaction History
+
+Wisesama shows a transaction summary for scanned addresses:
+
+- **Total transactions** - Very new addresses with zero history should be treated cautiously
+- **Balance** - Scam addresses often have many small incoming transactions (victims) and rapid outflows
+- **Last activity** - Dormant addresses that suddenly become active may indicate compromised keys
+
+## Step 5: Use Our Bots
+
+You don't need to visit the website every time. Wisesama is available where you already are:
+
+- **Telegram**: Send `/check <address>` to [@wisesama_bot](https://t.me/wisesama)
+- **Discord**: Use the `/check` command in our [server](https://discord.gg/wisesama)
+- **Twitter/X**: Tag [@wisesama_help](https://x.com/wisesama_help) with the address
+
+## When in Doubt, Don't Send
+
+No legitimate project will pressure you to send funds immediately. If you're unsure about an address:
+
+1. Scan it on Wisesama first
+2. Verify the on-chain identity matches the claimed entity
+3. Cross-reference with official project channels
+4. Ask in community channels before transacting
+
+If you've encountered a scam address, [report it on Wisesama](/report) to help protect others in the ecosystem.

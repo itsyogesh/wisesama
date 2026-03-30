@@ -1,0 +1,62 @@
+---
+title: "Introducing Wisesama: Real-Time Fraud Detection for the Polkadot Ecosystem"
+date: "2026-03-30"
+excerpt: "Wisesama combines ML-based risk scoring, 70+ VirusTotal engines, on-chain identity verification, and community reporting to protect the Polkadot ecosystem from scams."
+author: "Wisesama Team"
+tags: ["announcement", "polkadot", "fraud-detection", "launch"]
+---
+
+The Polkadot ecosystem is growing fast. With that growth comes an increasing number of scams, phishing domains, impersonation accounts, and fraudulent wallet addresses targeting users. Wisesama was built to fight back.
+
+## What Is Wisesama?
+
+Wisesama is a fraud detection and risk assessment platform purpose-built for the Polkadot and Kusama ecosystem. It lets you scan wallet addresses, domains, Twitter handles, and email addresses for fraud risk in seconds.
+
+Under the hood, Wisesama combines multiple layers of analysis to give you a comprehensive risk assessment for any entity you check.
+
+## How It Works
+
+### Six Layers of Analysis
+
+Every scan runs through up to six analysis layers in parallel:
+
+1. **Blacklist Check** - Cross-references against the official polkadot-js/phishing database containing 52K+ known malicious sites and 250+ flagged addresses.
+2. **Whitelist Verification** - Checks if the entity belongs to a known, verified project in the ecosystem.
+3. **On-Chain Identity** - Queries the Polkadot People Chain to verify on-chain identity registrations and registrar judgements.
+4. **ML Risk Scoring** - Analyzes on-chain behavioral patterns including transaction history, counterparty diversity, and account age.
+5. **VirusTotal Integration** - For domains, scans against 70+ antivirus and security engines for real-time threat intelligence.
+6. **Impersonation Detection** - For Twitter handles, uses similarity matching to detect accounts impersonating known ecosystem projects.
+
+### Risk Levels
+
+Every entity receives a clear risk assessment:
+
+- **Safe** - Known, verified entity with clean history
+- **Unknown** - No data available, exercise caution
+- **Caution** - Some risk indicators detected
+- **Fraud** - Confirmed malicious entity
+
+## Community-Powered Security
+
+Wisesama isn't just automated scanning. The community plays a critical role.
+
+Anyone can submit a fraud report through the website, and our team reviews each report. Verified reports are added to the blacklist and contributed back to the polkadot-js/phishing repository as upstream PRs, protecting the entire ecosystem.
+
+## Available Everywhere
+
+### Website
+Visit [wisesama.com](https://wisesama.com) to scan any entity directly.
+
+### Bots
+Wisesama is available as a bot on multiple platforms:
+
+- **Telegram** - Send `/check <address>` to [@wisesama_bot](https://t.me/wisesama) for instant risk assessments
+- **Discord** - Use `/check` slash commands in our [Discord server](https://discord.gg/wisesama)
+- **Twitter/X** - Tag [@wisesama_help](https://x.com/wisesama_help) with an address or domain to get a public risk assessment
+
+### API
+Developers can integrate Wisesama's fraud detection directly into their dApps, wallets, and tools using our free REST API. Check the [API documentation](/docs) for details.
+
+## What's Next
+
+We're actively working on expanding coverage to additional chains within the Polkadot ecosystem and improving our ML models with more training data from community reports. If you've encountered a scam in the Polkadot ecosystem, [report it](/report) and help us protect the community.
