@@ -153,13 +153,14 @@ export async function adminRoutes(fastify: FastifyInstance) {
       preHandler: [authenticate, requireAdmin],
       schema: {
         tags: ['admin'],
-        description: 'Sync all on-chain identities from People Chains (Polkadot + Kusama)',
+        description: 'Sync on-chain identities from a People Chain. Must specify chain to avoid timeout.',
         security: [{ cookieAuth: [] }],
         querystring: {
           type: 'object',
           properties: {
-            chain: { type: 'string', enum: ['polkadot', 'kusama', 'all'], default: 'all' },
+            chain: { type: 'string', enum: ['polkadot', 'kusama'] },
           },
+          required: ['chain'],
         },
         response: {
           200: {
@@ -190,20 +191,9 @@ export async function adminRoutes(fastify: FastifyInstance) {
       },
     },
     async (request) => {
-      const chain = (request.query as { chain?: string }).chain || 'all';
-      const results: Record<string, unknown> = {};
-
-      if (chain === 'all' || chain === 'polkadot') {
-        results.polkadot = await identitySyncService.syncChain('polkadot');
-      }
-      if (chain === 'all' || chain === 'kusama') {
-        results.kusama = await identitySyncService.syncChain('kusama');
-      }
-
-      return {
-        message: 'Identity sync completed',
-        ...results,
-      };
+      const chain = (request.query as { chain: string }).chain;
+      const result = await identitySyncService.syncChain(chain);
+      return { message: `Identity sync completed for ${chain}`, chain, ...result };
     }
   );
 
