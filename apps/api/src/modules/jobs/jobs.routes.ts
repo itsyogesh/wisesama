@@ -139,11 +139,16 @@ export async function jobsRoutes(fastify: FastifyInstance) {
       }
 
       try {
-        // Accept chain from body or query to allow per-chain invocations
-        // (running both chains in one serverless function risks timeout)
+        // Chain is required — each chain runs as a separate invocation
+        // QStash schedules: polkadot at 00:00 UTC, kusama at 00:15 UTC
         const reqBody = (request.body as { chain?: string }) || {};
         const reqQuery = (request.query as { chain?: string }) || {};
-        const chain = reqBody.chain || reqQuery.chain || 'polkadot';
+        const chain = reqBody.chain || reqQuery.chain;
+
+        if (!chain || !['polkadot', 'kusama'].includes(chain)) {
+          reply.status(400);
+          return { error: 'chain parameter required (polkadot or kusama)' };
+        }
 
         request.log.info({ chain }, 'Starting identity sync job');
 

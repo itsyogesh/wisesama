@@ -227,10 +227,17 @@ export const identitiesApi = {
     const response = await apiClient.get('/api/v1/admin/sync/identities/status');
     return response.data;
   },
-  triggerSync: async (chain: string = 'all') => {
+  triggerSync: async (chain: 'polkadot' | 'kusama') => {
     const response = await apiClient.post('/api/v1/admin/sync/identities', null, {
       params: { chain },
     });
     return response.data;
+  },
+  triggerSyncAll: async () => {
+    const [polkadot, kusama] = await Promise.all([
+      apiClient.post('/api/v1/admin/sync/identities', null, { params: { chain: 'polkadot' } }),
+      apiClient.post('/api/v1/admin/sync/identities', null, { params: { chain: 'kusama' } }),
+    ]);
+    return { polkadot: polkadot.data, kusama: kusama.data };
   },
 };

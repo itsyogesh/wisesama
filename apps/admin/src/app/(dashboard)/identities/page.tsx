@@ -60,7 +60,7 @@ export default function IdentitiesPage() {
   });
 
   const syncMutation = useMutation({
-    mutationFn: () => identitiesApi.triggerSync('all'),
+    mutationFn: () => identitiesApi.triggerSyncAll(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['identity-sync-status'] });
       queryClient.invalidateQueries({ queryKey: ['identities'] });
