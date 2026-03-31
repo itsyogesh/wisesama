@@ -58,11 +58,14 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
   let processed = 0;
   let replied = 0;
   let errors = 0;
-  let newestIdSeen: string | undefined;
   let paginationToken: string | undefined;
-  const MAX_PAGES = 5; // Safety cap to avoid runaway pagination
+  let replyCapHit = false;
+  // Track the newest tweet ID that was fully handled (replied, deduped, or unparseable).
+  // Tweets skipped solely because of the reply cap are NOT considered handled —
+  // they stay ahead of the cursor so the next poll retries them.
+  let newestHandledId: string | undefined;
+  const MAX_PAGES = 5;
 
-  // Paginate through all new mentions before advancing the cursor
   for (let page = 0; page < MAX_PAGES; page++) {
     const params = new URLSearchParams({
       'tweet.fields': 'text,author_id,created_at',
@@ -91,12 +94,6 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
 
     if (!data.data || data.data.length === 0) break;
 
-    // Track newest ID from the first page only (it has the most recent tweets)
-    if (page === 0 && data.meta?.newest_id) {
-      newestIdSeen = data.meta.newest_id;
-    }
-
-    // Build user lookup map
     const userMap = new Map<string, string>();
     for (const user of data.includes?.users ?? []) {
       userMap.set(user.id, user.username);
@@ -105,21 +102,35 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
     for (const tweet of data.data) {
       processed++;
 
-      // Cap replies per poll cycle to prevent spam abuse
-      if (replied >= MAX_REPLIES_PER_POLL) continue; // continue processing to count, but don't reply
+      // Once reply cap is hit, stop processing this and all subsequent pages.
+      // The cursor won't advance past unprocessed tweets, so they'll be
+      // picked up on the next poll run.
+      if (replied >= MAX_REPLIES_PER_POLL) {
+        replyCapHit = true;
+        break;
+      }
 
       try {
         const alreadyReplied = await redis.get(REDIS_KEYS.replied(tweet.id));
-        if (alreadyReplied) continue;
+        if (alreadyReplied) {
+          newestHandledId = newestHandledId ?? tweet.id; // already handled
+          continue;
+        }
 
         const parsed = parseMention(tweet.text);
-        if (!parsed || parsed.entities.length === 0) continue;
+        if (!parsed || parsed.entities.length === 0) {
+          newestHandledId = newestHandledId ?? tweet.id; // nothing to do
+          continue;
+        }
 
         const entity = parsed.entities[0]!;
         const author = userMap.get(tweet.author_id) ?? 'user';
 
         const onCooldown = await redis.get(REDIS_KEYS.entityCooldown(entity));
-        if (onCooldown) continue;
+        if (onCooldown) {
+          newestHandledId = newestHandledId ?? tweet.id; // intentionally skipped
+          continue;
+        }
 
         let replyText: string;
 
@@ -144,23 +155,25 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
 
         await postReply(tweet.id, replyText);
         replied++;
+        newestHandledId = newestHandledId ?? tweet.id;
 
         await redis.setex(REDIS_KEYS.replied(tweet.id), 48 * 60 * 60, '1');
         await redis.setex(REDIS_KEYS.entityCooldown(entity), 5 * 60, '1');
       } catch (err) {
         console.error(`[Twitter] Error processing tweet ${tweet.id}:`, err);
         errors++;
+        newestHandledId = newestHandledId ?? tweet.id; // errored but attempted
       }
     }
 
-    // Continue to next page if available
-    if (!data.meta?.next_token) break;
+    if (replyCapHit || !data.meta?.next_token) break;
     paginationToken = data.meta.next_token;
   }
 
-  // Only advance cursor after all pages are processed
-  if (newestIdSeen) {
-    await redis.set(REDIS_KEYS.lastMentionId, newestIdSeen);
+  // Only advance cursor to the newest tweet that was actually handled.
+  // Tweets beyond the reply cap stay ahead of the cursor for the next poll.
+  if (newestHandledId) {
+    await redis.set(REDIS_KEYS.lastMentionId, newestHandledId);
   }
 
   return { processed, replied, errors };
