@@ -82,7 +82,8 @@ async function buildApp() {
       request.url.startsWith('/docs') ||
       request.url.startsWith('/api/auth') ||
       request.url.startsWith('/api/v1/telegram/webhook') ||
-      request.url.startsWith('/api/v1/discord/interactions')
+      request.url.startsWith('/api/v1/discord/interactions') ||
+      request.url.startsWith('/api/v1/jobs/')
     ) {
       return;
     }
