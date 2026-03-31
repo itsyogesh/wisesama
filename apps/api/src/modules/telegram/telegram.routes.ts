@@ -13,8 +13,12 @@ export async function telegramRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      // Verify secret token if configured
+      // Verify webhook secret — fail closed in production
       const secretToken = process.env.TELEGRAM_WEBHOOK_SECRET;
+      if (!secretToken && process.env.NODE_ENV === 'production') {
+        reply.status(503);
+        return { error: 'Webhook secret not configured' };
+      }
       if (secretToken) {
         const headerToken = request.headers['x-telegram-bot-api-secret-token'] as string;
         if (headerToken !== secretToken) {

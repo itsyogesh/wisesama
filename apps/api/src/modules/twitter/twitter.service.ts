@@ -35,7 +35,7 @@ interface TwitterUser {
 interface MentionsResponse {
   data?: Tweet[];
   includes?: { users?: TwitterUser[] };
-  meta?: { newest_id?: string; result_count?: number };
+  meta?: { newest_id?: string; oldest_id?: string; result_count?: number; next_token?: string };
 }
 
 function getBearerToken(): string {
@@ -55,103 +55,112 @@ export async function pollAndProcessMentions(): Promise<{ processed: number; rep
   const userId = getUserId();
   const lastMentionId = await redis.get<string>(REDIS_KEYS.lastMentionId);
 
-  // Fetch new mentions
-  const params = new URLSearchParams({
-    'tweet.fields': 'text,author_id,created_at',
-    'user.fields': 'username',
-    expansions: 'author_id',
-    max_results: '20',
-  });
-  if (lastMentionId) {
-    params.set('since_id', lastMentionId);
-  }
-
-  const response = await fetch(`${X_API}/users/${userId}/mentions?${params}`, {
-    headers: { Authorization: `Bearer ${bearerToken}` },
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('[Twitter] Failed to fetch mentions:', response.status, error);
-    throw new Error(`Twitter API error: ${response.status}`);
-  }
-
-  const data = (await response.json()) as MentionsResponse;
-
-  if (!data.data || data.data.length === 0) {
-    return { processed: 0, replied: 0, errors: 0 };
-  }
-
-  // Build user lookup map
-  const userMap = new Map<string, string>();
-  for (const user of data.includes?.users ?? []) {
-    userMap.set(user.id, user.username);
-  }
-
   let processed = 0;
   let replied = 0;
   let errors = 0;
+  let newestIdSeen: string | undefined;
+  let paginationToken: string | undefined;
+  const MAX_PAGES = 5; // Safety cap to avoid runaway pagination
 
-  for (const tweet of data.data) {
-    processed++;
-
-    // Cap replies per poll cycle to prevent spam abuse
-    if (replied >= MAX_REPLIES_PER_POLL) break;
-
-    try {
-      // Skip if already replied
-      const alreadyReplied = await redis.get(REDIS_KEYS.replied(tweet.id));
-      if (alreadyReplied) continue;
-
-      // Parse the mention
-      const parsed = parseMention(tweet.text);
-      if (!parsed || parsed.entities.length === 0) continue;
-
-      const entity = parsed.entities[0]!;
-      const author = userMap.get(tweet.author_id) ?? 'user';
-
-      // Check entity cooldown
-      const onCooldown = await redis.get(REDIS_KEYS.entityCooldown(entity));
-      if (onCooldown) continue;
-
-      let replyText: string;
-
-      if (parsed.intent === 'CHECK') {
-        const result = await queryService.checkEntity(entity);
-        replyText = formatCheckTweet(result);
-      } else {
-        // REPORT intent
-        const { type: entityType } = detectEntityType(entity);
-        const report = await prisma.report.create({
-          data: {
-            reportedValue: entity,
-            entityType: entityType as EntityType,
-            threatCategory: 'OTHER',
-            description: `Reported via X by @${author}: ${tweet.text.substring(0, 200)}`,
-            reporterName: `X: @${author}`,
-            status: 'pending',
-            evidenceUrls: [],
-          },
-        });
-        replyText = formatReportTweet(entity, report.id, author);
-      }
-
-      // Post reply
-      await postReply(tweet.id, replyText);
-      replied++;
-
-      // Set dedup and cooldown
-      await redis.setex(REDIS_KEYS.replied(tweet.id), 48 * 60 * 60, '1');
-      await redis.setex(REDIS_KEYS.entityCooldown(entity), 5 * 60, '1');
-    } catch (err) {
-      console.error(`[Twitter] Error processing tweet ${tweet.id}:`, err);
-      errors++;
+  // Paginate through all new mentions before advancing the cursor
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const params = new URLSearchParams({
+      'tweet.fields': 'text,author_id,created_at',
+      'user.fields': 'username',
+      expansions: 'author_id',
+      max_results: '20',
+    });
+    if (lastMentionId) {
+      params.set('since_id', lastMentionId);
     }
+    if (paginationToken) {
+      params.set('pagination_token', paginationToken);
+    }
+
+    const response = await fetch(`${X_API}/users/${userId}/mentions?${params}`, {
+      headers: { Authorization: `Bearer ${bearerToken}` },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('[Twitter] Failed to fetch mentions:', response.status, error);
+      throw new Error(`Twitter API error: ${response.status}`);
+    }
+
+    const data = (await response.json()) as MentionsResponse;
+
+    if (!data.data || data.data.length === 0) break;
+
+    // Track newest ID from the first page only (it has the most recent tweets)
+    if (page === 0 && data.meta?.newest_id) {
+      newestIdSeen = data.meta.newest_id;
+    }
+
+    // Build user lookup map
+    const userMap = new Map<string, string>();
+    for (const user of data.includes?.users ?? []) {
+      userMap.set(user.id, user.username);
+    }
+
+    for (const tweet of data.data) {
+      processed++;
+
+      // Cap replies per poll cycle to prevent spam abuse
+      if (replied >= MAX_REPLIES_PER_POLL) continue; // continue processing to count, but don't reply
+
+      try {
+        const alreadyReplied = await redis.get(REDIS_KEYS.replied(tweet.id));
+        if (alreadyReplied) continue;
+
+        const parsed = parseMention(tweet.text);
+        if (!parsed || parsed.entities.length === 0) continue;
+
+        const entity = parsed.entities[0]!;
+        const author = userMap.get(tweet.author_id) ?? 'user';
+
+        const onCooldown = await redis.get(REDIS_KEYS.entityCooldown(entity));
+        if (onCooldown) continue;
+
+        let replyText: string;
+
+        if (parsed.intent === 'CHECK') {
+          const result = await queryService.checkEntity(entity);
+          replyText = formatCheckTweet(result);
+        } else {
+          const { type: entityType } = detectEntityType(entity);
+          const report = await prisma.report.create({
+            data: {
+              reportedValue: entity,
+              entityType: entityType as EntityType,
+              threatCategory: 'OTHER',
+              description: `Reported via X by @${author}: ${tweet.text.substring(0, 200)}`,
+              reporterName: `X: @${author}`,
+              status: 'pending',
+              evidenceUrls: [],
+            },
+          });
+          replyText = formatReportTweet(entity, report.id, author);
+        }
+
+        await postReply(tweet.id, replyText);
+        replied++;
+
+        await redis.setex(REDIS_KEYS.replied(tweet.id), 48 * 60 * 60, '1');
+        await redis.setex(REDIS_KEYS.entityCooldown(entity), 5 * 60, '1');
+      } catch (err) {
+        console.error(`[Twitter] Error processing tweet ${tweet.id}:`, err);
+        errors++;
+      }
+    }
+
+    // Continue to next page if available
+    if (!data.meta?.next_token) break;
+    paginationToken = data.meta.next_token;
   }
 
-  // Update last mention ID
-  if (data.meta?.newest_id) {
-    await redis.set(REDIS_KEYS.lastMentionId, data.meta.newest_id);
+  // Only advance cursor after all pages are processed
+  if (newestIdSeen) {
+    await redis.set(REDIS_KEYS.lastMentionId, newestIdSeen);
   }
 
   return { processed, replied, errors };
