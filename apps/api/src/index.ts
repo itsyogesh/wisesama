@@ -22,6 +22,9 @@ import { whitelistRequestsAdminRoutes } from './modules/admin/whitelist-requests
 import { activityAdminRoutes } from './modules/admin/activity.routes';
 import { whitelistRequestRoutes } from './modules/whitelist/request.routes';
 import { jobsRoutes } from './modules/jobs/jobs.routes';
+import { telegramRoutes } from './modules/telegram/telegram.routes';
+import { discordRoutes } from './modules/discord/discord.routes';
+import { twitterRoutes } from './modules/twitter/twitter.routes';
 import { ratelimit } from './lib/redis';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -74,7 +77,13 @@ async function buildApp() {
   // Rate limiting with Upstash
   fastify.addHook('onRequest', async (request, reply) => {
     // Skip rate limiting for health checks, docs, and auth routes
-    if (request.url === '/api/v1/health' || request.url.startsWith('/docs') || request.url.startsWith('/api/auth')) {
+    if (
+      request.url === '/api/v1/health' ||
+      request.url.startsWith('/docs') ||
+      request.url.startsWith('/api/auth') ||
+      request.url.startsWith('/api/v1/telegram/webhook') ||
+      request.url.startsWith('/api/v1/discord/interactions')
+    ) {
       return;
     }
 
@@ -115,6 +124,7 @@ async function buildApp() {
         { name: 'api-keys', description: 'API key management' },
         { name: 'admin', description: 'Admin operations (requires admin role)' },
         { name: 'jobs', description: 'Background job endpoints' },
+        { name: 'bots', description: 'Bot integrations (Telegram, Discord, X/Twitter)' },
       ],
       components: {
         securitySchemes: {
@@ -178,6 +188,11 @@ async function buildApp() {
   await fastify.register(reportRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
   await fastify.register(jobsRoutes, { prefix: '/api/v1' });
+
+  // Bot integrations (Telegram, Discord, X/Twitter)
+  await fastify.register(telegramRoutes, { prefix: '/api/v1' });
+  await fastify.register(discordRoutes, { prefix: '/api/v1' });
+  await fastify.register(twitterRoutes, { prefix: '/api/v1' });
 
   // Public whitelist routes
   await fastify.register(whitelistRequestRoutes, { prefix: '/api/v1' });

@@ -4,6 +4,7 @@ import { prisma } from '@wisesama/database';
 import { authenticate, requireAdmin } from '../../middleware/auth.middleware';
 import { sendReportVerified, sendReportRejected } from '../../services/email.service';
 import { contributeToPhishing, isGitHubConfigured } from '../../services/github-contribution.service';
+import { broadcastVerifiedReport } from '../../services/alert.service';
 import { normalizeEntityValue } from '../../utils/normalize';
 
 const verifyReportSchema = z.object({
@@ -284,6 +285,16 @@ export async function reportsAdminRoutes(fastify: FastifyInstance) {
           request.log.warn({ err }, 'Failed to contribute to upstream');
         }
       }
+
+      // Broadcast to Discord, Telegram, X (async, non-blocking)
+      broadcastVerifiedReport({
+        entityValue: report.reportedValue,
+        entityType: report.entityType,
+        threatCategory: report.threatCategory,
+        riskScore: 95,
+      }).catch((err) => {
+        request.log.warn({ err }, 'Failed to broadcast verified report to channels');
+      });
 
       return {
         message: 'Report verified successfully',

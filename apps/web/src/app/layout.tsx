@@ -1,3 +1,4 @@
+import Script from 'next/script';
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
@@ -94,6 +95,23 @@ export default function RootLayout({
           />
         </head>
         <body className="font-sans antialiased bg-black min-h-screen flex flex-col">
+          {/* Google Analytics 4 — placed in body for correct afterInteractive strategy */}
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <>
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+                strategy="afterInteractive"
+              />
+              <Script id="ga4-init" strategy="afterInteractive">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+                `}
+              </Script>
+            </>
+          )}
           <Providers>
             <SiteHeader />
             <main className="flex-1">{children}</main>
