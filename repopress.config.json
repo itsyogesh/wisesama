@@ -71,7 +71,7 @@
       "id": "wisesama-docs",
       "name": "Wisesama Blog",
       "contentRoot": "apps/web/content/blog",
-      "framework": "detected",
+      "framework": "contentlayer",
       "contentType": "blog"
     }
   ]
