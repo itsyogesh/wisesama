@@ -66,6 +66,13 @@
           "kind": "flow"
         }
       }
+    },
+    {
+      "id": "wisesama-docs",
+      "name": "Wisesama Docs",
+      "contentRoot": "apps/web/content/blog",
+      "framework": "auto",
+      "contentType": "blog"
     }
   ]
 }
