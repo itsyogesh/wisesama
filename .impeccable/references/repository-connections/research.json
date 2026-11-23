@@ -1,0 +1,111 @@
+{
+  "task": "Repository onboarding and ongoing connection management for Wisesama",
+  "intent": "Plan repository onboarding, ongoing connection management, and public discovery for a vulnerability response product.",
+  "platform": "web",
+  "output_destination": "code",
+  "inspected_at": "2026-11-04",
+  "scope": "Read-only reference research; structure and affordances only. No production UI changed, no collections created.",
+  "recommended_references": [
+    {
+      "app": "Vercel",
+      "kind": "flow",
+      "name": "Creating a project (import)",
+      "mobbin_url": "https://mobbin.com/flows/0d992538-325c-42ff-ae7f-66d1ef3dbba8",
+      "decision": "Choose an account scope, search repositories, and import one; retain repository and branch context while choosing project name and root directory.",
+      "inspected_screens": [
+        {
+          "position": 2,
+          "screen_id": "1c2ad252-6ee3-4d96-b37f-a3ddc1831a9c",
+          "image_url": "https://mobbin.com/api/mcp/short/6e5UIG43",
+          "local_image": "vercel-repository-picker.jpg",
+          "visible": "Account selector and repository search above repo rows, one Import action per row."
+        },
+        {
+          "position": 3,
+          "screen_id": "8234b183-6909-4963-bf81-b63b743beaee",
+          "image_url": "https://mobbin.com/api/mcp/short/XAnHN4CH",
+          "local_image": "vercel-project-configuration.jpg",
+          "visible": "Selected GitHub repository and main branch summary above team/project name; Root Directory field with Edit action."
+        }
+      ],
+      "adaptation": "Use the same progressive sequence for provider/account -> repository -> branch/inventory path -> parsed preview -> assessment. Root directory maps to a service boundary in a monorepo. Directory selection alone does not establish vulnerability scope: Wisesama must implement importer-aware monorepo dependency closure or label the imported shared lockfile as repository-wide.",
+      "do_not_copy": "Deployment settings, template gallery, AI build prompt, hosting presets, environment variables or Deploy action."
+    },
+    {
+      "app": "Amazon Web Services (AWS)",
+      "kind": "screen",
+      "name": "Add repository and branch",
+      "mobbin_url": "https://mobbin.com/screens/53ae168c-f0dc-4365-872a-706e7f8f7e61",
+      "screen_id": "53ae168c-f0dc-4365-872a-706e7f8f7e61",
+      "image_url": "https://mobbin.com/api/mcp/short/jkxQDZPt",
+      "local_image": "aws-repository-branch.jpg",
+      "decision": "Keep repository selection, branch selection and missing-repository permission recovery in the same onboarding step.",
+      "visible": "Stepped setup; repository search/selection and refresh; explanatory missing-repository hint with Update GitHub permissions; branch picker; monorepo checkbox; Next disabled until required choices.",
+      "adaptation": "Provide a clear route to grant the Wisesama app access to a missing repository and refresh the picker. Represent branch and monorepo inventory selection explicitly.",
+      "do_not_copy": "The deployment-specific suggestion to push a commit as a recovery step; it is not established as appropriate for Wisesama."
+    },
+    {
+      "app": "Vercel",
+      "kind": "flow",
+      "name": "Connecting to a Git repository",
+      "mobbin_url": "https://mobbin.com/flows/48558b2f-ca61-401e-a78d-9ddd30fcbc23",
+      "inspected_screens": [
+        {
+          "position": 4,
+          "screen_id": "156e9938-1514-4396-bfcd-917d05a67665",
+          "image_url": "https://mobbin.com/api/mcp/short/V7fQfnAN",
+          "local_image": "vercel-connected-settings.jpg",
+          "visible": "Dedicated Git settings show connected repository identity, external link, Connected just now timestamp, Disconnect action, and a connection-success toast."
+        }
+      ],
+      "decision": "A connected repository needs a durable settings surface, not only an onboarding success message.",
+      "adaptation": "Show repository identity, connection state and access management separately from the project findings. Add Wisesama-specific branch/inventory path, immutable assessed commit, last sync/assessment and sync errors as product requirements.",
+      "do_not_copy": "PR comments, commit comments/statuses or deployment events: these imply write permissions and are outside the initial read-only scan connection.",
+      "limit": "The reference shows connection time and disconnect, not Wisesama scan freshness, webhook health, paused/revoked access or failure recovery."
+    }
+  ],
+  "secondary_inspected_reference": {
+    "app": "Render",
+    "mobbin_url": "https://mobbin.com/screens/6362a411-6e89-4b95-878f-0c289d02b3ce",
+    "screen_id": "6362a411-6e89-4b95-878f-0c289d02b3ce",
+    "image_url": "https://mobbin.com/api/mcp/short/Jh6syvhL",
+    "local_image": "render-repository-connections.jpg",
+    "visible": "Repository list/search with Connect rows; adjacent provider account summary showing GitHub connected user and repo count, Configure account action, and GitLab Connect account.",
+    "decision": "Keep provider account/access management available beside the repo picker. GitLab can be another provider in the same architecture.",
+    "limit": "Blueprint deployment and public-repository URL entry are not required for Wisesama; this screen does not establish ongoing scan status."
+  },
+  "searches": [
+    {
+      "tool": "search_flows",
+      "query": "Importing a GitHub repository into a developer tool",
+      "result": "Too centered on native GitHub migration; not used."
+    },
+    {
+      "tool": "search_screens",
+      "query": "Git repository integration settings",
+      "result": "Broad candidates, only inspected Render used as secondary."
+    },
+    {
+      "tool": "search_flows",
+      "query": "Creating a project from a Git repository",
+      "result": "Vercel import and connect flows selected."
+    },
+    {
+      "tool": "search_screens",
+      "query": "Git integration settings with repository and branch",
+      "mode": "deep",
+      "result": "AWS and Render inspected full resolution."
+    },
+    {
+      "tool": "search_screens",
+      "query": "Connected Git repository settings",
+      "result": "Mostly empty/disconnected screens; not cited in recommendations."
+    }
+  ],
+  "evidence_limits": [
+    "Selected high-resolution files were opened and inspected. Flow screens not listed above were not fully inspected and must not be described as evidence.",
+    "No selected screen shows access-revoked, token-expired, installation-suspended or webhook-failure states. Those are Wisesama product requirements, not Mobbin-derived claims.",
+    "No selected screen proves software exposure or a deployed fix. Repository sync state must remain separate from assessment and remediation state.",
+    "No ai_usage_notice was returned by the searches."
+  ]
+}

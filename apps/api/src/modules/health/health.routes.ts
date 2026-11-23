@@ -1,5 +1,5 @@
-import type { FastifyInstance } from 'fastify';
 import { prisma } from '@wisesama/database';
+import type { FastifyInstance } from 'fastify';
 import { redis } from '../../lib/redis';
 
 export async function healthRoutes(fastify: FastifyInstance) {

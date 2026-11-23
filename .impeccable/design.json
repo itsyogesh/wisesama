@@ -1,0 +1,977 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-05T23:23:59.164497Z",
+  "title": "Design System: Wisesama",
+  "extensions": {
+    "colorMeta": {
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Dark · Page ground",
+        "tonalRamp": [
+          "oklch(15% 0.00821 285.52)",
+          "oklch(26% 0.00821 285.52)",
+          "oklch(38% 0.00821 285.52)",
+          "oklch(49% 0.00821 285.52)",
+          "oklch(61% 0.00821 285.52)",
+          "oklch(72% 0.00821 285.52)",
+          "oklch(84% 0.00821 285.52)",
+          "oklch(95% 0.00821 285.52)"
+        ]
+      },
+      "dark-sidebar": {
+        "role": "neutral",
+        "displayName": "Dark · Navigation ground",
+        "tonalRamp": [
+          "oklch(15% 0.00795 285.65)",
+          "oklch(26% 0.00795 285.65)",
+          "oklch(38% 0.00795 285.65)",
+          "oklch(49% 0.00795 285.65)",
+          "oklch(61% 0.00795 285.65)",
+          "oklch(72% 0.00795 285.65)",
+          "oklch(84% 0.00795 285.65)",
+          "oklch(95% 0.00795 285.65)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark · Information surface",
+        "tonalRamp": [
+          "oklch(15% 0.01175 285.35)",
+          "oklch(26% 0.01175 285.35)",
+          "oklch(38% 0.01175 285.35)",
+          "oklch(49% 0.01175 285.35)",
+          "oklch(61% 0.01175 285.35)",
+          "oklch(72% 0.01175 285.35)",
+          "oklch(84% 0.01175 285.35)",
+          "oklch(95% 0.01175 285.35)"
+        ]
+      },
+      "dark-surface-2": {
+        "role": "neutral",
+        "displayName": "Dark · Grouped surface",
+        "tonalRamp": [
+          "oklch(15% 0.01319 285.39)",
+          "oklch(26% 0.01319 285.39)",
+          "oklch(38% 0.01319 285.39)",
+          "oklch(49% 0.01319 285.39)",
+          "oklch(61% 0.01319 285.39)",
+          "oklch(72% 0.01319 285.39)",
+          "oklch(84% 0.01319 285.39)",
+          "oklch(95% 0.01319 285.39)"
+        ]
+      },
+      "dark-hover": {
+        "role": "neutral",
+        "displayName": "Dark · Hover surface",
+        "tonalRamp": [
+          "oklch(15% 0.01859 289.63)",
+          "oklch(26% 0.01859 289.63)",
+          "oklch(38% 0.01859 289.63)",
+          "oklch(49% 0.01859 289.63)",
+          "oklch(61% 0.01859 289.63)",
+          "oklch(72% 0.01859 289.63)",
+          "oklch(84% 0.01859 289.63)",
+          "oklch(95% 0.01859 289.63)"
+        ]
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Dark · Primary text",
+        "tonalRamp": [
+          "oklch(15% 0.00955 299.24)",
+          "oklch(26% 0.00955 299.24)",
+          "oklch(38% 0.00955 299.24)",
+          "oklch(49% 0.00955 299.24)",
+          "oklch(61% 0.00955 299.24)",
+          "oklch(72% 0.00955 299.24)",
+          "oklch(84% 0.00955 299.24)",
+          "oklch(95% 0.00955 299.24)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Dark · Supporting text",
+        "tonalRamp": [
+          "oklch(15% 0.02321 297.26)",
+          "oklch(26% 0.02321 297.26)",
+          "oklch(38% 0.02321 297.26)",
+          "oklch(49% 0.02321 297.26)",
+          "oklch(61% 0.02321 297.26)",
+          "oklch(72% 0.02321 297.26)",
+          "oklch(84% 0.02321 297.26)",
+          "oklch(95% 0.02321 297.26)"
+        ]
+      },
+      "dark-quiet": {
+        "role": "neutral",
+        "displayName": "Dark · Quiet metadata",
+        "tonalRamp": [
+          "oklch(15% 0.02321 297.26)",
+          "oklch(26% 0.02321 297.26)",
+          "oklch(38% 0.02321 297.26)",
+          "oklch(49% 0.02321 297.26)",
+          "oklch(61% 0.02321 297.26)",
+          "oklch(72% 0.02321 297.26)",
+          "oklch(84% 0.02321 297.26)",
+          "oklch(95% 0.02321 297.26)"
+        ]
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "Dark · Separator",
+        "tonalRamp": [
+          "oklch(15% 0.02005 293.44)",
+          "oklch(26% 0.02005 293.44)",
+          "oklch(38% 0.02005 293.44)",
+          "oklch(49% 0.02005 293.44)",
+          "oklch(61% 0.02005 293.44)",
+          "oklch(72% 0.02005 293.44)",
+          "oklch(84% 0.02005 293.44)",
+          "oklch(95% 0.02005 293.44)"
+        ]
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "Dark · Purple accent",
+        "tonalRamp": [
+          "oklch(15% 0.16736 294.36)",
+          "oklch(26% 0.16736 294.36)",
+          "oklch(38% 0.16736 294.36)",
+          "oklch(49% 0.16736 294.36)",
+          "oklch(61% 0.16736 294.36)",
+          "oklch(72% 0.16736 294.36)",
+          "oklch(84% 0.16736 294.36)",
+          "oklch(95% 0.16736 294.36)"
+        ]
+      },
+      "dark-accent-solid": {
+        "role": "primary",
+        "displayName": "Dark · Solid purple action",
+        "tonalRamp": [
+          "oklch(15% 0.22877 291.69)",
+          "oklch(26% 0.22877 291.69)",
+          "oklch(38% 0.22877 291.69)",
+          "oklch(49% 0.22877 291.69)",
+          "oklch(61% 0.22877 291.69)",
+          "oklch(72% 0.22877 291.69)",
+          "oklch(84% 0.22877 291.69)",
+          "oklch(95% 0.22877 291.69)"
+        ]
+      },
+      "dark-accent-hover": {
+        "role": "primary",
+        "displayName": "Dark · Purple action hover",
+        "tonalRamp": [
+          "oklch(15% 0.22075 294.29)",
+          "oklch(26% 0.22075 294.29)",
+          "oklch(38% 0.22075 294.29)",
+          "oklch(49% 0.22075 294.29)",
+          "oklch(61% 0.22075 294.29)",
+          "oklch(72% 0.22075 294.29)",
+          "oklch(84% 0.22075 294.29)",
+          "oklch(95% 0.22075 294.29)"
+        ]
+      },
+      "dark-tint": {
+        "role": "primary",
+        "displayName": "Dark · Selected purple tint",
+        "tonalRamp": [
+          "oklch(15% 0.03986 301.21)",
+          "oklch(26% 0.03986 301.21)",
+          "oklch(38% 0.03986 301.21)",
+          "oklch(49% 0.03986 301.21)",
+          "oklch(61% 0.03986 301.21)",
+          "oklch(72% 0.03986 301.21)",
+          "oklch(84% 0.03986 301.21)",
+          "oklch(95% 0.03986 301.21)"
+        ]
+      },
+      "dark-danger": {
+        "role": "semantic",
+        "displayName": "Dark · Danger signal",
+        "tonalRamp": [
+          "oklch(15% 0.10747 11.85)",
+          "oklch(26% 0.10747 11.85)",
+          "oklch(38% 0.10747 11.85)",
+          "oklch(49% 0.10747 11.85)",
+          "oklch(61% 0.10747 11.85)",
+          "oklch(72% 0.10747 11.85)",
+          "oklch(84% 0.10747 11.85)",
+          "oklch(95% 0.10747 11.85)"
+        ]
+      },
+      "dark-danger-bg": {
+        "role": "semantic",
+        "displayName": "Dark · Danger message ground",
+        "tonalRamp": [
+          "oklch(15% 0.03272 349.52)",
+          "oklch(26% 0.03272 349.52)",
+          "oklch(38% 0.03272 349.52)",
+          "oklch(49% 0.03272 349.52)",
+          "oklch(61% 0.03272 349.52)",
+          "oklch(72% 0.03272 349.52)",
+          "oklch(84% 0.03272 349.52)",
+          "oklch(95% 0.03272 349.52)"
+        ]
+      },
+      "dark-warn": {
+        "role": "semantic",
+        "displayName": "Dark · Warning signal",
+        "tonalRamp": [
+          "oklch(15% 0.10033 76.91)",
+          "oklch(26% 0.10033 76.91)",
+          "oklch(38% 0.10033 76.91)",
+          "oklch(49% 0.10033 76.91)",
+          "oklch(61% 0.10033 76.91)",
+          "oklch(72% 0.10033 76.91)",
+          "oklch(84% 0.10033 76.91)",
+          "oklch(95% 0.10033 76.91)"
+        ]
+      },
+      "dark-warn-bg": {
+        "role": "semantic",
+        "displayName": "Dark · Warning ground",
+        "tonalRamp": [
+          "oklch(15% 0.02229 75.52)",
+          "oklch(26% 0.02229 75.52)",
+          "oklch(38% 0.02229 75.52)",
+          "oklch(49% 0.02229 75.52)",
+          "oklch(61% 0.02229 75.52)",
+          "oklch(72% 0.02229 75.52)",
+          "oklch(84% 0.02229 75.52)",
+          "oklch(95% 0.02229 75.52)"
+        ]
+      },
+      "dark-success": {
+        "role": "semantic",
+        "displayName": "Dark · Success signal",
+        "tonalRamp": [
+          "oklch(15% 0.06222 167.87)",
+          "oklch(26% 0.06222 167.87)",
+          "oklch(38% 0.06222 167.87)",
+          "oklch(49% 0.06222 167.87)",
+          "oklch(61% 0.06222 167.87)",
+          "oklch(72% 0.06222 167.87)",
+          "oklch(84% 0.06222 167.87)",
+          "oklch(95% 0.06222 167.87)"
+        ]
+      },
+      "dark-success-bg": {
+        "role": "semantic",
+        "displayName": "Dark · Success message ground",
+        "tonalRamp": [
+          "oklch(15% 0.02501 170.63)",
+          "oklch(26% 0.02501 170.63)",
+          "oklch(38% 0.02501 170.63)",
+          "oklch(49% 0.02501 170.63)",
+          "oklch(61% 0.02501 170.63)",
+          "oklch(72% 0.02501 170.63)",
+          "oklch(84% 0.02501 170.63)",
+          "oklch(95% 0.02501 170.63)"
+        ]
+      },
+      "light-bg": {
+        "role": "neutral",
+        "displayName": "Light · Page ground",
+        "tonalRamp": [
+          "oklch(15% 0.00283 308.43)",
+          "oklch(26% 0.00283 308.43)",
+          "oklch(38% 0.00283 308.43)",
+          "oklch(49% 0.00283 308.43)",
+          "oklch(61% 0.00283 308.43)",
+          "oklch(72% 0.00283 308.43)",
+          "oklch(84% 0.00283 308.43)",
+          "oklch(95% 0.00283 308.43)"
+        ]
+      },
+      "light-sidebar": {
+        "role": "neutral",
+        "displayName": "Light · Navigation ground",
+        "tonalRamp": [
+          "oklch(15% 0.00695 304.24)",
+          "oklch(26% 0.00695 304.24)",
+          "oklch(38% 0.00695 304.24)",
+          "oklch(49% 0.00695 304.24)",
+          "oklch(61% 0.00695 304.24)",
+          "oklch(72% 0.00695 304.24)",
+          "oklch(84% 0.00695 304.24)",
+          "oklch(95% 0.00695 304.24)"
+        ]
+      },
+      "light-surface": {
+        "role": "neutral",
+        "displayName": "Light · Information surface",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "light-surface-2": {
+        "role": "neutral",
+        "displayName": "Light · Grouped surface",
+        "tonalRamp": [
+          "oklch(15% 0.00694 304.24)",
+          "oklch(26% 0.00694 304.24)",
+          "oklch(38% 0.00694 304.24)",
+          "oklch(49% 0.00694 304.24)",
+          "oklch(61% 0.00694 304.24)",
+          "oklch(72% 0.00694 304.24)",
+          "oklch(84% 0.00694 304.24)",
+          "oklch(95% 0.00694 304.24)"
+        ]
+      },
+      "light-hover": {
+        "role": "neutral",
+        "displayName": "Light · Hover surface",
+        "tonalRamp": [
+          "oklch(15% 0.01111 303.11)",
+          "oklch(26% 0.01111 303.11)",
+          "oklch(38% 0.01111 303.11)",
+          "oklch(49% 0.01111 303.11)",
+          "oklch(61% 0.01111 303.11)",
+          "oklch(72% 0.01111 303.11)",
+          "oklch(84% 0.01111 303.11)",
+          "oklch(95% 0.01111 303.11)"
+        ]
+      },
+      "light-text": {
+        "role": "neutral",
+        "displayName": "Light · Primary text",
+        "tonalRamp": [
+          "oklch(15% 0.02508 298.61)",
+          "oklch(26% 0.02508 298.61)",
+          "oklch(38% 0.02508 298.61)",
+          "oklch(49% 0.02508 298.61)",
+          "oklch(61% 0.02508 298.61)",
+          "oklch(72% 0.02508 298.61)",
+          "oklch(84% 0.02508 298.61)",
+          "oklch(95% 0.02508 298.61)"
+        ]
+      },
+      "light-muted": {
+        "role": "neutral",
+        "displayName": "Light · Supporting text",
+        "tonalRamp": [
+          "oklch(15% 0.03558 301.73)",
+          "oklch(26% 0.03558 301.73)",
+          "oklch(38% 0.03558 301.73)",
+          "oklch(49% 0.03558 301.73)",
+          "oklch(61% 0.03558 301.73)",
+          "oklch(72% 0.03558 301.73)",
+          "oklch(84% 0.03558 301.73)",
+          "oklch(95% 0.03558 301.73)"
+        ]
+      },
+      "light-quiet": {
+        "role": "neutral",
+        "displayName": "Light · Quiet metadata",
+        "tonalRamp": [
+          "oklch(15% 0.03558 301.73)",
+          "oklch(26% 0.03558 301.73)",
+          "oklch(38% 0.03558 301.73)",
+          "oklch(49% 0.03558 301.73)",
+          "oklch(61% 0.03558 301.73)",
+          "oklch(72% 0.03558 301.73)",
+          "oklch(84% 0.03558 301.73)",
+          "oklch(95% 0.03558 301.73)"
+        ]
+      },
+      "light-line": {
+        "role": "neutral",
+        "displayName": "Light · Separator",
+        "tonalRamp": [
+          "oklch(15% 0.01699 304.79)",
+          "oklch(26% 0.01699 304.79)",
+          "oklch(38% 0.01699 304.79)",
+          "oklch(49% 0.01699 304.79)",
+          "oklch(61% 0.01699 304.79)",
+          "oklch(72% 0.01699 304.79)",
+          "oklch(84% 0.01699 304.79)",
+          "oklch(95% 0.01699 304.79)"
+        ]
+      },
+      "light-accent": {
+        "role": "primary",
+        "displayName": "Light · Purple accent",
+        "tonalRamp": [
+          "oklch(15% 0.21268 294.07)",
+          "oklch(26% 0.21268 294.07)",
+          "oklch(38% 0.21268 294.07)",
+          "oklch(49% 0.21268 294.07)",
+          "oklch(61% 0.21268 294.07)",
+          "oklch(72% 0.21268 294.07)",
+          "oklch(84% 0.21268 294.07)",
+          "oklch(95% 0.21268 294.07)"
+        ]
+      },
+      "light-accent-solid": {
+        "role": "primary",
+        "displayName": "Light · Solid purple action",
+        "tonalRamp": [
+          "oklch(15% 0.22517 292.94)",
+          "oklch(26% 0.22517 292.94)",
+          "oklch(38% 0.22517 292.94)",
+          "oklch(49% 0.22517 292.94)",
+          "oklch(61% 0.22517 292.94)",
+          "oklch(72% 0.22517 292.94)",
+          "oklch(84% 0.22517 292.94)",
+          "oklch(95% 0.22517 292.94)"
+        ]
+      },
+      "light-accent-hover": {
+        "role": "primary",
+        "displayName": "Light · Purple action hover",
+        "tonalRamp": [
+          "oklch(15% 0.20549 293.06)",
+          "oklch(26% 0.20549 293.06)",
+          "oklch(38% 0.20549 293.06)",
+          "oklch(49% 0.20549 293.06)",
+          "oklch(61% 0.20549 293.06)",
+          "oklch(72% 0.20549 293.06)",
+          "oklch(84% 0.20549 293.06)",
+          "oklch(95% 0.20549 293.06)"
+        ]
+      },
+      "light-tint": {
+        "role": "primary",
+        "displayName": "Light · Selected purple tint",
+        "tonalRamp": [
+          "oklch(15% 0.03061 302.30)",
+          "oklch(26% 0.03061 302.30)",
+          "oklch(38% 0.03061 302.30)",
+          "oklch(49% 0.03061 302.30)",
+          "oklch(61% 0.03061 302.30)",
+          "oklch(72% 0.03061 302.30)",
+          "oklch(84% 0.03061 302.30)",
+          "oklch(95% 0.03061 302.30)"
+        ]
+      },
+      "light-danger": {
+        "role": "semantic",
+        "displayName": "Light · Danger signal",
+        "tonalRamp": [
+          "oklch(15% 0.15545 13.40)",
+          "oklch(26% 0.15545 13.40)",
+          "oklch(38% 0.15545 13.40)",
+          "oklch(49% 0.15545 13.40)",
+          "oklch(61% 0.15545 13.40)",
+          "oklch(72% 0.15545 13.40)",
+          "oklch(84% 0.15545 13.40)",
+          "oklch(95% 0.15545 13.40)"
+        ]
+      },
+      "light-danger-bg": {
+        "role": "semantic",
+        "displayName": "Light · Danger message ground",
+        "tonalRamp": [
+          "oklch(15% 0.02000 353.99)",
+          "oklch(26% 0.02000 353.99)",
+          "oklch(38% 0.02000 353.99)",
+          "oklch(49% 0.02000 353.99)",
+          "oklch(61% 0.02000 353.99)",
+          "oklch(72% 0.02000 353.99)",
+          "oklch(84% 0.02000 353.99)",
+          "oklch(95% 0.02000 353.99)"
+        ]
+      },
+      "light-warn": {
+        "role": "semantic",
+        "displayName": "Light · Warning signal",
+        "tonalRamp": [
+          "oklch(15% 0.10766 69.89)",
+          "oklch(26% 0.10766 69.89)",
+          "oklch(38% 0.10766 69.89)",
+          "oklch(49% 0.10766 69.89)",
+          "oklch(61% 0.10766 69.89)",
+          "oklch(72% 0.10766 69.89)",
+          "oklch(84% 0.10766 69.89)",
+          "oklch(95% 0.10766 69.89)"
+        ]
+      },
+      "light-warn-bg": {
+        "role": "semantic",
+        "displayName": "Light · Warning ground",
+        "tonalRamp": [
+          "oklch(15% 0.02891 82.60)",
+          "oklch(26% 0.02891 82.60)",
+          "oklch(38% 0.02891 82.60)",
+          "oklch(49% 0.02891 82.60)",
+          "oklch(61% 0.02891 82.60)",
+          "oklch(72% 0.02891 82.60)",
+          "oklch(84% 0.02891 82.60)",
+          "oklch(95% 0.02891 82.60)"
+        ]
+      },
+      "light-success": {
+        "role": "semantic",
+        "displayName": "Light · Success signal",
+        "tonalRamp": [
+          "oklch(15% 0.07407 165.65)",
+          "oklch(26% 0.07407 165.65)",
+          "oklch(38% 0.07407 165.65)",
+          "oklch(49% 0.07407 165.65)",
+          "oklch(61% 0.07407 165.65)",
+          "oklch(72% 0.07407 165.65)",
+          "oklch(84% 0.07407 165.65)",
+          "oklch(95% 0.07407 165.65)"
+        ]
+      },
+      "light-success-bg": {
+        "role": "semantic",
+        "displayName": "Light · Success message ground",
+        "tonalRamp": [
+          "oklch(15% 0.01409 162.47)",
+          "oklch(26% 0.01409 162.47)",
+          "oklch(38% 0.01409 162.47)",
+          "oklch(49% 0.01409 162.47)",
+          "oklch(61% 0.01409 162.47)",
+          "oklch(72% 0.01409 162.47)",
+          "oklch(84% 0.01409 162.47)",
+          "oklch(95% 0.01409 162.47)"
+        ]
+      },
+      "on-accent": {
+        "role": "neutral",
+        "displayName": "On-accent white",
+        "tonalRamp": [
+          "oklch(15% 0.00000 0.00)",
+          "oklch(26% 0.00000 0.00)",
+          "oklch(38% 0.00000 0.00)",
+          "oklch(49% 0.00000 0.00)",
+          "oklch(61% 0.00000 0.00)",
+          "oklch(72% 0.00000 0.00)",
+          "oklch(84% 0.00000 0.00)",
+          "oklch(95% 0.00000 0.00)"
+        ]
+      },
+      "dark-public-heading": {
+        "role": "primary",
+        "displayName": "Dark · Public heading lavender",
+        "tonalRamp": [
+          "oklch(15% 0.09650 299.94)",
+          "oklch(26% 0.09650 299.94)",
+          "oklch(38% 0.09650 299.94)",
+          "oklch(49% 0.09650 299.94)",
+          "oklch(61% 0.09650 299.94)",
+          "oklch(72% 0.09650 299.94)",
+          "oklch(84% 0.09650 299.94)",
+          "oklch(95% 0.09650 299.94)"
+        ]
+      },
+      "light-public-heading": {
+        "role": "primary",
+        "displayName": "Light · Public heading lavender",
+        "tonalRamp": [
+          "oklch(15% 0.15570 300.72)",
+          "oklch(26% 0.15570 300.72)",
+          "oklch(38% 0.15570 300.72)",
+          "oklch(49% 0.15570 300.72)",
+          "oklch(61% 0.15570 300.72)",
+          "oklch(72% 0.15570 300.72)",
+          "oklch(84% 0.15570 300.72)",
+          "oklch(95% 0.15570 300.72)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Page heading",
+        "purpose": "Operational page headings; responsive variants are documented in DESIGN.md."
+      },
+      "title": {
+        "displayName": "Section title",
+        "purpose": "General section headings; finding and rail variants are smaller."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Base reading text; dense operational content commonly uses 13px."
+      },
+      "label": {
+        "displayName": "Control label",
+        "purpose": "Buttons, navigation, and field labels."
+      },
+      "mono": {
+        "displayName": "Identifiers",
+        "purpose": "Packages, versions, advisory identifiers, and code."
+      },
+      "display": {
+        "displayName": "Public home display",
+        "purpose": "Homepage question and lavender emphasis; responsive variants retain Satoshi."
+      },
+      "public-headline": {
+        "displayName": "Public page introduction",
+        "purpose": "Product, provider, access and agent introductions."
+      },
+      "article-headline": {
+        "displayName": "Article heading",
+        "purpose": "Guide and developer-reference introduction."
+      },
+      "reading": {
+        "displayName": "Guide and reference prose",
+        "purpose": "Long reading with 1.8 line height; reduces to 15px on mobile."
+      },
+      "public-label": {
+        "displayName": "Public action label",
+        "purpose": "Larger discovery-surface actions; private working controls keep their compact label role."
+      }
+    },
+    "shadows": [
+      {
+        "name": "scoped-control-rest",
+        "value": "0 1px 2px rgb(0 0 0 / 0.08)",
+        "purpose": "Organization/RepositoryOnboarding field shells only; disabled shells remove the shadow."
+      },
+      {
+        "name": "scoped-picker-popup",
+        "value": "0 12px 34px rgb(0 0 0 / 0.25), 0 0 0 1px var(--line)",
+        "purpose": "Temporary portalled menus in the scoped control refresh."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "background 140ms ease",
+        "purpose": "Button background feedback; disabled by reduced-motion preference."
+      },
+      {
+        "name": "upload-state",
+        "value": "border-color 140ms, background 140ms",
+        "purpose": "Drop-zone drag state."
+      },
+      {
+        "name": "disclosure-state",
+        "value": "transform 120ms ease",
+        "purpose": "Source-health disclosure chevron."
+      },
+      {
+        "name": "toggle-state",
+        "value": "transform 140ms ease",
+        "purpose": "Notification switch thumb."
+      },
+      {
+        "name": "busy-base",
+        "value": "rotate 800ms linear infinite",
+        "purpose": "Base loading spinner."
+      },
+      {
+        "name": "busy-finding",
+        "value": "fd-spin 900ms linear infinite",
+        "purpose": "Finding response saving indicator."
+      },
+      {
+        "name": "busy-refresh",
+        "value": "rotate 1s linear infinite",
+        "purpose": "Workspace refresh indicator."
+      },
+      {
+        "name": "busy-public-advisory",
+        "value": "ad-spin 1s linear infinite",
+        "purpose": "Public advisory loading indicator; disabled by reduced-motion preference."
+      },
+      {
+        "name": "public-control-state",
+        "value": "background 160ms ease",
+        "purpose": "Public action feedback; reduced-motion preferences suppress transitions."
+      },
+      {
+        "name": "public-record-arrival",
+        "value": "pub-record-arrive 700ms cubic-bezier(0.16, 1, 0.3, 1) both",
+        "purpose": "Homepage product record only: 12px upward translation and shallow clip reveal, enabled only without reduced-motion preference."
+      },
+      {
+        "name": "scoped-field-state",
+        "value": "border-color 120ms ease-out, background-color 120ms ease-out",
+        "purpose": "Scoped shell/picker/textarea feedback; reduced motion disables transitions."
+      },
+      {
+        "name": "scoped-menu-state",
+        "value": "opacity 120ms ease-out, transform 120ms ease-out",
+        "purpose": "Scoped menus use translateY(-2px) during entry/exit; reduced motion removes transitions and displacement."
+      },
+      {
+        "name": "scoped-picker-busy",
+        "value": "ws-control-spin 800ms linear infinite",
+        "purpose": "Scoped picker spinner; reduced motion disables rotation while busy state remains."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "520px"
+      },
+      {
+        "name": "project-response-compact",
+        "value": "600px"
+      },
+      {
+        "name": "admin-compact",
+        "value": "650px"
+      },
+      {
+        "name": "public-stack",
+        "value": "700px"
+      },
+      {
+        "name": "account-stack",
+        "value": "760px"
+      },
+      {
+        "name": "supporting-layout",
+        "value": "800px"
+      },
+      {
+        "name": "shell-mobile",
+        "value": "820px"
+      },
+      {
+        "name": "finding-stack",
+        "value": "850px"
+      },
+      {
+        "name": "admin-shell-mobile",
+        "value": "900px"
+      },
+      {
+        "name": "account-gap",
+        "value": "1000px"
+      },
+      {
+        "name": "advisory-rail",
+        "value": "1050px"
+      },
+      {
+        "name": "reduced-desktop",
+        "value": "1100px"
+      },
+      {
+        "name": "public-compact",
+        "value": "1170px"
+      },
+      {
+        "name": "baseline-stack",
+        "value": "1180px"
+      },
+      {
+        "name": "admin-record-stack",
+        "value": "1200px"
+      },
+      {
+        "name": "wide-gutter",
+        "value": "1500px"
+      },
+      {
+        "name": "wide-finding",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary record action; theme roles change through inherited CSS variables.",
+      "html": "<button type=\"button\" class=\"ds-button ds-primary\">Start investigation</button>",
+      "css": ".ds-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:35px;padding:7px 13px;border-radius:6px;border:1px solid var(--line);color:var(--text);background:var(--surface);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background 140ms ease}.ds-button:hover:not(:disabled){background:var(--hover)}.ds-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}.ds-button:active:not(:disabled){transform:translateY(1px)}.ds-button:disabled{cursor:not-allowed;opacity:.45}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-primary{background:var(--accent-solid);color:#fff;border-color:transparent}.ds-primary:hover:not(:disabled){background:var(--accent-hover)}.ds-primary:disabled{opacity:.65}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Outlined secondary record or setup action.",
+      "html": "<button type=\"button\" class=\"ds-button\">Record response</button>",
+      "css": ".ds-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:35px;padding:7px 13px;border-radius:6px;border:1px solid var(--line);color:var(--text);background:var(--surface);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background 140ms ease}.ds-button:hover:not(:disabled){background:var(--hover)}.ds-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}.ds-button:active:not(:disabled){transform:translateY(1px)}.ds-button:disabled{cursor:not-allowed;opacity:.45}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}"
+    },
+    {
+      "name": "Ghost button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet shell or utility action.",
+      "html": "<button type=\"button\" class=\"ds-button ds-ghost\">Light mode</button>",
+      "css": ".ds-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:35px;padding:7px 13px;border-radius:6px;border:1px solid var(--line);color:var(--text);background:var(--surface);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background 140ms ease}.ds-button:hover:not(:disabled){background:var(--hover)}.ds-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}.ds-button:active:not(:disabled){transform:translateY(1px)}.ds-button:disabled{cursor:not-allowed;opacity:.45}@media(prefers-reduced-motion:reduce){.ds-button{transition:none}}.ds-ghost{background:transparent;border-color:transparent;color:var(--muted)}.ds-ghost:hover{background:var(--hover);color:var(--text)}"
+    },
+    {
+      "name": "Labeled field",
+      "kind": "input",
+      "refersTo": "scoped-text-input",
+      "description": "Reviewed Organization/RepositoryOnboarding native field: 42px shell, 44px on small/coarse-pointer surfaces, outer accent focus and associated help. Remaining legacy fields retain the input token.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-field-label\" for=\"ds-project-name\">Project name<span class=\"ds-required\" aria-hidden=\"true\">*</span></label><div class=\"ds-input-shell\"><input id=\"ds-project-name\" class=\"ds-input\" placeholder=\"Your service\" required maxlength=\"100\" aria-describedby=\"ds-project-help\"></div><p class=\"ds-field-help\" id=\"ds-project-help\">Use a name your team recognises. Static example; changes are not saved.</p></div>",
+      "css": ".ds-field{display:grid;align-content:start;gap:8px;min-width:0;color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-field-label{display:flex;align-items:baseline;gap:4px;font-size:13px;font-weight:600;line-height:1.5}.ds-required{color:var(--muted);font-weight:400}.ds-input-shell{display:flex;align-items:center;gap:9px;min-width:0;min-height:42px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgb(0 0 0 / .08);transition:border-color 120ms ease-out,background-color 120ms ease-out;cursor:text}.ds-input{appearance:none;box-sizing:border-box;flex:1;min-width:0;width:100%;min-height:40px;padding:9px 0;border:0;border-radius:0;background:transparent;color:var(--text);font:400 13px/1.5 Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;outline:none;box-shadow:none}.ds-input::placeholder{color:var(--muted);opacity:1}.ds-input-shell:focus-within{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:2px}.ds-input-shell:has(input:user-invalid),.ds-input-shell[data-invalid]{border-color:var(--danger)}.ds-input-shell[data-disabled]{opacity:.55;cursor:not-allowed;box-shadow:none}.ds-input:disabled{cursor:not-allowed}.ds-input:read-only{color:var(--muted)}.ds-field-help{margin:0;color:var(--muted);font-size:12px;font-weight:400;line-height:1.6;overflow-wrap:anywhere}@media(hover:hover) and (pointer:fine){.ds-input-shell:not([data-disabled]):hover{border-color:var(--quiet)}.ds-input-shell:focus-within:hover{border-color:var(--accent)}}@media(pointer:coarse),(max-width:600px){.ds-input-shell{min-height:44px}.ds-input{min-height:42px;font-size:16px}}@media(prefers-reduced-motion:reduce){.ds-input-shell{transition:none}}"
+    },
+    {
+      "name": "Active navigation",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "Desktop navigation row with a tinted current destination and count.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Preview navigation\"><a href=\"#ds-inbox\" aria-current=\"page\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 4h16v16H4zM4 14h5l2 3h2l2-3h5\"/></svg>Response inbox<span>4</span></a></nav>",
+      "css": ".ds-nav a{display:flex;align-items:center;gap:11px;height:38px;padding:0 11px;border-radius:6px;color:var(--muted);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:13px;font-weight:600;text-decoration:none}.ds-nav a:hover{background:var(--hover);color:var(--text)}.ds-nav a[aria-current=\"page\"]{background:var(--tint);color:var(--accent)}.ds-nav a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}.ds-nav svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}.ds-nav span{margin-left:auto;font-size:12px;font-weight:600}"
+    },
+    {
+      "name": "Severity label",
+      "kind": "chip",
+      "description": "Written technical severity with the narrow marker used in rows and properties.",
+      "html": "<span class=\"ds-severity\"><span aria-hidden=\"true\"></span>High</span>",
+      "css": ".ds-severity{display:inline-flex;align-items:center;gap:6px;color:var(--danger);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:12px;white-space:nowrap}.ds-severity>span{display:inline-block;width:3px;height:12px;border-radius:1px;background:var(--danger)}"
+    },
+    {
+      "name": "Match evidence table",
+      "kind": "card",
+      "refersTo": "evidence-card",
+      "description": "Structured source and inventory facts use a flat surface with row separators.",
+      "html": "<dl class=\"ds-evidence\"><div><dt>Imported package</dt><dd><code>example-package@1.2.3</code></dd></div><div><dt>Ecosystem</dt><dd>npm</dd></div></dl>",
+      "css": ".ds-evidence{margin:0;border:1px solid var(--line);border-radius:7px;background:var(--surface);overflow:hidden;font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;font-size:13px;color:var(--text)}.ds-evidence>div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:17px;padding:11px 13px;border-bottom:1px solid var(--line)}.ds-evidence>div:last-child{border-bottom:0}.ds-evidence dt{color:var(--muted);font-size:12px}.ds-evidence dd{margin:0;min-width:0;overflow-wrap:anywhere}.ds-evidence code{font-family:var(--mono);font-size:12px;line-height:1.7}@media(max-width:520px){.ds-evidence>div{grid-template-columns:108px minmax(0,1fr);gap:10px;padding:11px 10px;font-size:12px}.ds-evidence dt,.ds-evidence code{font-size:11px}}"
+    },
+    {
+      "name": "Finding row",
+      "kind": "custom",
+      "description": "Compact linked record with project identity retained in metadata on narrow viewports.",
+      "html": "<div class=\"ds-finding\"><a href=\"#ds-finding\">Example package advisory</a><div class=\"ds-finding-sub\"><span class=\"ds-project\">Example project</span><code>example-package 1.2.3</code><span class=\"ds-id\">Advisory identifier</span></div></div>",
+      "css": ".ds-finding{padding:17px 12px 17px 0;border-bottom:1px solid var(--line);font-family:Satoshi, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;color:var(--text)}.ds-finding:hover{background:var(--surface)}.ds-finding>a{display:inline-flex;color:var(--text);font-size:13px;font-weight:600;text-decoration:none;overflow-wrap:anywhere}.ds-finding>a:hover{color:var(--accent)}.ds-finding>a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}.ds-finding-sub{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--muted);font-size:12px;margin-top:5px}.ds-finding-sub code{font-family:var(--mono);font-size:11px;color:var(--muted)}.ds-id{font-family:var(--mono);font-size:11px;color:var(--quiet)}.ds-project{display:none}@media(max-width:820px){.ds-finding-sub{gap:4px}.ds-project{display:block;flex-basis:100%;font-size:11px;color:var(--muted);overflow-wrap:anywhere}.ds-id{display:none}}@media(max-width:520px){.ds-finding>a{font-size:12px;line-height:1.6}.ds-finding{padding-top:16px;padding-bottom:16px}}"
+    },
+    {
+      "name": "Public advisory reading record",
+      "kind": "custom",
+      "description": "Plain upstream-summary reading column with separate advisory evidence; a public record does not establish a private inventory match.",
+      "html": "<div class=\"ds-ad-layout\"><article class=\"ds-ad-main\"><section class=\"ds-ad-section\"><h2>Advisory summary</h2><p class=\"ds-ad-summary\">The source has not provided a summary. Review its references for details.</p></section></article><aside class=\"ds-ad-signals\" aria-label=\"Advisory evidence\"><section><h2>Known exploitation</h2><p>Exploitation evidence unknown</p><p class=\"ds-ad-footnote\">Absence from KEV does not prove absence of exploitation.</p></section><p class=\"ds-ad-scope\">This is a public advisory. It does not establish whether your project is affected or whether a deployed system has been fixed.</p></aside></div>",
+      "css": ".ds-ad-layout{display:grid;grid-template-columns:minmax(0,1fr) 245px;gap:44px;align-items:start;font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;color:var(--text)}.ds-ad-main{min-width:0}.ds-ad-section{margin-top:32px}.ds-ad-section>h2{font-size:16px;margin:0 0 15px;font-weight:700;line-height:1.4;letter-spacing:-.015em}.ds-ad-summary{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.85;max-width:74ch;color:var(--text);margin:0}.ds-ad-signals{border-left:1px solid var(--line);padding-left:24px}.ds-ad-signals section{padding-bottom:25px;margin-bottom:25px;border-bottom:1px solid var(--line)}.ds-ad-signals h2{font-size:12px;font-weight:400;color:var(--muted);margin:0 0 9px;line-height:1.4;letter-spacing:-.015em}.ds-ad-signals section>p:not(.ds-ad-footnote){font-size:13px;line-height:1.7;margin:0;color:var(--muted)}.ds-ad-footnote{font-size:12px;line-height:1.7;color:var(--muted);margin:10px 0 0}.ds-ad-scope{font-size:12px;line-height:1.75;color:var(--muted);margin:0}@media(max-width:1050px){.ds-ad-layout{grid-template-columns:minmax(0,1fr) 210px;gap:27px}.ds-ad-signals{padding-left:20px}}@media(max-width:800px){.ds-ad-layout{grid-template-columns:minmax(0,1fr)}.ds-ad-signals{border-left:0;border-top:1px solid var(--line);padding:25px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:0 25px}.ds-ad-signals section{padding-bottom:22px;margin-bottom:22px}.ds-ad-scope{grid-column:1/-1;max-width:70ch}}@media(max-width:520px){.ds-ad-summary{font-size:13px}.ds-ad-signals{grid-template-columns:minmax(0,1fr)}.ds-ad-section>h2{font-size:15px}.ds-ad-section{margin-top:28px}}"
+    },
+    {
+      "name": "Public repository action",
+      "kind": "button",
+      "refersTo": "button-public",
+      "description": "Larger discovery-surface action uses the same purple and control corners as the workspace.",
+      "html": "<a class=\"ds-public-button\" href=\"#ds-connect\">Connect a repository <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></a>",
+      "css": ".ds-public-button{display:inline-flex;gap:14px;align-items:center;justify-content:center;padding:13px 20px;border-radius:6px;background:var(--accent-solid);color:#fff;font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:14px;font-weight:600;line-height:1.45;text-align:center;text-decoration:none;transition:background 160ms ease}.ds-public-button:hover{background:var(--accent-hover)}.ds-public-button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-public-button svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none}@media(prefers-reduced-motion:reduce){.ds-public-button{transition:none}}"
+    },
+    {
+      "name": "Developer code block",
+      "kind": "custom",
+      "refersTo": "code-block",
+      "description": "Actual label/copy/contained-scroll geometry. The live React component supplies Copied and manual-copy failure states.",
+      "html": "<div class=\"ds-code-block\"><div><span>Public advisory request</span><button type=\"button\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"12\" height=\"12\" rx=\"2\"/><path d=\"M5 15H3V3h12v2\"/></svg> Copy</button></div><pre><code>curl --get \"$WISESAMA_API/api/v1/intel/advisories\" \\\n  --data-urlencode \"ecosystem=npm\" \\\n  --data-urlencode \"package=example-package\"</code></pre></div>",
+      "css": ".ds-code-block{margin:0;background:var(--surface-2);border-radius:8px;overflow:hidden;color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-code-block>div{display:flex;align-items:center;gap:12px;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 16px;color:var(--muted);font-size:11px}.ds-code-block button{display:inline-flex;align-items:center;gap:7px;background:transparent;border:0;padding:4px;color:var(--text);font-family:inherit;font-size:11px;cursor:pointer}.ds-code-block button:hover{color:var(--accent)}.ds-code-block button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-code-block button:active{transform:translateY(1px)}.ds-code-block svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;fill:none;width:13px;height:13px}.ds-code-block pre{max-width:100%;overflow-x:auto;padding:19px 20px;margin:0;line-height:1.8;scrollbar-width:thin;scrollbar-color:var(--line) var(--surface-2)}.ds-code-block code{font-family:var(--mono);font-size:12px;letter-spacing:0}@media(max-width:700px){.ds-code-block>div{padding:9px 12px}.ds-code-block pre{padding:16px 14px}.ds-code-block code{font-size:11px}}"
+    },
+    {
+      "name": "Repository source provenance",
+      "kind": "custom",
+      "refersTo": "repository-source",
+      "description": "Persisted source identity, separate synchronization/assessment signals, mismatch notice and retained-evidence failure. All preview data is synthetic.",
+      "html": "<article class=\"ds-source\"><header><div><h3>Synthetic verification repository</h3><p>main · Paused</p></div><a href=\"#ds-findings\">View findings →</a></header><dl><div><dt>Last successful sync</dt><dd>Nov 3, 2026 · 08:58 UTC</dd></div><div><dt>Last attempted sync</dt><dd>Nov 4, 2026 · 08:58 UTC</dd></div><div><dt>Imported commit</dt><dd><code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code></dd></div><div><dt>Latest observed commit</dt><dd><code>bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb</code></dd></div><div><dt>Last vulnerability assessment</dt><dd>Nov 4, 2026 · 06:58 UTC</dd></div><div><dt>Inventory scope</dt><dd>Repository inventory</dd></div><div><dt>Files</dt><dd><code>package-lock.json</code></dd></div></dl><p class=\"ds-source-error\">Synthetic local verification record. No provider connection is active. The last successful inventory and findings are retained.</p><p class=\"ds-source-error\">The last vulnerability assessment could not complete: synthetic advisory-refresh failure. Prior findings remain available.</p><p class=\"ds-source-notice\">The latest observed revision differs from the imported inventory. Refresh before relying on current repository coverage.</p><div class=\"ds-source-actions\"><button type=\"button\" disabled>Sync now</button><button type=\"button\">Resume sync</button><button type=\"button\">Edit source</button><button type=\"button\">Detach source</button></div></article>",
+      "css": ".ds-source{padding:26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;display:grid;gap:24px;color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:15px;line-height:1.5}.ds-source header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.ds-source h3{font-size:17px;margin:0;font-weight:700;overflow-wrap:anywhere}.ds-source header p{font-size:13px;color:var(--muted);margin:10px 0 0}.ds-source header>a{padding:7px 13px;color:var(--muted);font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;border-radius:6px}.ds-source header>a:hover{background:var(--hover);color:var(--text)}.ds-source header>a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-source dl{display:grid;grid-template-columns:1fr 1fr;margin:0;gap:20px 32px}.ds-source dl>div{min-width:0}.ds-source dt{font-size:12px;color:var(--muted);margin-bottom:5px}.ds-source dd{margin:0;overflow-wrap:anywhere}.ds-source code{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere;word-break:break-all}.ds-source-error,.ds-source-notice{padding:12px 13px;border-radius:6px;font-size:13px;margin:0}.ds-source-error{color:var(--danger);background:var(--danger-bg)}.ds-source-notice{color:var(--muted);background:var(--surface-2)}.ds-source-actions{display:flex;flex-wrap:wrap;gap:8px}.ds-source-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:35px;padding:7px 13px;border-radius:6px;border:1px solid transparent;color:var(--muted);background:transparent;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background 140ms ease}.ds-source-actions button:first-child{border-color:var(--line);color:var(--text);background:var(--surface)}.ds-source-actions button:hover:not(:disabled){background:var(--hover);color:var(--text)}.ds-source-actions button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-source-actions button:active:not(:disabled){transform:translateY(1px)}.ds-source-actions button:disabled{cursor:not-allowed;opacity:.45}@media(max-width:760px){.ds-source{padding:20px}.ds-source header{flex-direction:column}.ds-source h3{font-size:15px;word-break:break-word}.ds-source dl{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.ds-source-actions button{transition:none}}"
+    },
+    {
+      "name": "Repository baseline check",
+      "kind": "custom",
+      "description": "Native evidence disclosure with written static-check state and read provenance. All example data is synthetic; Observed does not establish enforcement.",
+      "html": "<section class=\"ds-baseline\"><p class=\"ds-baseline-label\">Synthetic configuration example</p><dl class=\"ds-baseline-source\"><div><dt>Read commit</dt><dd><code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code></dd></div><div><dt>Checked inventory paths</dt><dd><code>pnpm-lock.yaml</code></dd></div></dl><details class=\"ds-baseline-check\" open><summary><svg class=\"ds-baseline-icon\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" aria-hidden=\"true\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z\"/><path d=\"M14 2v6h6M9 15l2 2 4-4\"/></svg><span class=\"ds-baseline-description\"><strong>Exact package manager declaration</strong><span>A pinned package manager was found in the checked configuration.</span></span><span class=\"ds-baseline-state\">Observed</span><svg class=\"ds-baseline-chevron\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-baseline-body\"><h4>Repository evidence</h4><dl><dt><code>package.json</code></dt><dd><code>packageManager</code> declares an exact pnpm version.</dd></dl><h4>Next step</h4><p>Keep the declaration aligned with the package manager used by CI.</p></div></details><p class=\"ds-baseline-limit\">Observed means configuration was found. CI and deployment enforcement have not been verified.</p></section>",
+      "css": ".ds-baseline{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.6}.ds-baseline-label{color:var(--muted);font-size:12px;margin:0 0 12px}.ds-baseline-source{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:16px;display:grid;gap:9px;margin:0 0 22px;font-size:12px}.ds-baseline-source>div{display:grid;grid-template-columns:125px minmax(0,1fr);gap:10px}.ds-baseline-source dt{color:var(--muted)}.ds-baseline-source dd{margin:0;overflow-wrap:anywhere}.ds-baseline code{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}.ds-baseline-check{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.ds-baseline-check summary{display:grid;grid-template-columns:17px minmax(0,1fr) auto 14px;align-items:start;gap:11px;list-style:none;cursor:pointer;padding:20px 0}.ds-baseline-check summary::-webkit-details-marker{display:none}.ds-baseline-check summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-baseline-check summary:hover strong{color:var(--accent)}.ds-baseline-icon,.ds-baseline-state{color:var(--accent);margin-top:2px}.ds-baseline-state{font-size:11px;white-space:nowrap}.ds-baseline-description{display:grid;gap:5px}.ds-baseline-description strong{font-size:14px;font-weight:600}.ds-baseline-description>span{color:var(--muted);overflow-wrap:anywhere}.ds-baseline-chevron{color:var(--muted);margin-top:3px}.ds-baseline-check[open] .ds-baseline-chevron{transform:rotate(180deg)}.ds-baseline-body{padding:0 0 22px 28px}.ds-baseline-body h4{font-size:12px;font-weight:600;margin:19px 0 9px}.ds-baseline-body h4:first-child{margin-top:0}.ds-baseline-body dl{background:var(--surface-2);border-radius:6px;padding:12px 14px;margin:0}.ds-baseline-body dd{margin:4px 0 0;color:var(--muted);overflow-wrap:anywhere}.ds-baseline-body p{margin:0;max-width:72ch;overflow-wrap:anywhere}.ds-baseline-limit{color:var(--muted);font-size:12px;margin:20px 0 0;max-width:72ch}@media(max-width:600px){.ds-baseline-source{padding:14px}.ds-baseline-source>div{grid-template-columns:105px minmax(0,1fr);gap:8px}.ds-baseline-check summary{grid-template-columns:17px minmax(0,1fr) 14px;gap:9px;padding:18px 0}.ds-baseline-description{grid-column:2;grid-row:1}.ds-baseline-state{grid-column:2;grid-row:2;margin-top:0}.ds-baseline-chevron{grid-column:3;grid-row:1}.ds-baseline-body{padding-left:26px}}"
+    },
+    {
+      "name": "Response task and saved history",
+      "kind": "custom",
+      "description": "Named-phase task and native history disclosure retain recorded answers/tasks even without an evidence reference. Synthetic static preview; changes are not saved.",
+      "html": "<section class=\"ds-response\"><p class=\"ds-response-meta\">Synthetic response preview · Guidance version 2026-11-05.1 · Changes are not saved</p><div class=\"ds-response-heading\"><h2>Response tasks</h2><span>0 of 1 recorded complete</span></div><h3>Establish applicability</h3><div class=\"ds-response-task\"><label><input type=\"checkbox\"/><span>Review installation history</span></label><p>Establish what ran during the incident window.</p><small>Record: Investigation reference and reviewed time window.</small></div><aside class=\"ds-response-history\"><h2>Response history</h2><strong>Investigating</strong><time datetime=\"2026-11-05T09:00:00Z\">Nov 5, 2026 · 09:00 UTC</time><p>Progress saved.</p><details open><summary>Evidence and recorded state</summary><p>No evidence reference recorded.</p><h4>Applicability answers</h4><ul><li>Installed during the incident window? unknown</li></ul><h4>Recorded tasks</h4><ul><li>Review installation history: Not recorded complete</li></ul></details></aside></section>",
+      "css": ".ds-response{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.6}.ds-response-meta{font-size:12px;color:var(--muted);margin:0 0 24px}.ds-response-heading{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:8px 20px;margin-bottom:16px}.ds-response h2{font-size:20px;line-height:1.3;margin:0 0 8px}.ds-response-heading>span{color:var(--muted);font-size:12px;margin-top:5px}.ds-response h3{font-size:16px;margin:0 0 4px}.ds-response-task{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0}.ds-response-task label{display:flex;align-items:start;gap:10px;font-weight:600;cursor:pointer}.ds-response-task input{width:18px;height:18px;margin:3px 0 0;accent-color:var(--accent-solid);flex:0 0 auto}.ds-response-task input:focus-visible{outline:2px solid var(--accent);outline-offset:4px}.ds-response-task label:hover{color:var(--accent)}.ds-response-task p,.ds-response-task small{display:block;color:var(--muted);font-size:13px;margin:8px 0 0 28px}.ds-response-task small{font-size:12px}.ds-response-history{border-left:1px solid var(--line);padding-left:24px;margin-top:28px;font-size:12px}.ds-response-history h2{font-size:14px}.ds-response-history strong,.ds-response-history time{display:block;font-size:12px}.ds-response-history time{color:var(--muted);margin-top:4px}.ds-response-history p{color:var(--muted);margin:10px 0;overflow-wrap:anywhere}.ds-response-history summary{color:var(--accent);font-size:12px;cursor:pointer}.ds-response-history summary:hover{color:var(--text)}.ds-response-history summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-response-history h4{font-size:12px;margin:12px 0 4px}.ds-response-history ul{padding-left:16px;color:var(--muted);margin:0;overflow-wrap:anywhere}@media(max-width:600px){.ds-response-history{border-left:0;border-top:1px solid var(--line);padding:24px 0 0}}"
+    },
+    {
+      "name": "Admin identity row and mobile facts",
+      "kind": "custom",
+      "description": "Native identity row reflows into labelled facts at 650px; opposite presentations are hidden from the accessibility tree. Synthetic static preview; overflow measurement belongs to the application.",
+      "html": "<section class=\"ds-admin-rows\"><p class=\"ds-admin-example\">Synthetic administration preview</p><table class=\"ds-admin-table\"><thead><tr><th scope=\"col\">User</th><th scope=\"col\">V2 access</th><th scope=\"col\">Projects</th><th scope=\"col\">Joined</th></tr></thead><tbody><tr><td><a class=\"ds-admin-identity\" href=\"#ds-admin-record\">Synthetic customer account <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" aria-hidden=\"true\"><path d=\"M7 17 17 7M7 7h10v10\"/></svg></a><small>synthetic-customer@example.invalid</small><dl class=\"ds-admin-mobile-facts\"><div><dt>V2 access</dt><dd><span class=\"ds-admin-active\">Active</span></dd></div><div><dt>Email confirmation</dt><dd>Not verified</dd></div><div><dt>Projects</dt><dd>1</dd></div><div><dt>Joined</dt><dd><time datetime=\"2026-11-05T09:00:00Z\">5 Nov 2026, 09:00 UTC</time></dd></div></dl></td><td><span class=\"ds-admin-active\">Active</span><small>Not verified</small></td><td>1</td><td><time datetime=\"2026-11-05T09:00:00Z\">5 Nov 2026, 09:00 UTC</time></td></tr></tbody></table></section>",
+      "css": ".ds-admin-rows{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.6}.ds-admin-example{font-size:12px;color:var(--muted);margin:0 0 16px}.ds-admin-table{width:100%;border-collapse:collapse;text-align:left}.ds-admin-table th{padding:12px 14px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11px;font-weight:500}.ds-admin-table td{padding:18px 14px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}.ds-admin-table th:first-child,.ds-admin-table td:first-child{padding-left:0;width:42%;min-width:220px}.ds-admin-table tr:hover td{background:var(--surface)}.ds-admin-identity{display:inline-flex;align-items:start;gap:12px;color:var(--text);font-weight:600;text-decoration:none}.ds-admin-identity svg{flex-shrink:0;margin-top:4px;color:var(--accent)}.ds-admin-identity:hover{color:var(--accent)}.ds-admin-identity:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-admin-identity:active{color:var(--accent)}.ds-admin-table small{display:block;margin-top:5px;color:var(--muted);font-size:11px;overflow-wrap:anywhere}.ds-admin-active{display:inline-flex;border-radius:4px;padding:3px 7px;font-size:11px;font-weight:600;line-height:1.5;background:var(--success-bg);color:var(--success)}.ds-admin-mobile-facts{display:none}@media(max-width:650px){.ds-admin-table th:not(:first-child),.ds-admin-table td:not(:first-child){display:none}.ds-admin-table th:first-child,.ds-admin-table td:first-child{width:100%;min-width:0;padding-right:0}.ds-admin-mobile-facts{display:grid;gap:10px;margin:16px 0 0}.ds-admin-mobile-facts>div{display:grid;grid-template-columns:minmax(100px,34%) minmax(0,1fr);gap:12px}.ds-admin-mobile-facts dt{color:var(--muted);font-size:11px}.ds-admin-mobile-facts dd{margin:0;min-width:0;font-size:12px;overflow-wrap:anywhere}}"
+    },
+    {
+      "name": "Admin source facts, confirmation and audit",
+      "kind": "custom",
+      "description": "Explicit Collection/Check state dimensions, historical facts, scoped reason/confirmation form, and separate audit. Synthetic static controls do not save or reproduce runtime validation.",
+      "html": "<section class=\"ds-admin-source\" id=\"ds-admin-record\"><p class=\"ds-admin-source-example\">Synthetic source preview · Changes are not saved</p><div class=\"ds-admin-source-states\"><span>Collection <strong>Paused</strong></span><span>Check state <strong>Paused</strong></span></div><div class=\"ds-admin-source-layout\"><section class=\"ds-admin-source-facts\"><h2>Collection record</h2><p>Exact package/version vulnerability matching</p><dl><div><dt>Source ID</dt><dd><code>osv</code></dd></div><div><dt>Last attempt</dt><dd><time datetime=\"2026-11-05T09:00:00Z\">5 Nov 2026, 09:00 UTC</time></dd></div><div><dt>Last successful check</dt><dd><time datetime=\"2026-11-05T08:00:00Z\">5 Nov 2026, 08:00 UTC</time></dd></div><div><dt>Latest error</dt><dd>No error recorded</dd></div></dl><p>Previous evidence is retained. Review coverage limits before relying on an earlier result.</p></section><section class=\"ds-admin-source-action\"><h2>Resume collection</h2><p>Allow fresh reads from this source. Resuming does not itself run a check or establish fresh evidence.</p><label class=\"ds-admin-reason-label\" for=\"ds-admin-reason\">Reason for this action</label><textarea id=\"ds-admin-reason\" rows=\"3\" minlength=\"20\" maxlength=\"1000\" required>Synthetic review: resume collection after inspecting the recorded source state.</textarea><small>20–1,000 characters. Keep secrets and sensitive evidence out of this record.</small><label class=\"ds-admin-confirm\"><input type=\"checkbox\" checked required/><span>I reviewed this record and confirm: resume reads from this source.</span></label><button type=\"button\">Confirm resume</button></section></div><section class=\"ds-admin-source-audit\"><h2>Audit history</h2><ol><li><div><strong>Source.Pause</strong><time datetime=\"2026-11-05T09:00:00Z\">5 Nov 2026, 09:00 UTC</time></div><p>Synthetic review: pause collection while checking source coverage.</p><small>Actor synthetic-operator · source · osv</small></li></ol><a href=\"#ds-admin-audit\">Open the audit log</a></section></section>",
+      "css": ".ds-admin-source{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.7}.ds-admin-source-example{color:var(--muted);font-size:12px;margin:0 0 22px}.ds-admin-source-states{display:flex;flex-wrap:wrap;gap:10px 16px;margin-bottom:26px;color:var(--muted);font-size:12px}.ds-admin-source-states>span{display:inline-flex;align-items:center;gap:8px}.ds-admin-source-states strong{color:var(--warn);background:var(--warn-bg);border-radius:4px;padding:3px 7px;font-size:11px;font-weight:600;line-height:1.5}.ds-admin-source-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:start}.ds-admin-source h2{font-size:17px;line-height:1.4;margin:0 0 12px}.ds-admin-source p{margin:0;color:var(--muted);overflow-wrap:anywhere}.ds-admin-source-facts{border-top:1px solid var(--line);padding-top:26px;min-width:0}.ds-admin-source-facts dl{display:grid;gap:16px;margin:22px 0}.ds-admin-source-facts dl>div{display:grid;grid-template-columns:155px minmax(0,1fr);gap:18px}.ds-admin-source-facts dt{color:var(--muted)}.ds-admin-source-facts dd{margin:0;min-width:0;overflow-wrap:anywhere}.ds-admin-source code{font-family:var(--mono);font-size:12px}.ds-admin-source-action{border:1px solid var(--line);border-radius:12px;padding:22px;background:var(--surface);min-width:0}.ds-admin-reason-label{display:block;margin:20px 0 8px;font-size:12px;font-weight:600}.ds-admin-source-action textarea{display:block;width:calc(100% - 26px);padding:10px 12px;min-height:40px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:7px;font:inherit;line-height:1.6;resize:vertical;caret-color:var(--accent)}.ds-admin-source-action textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-admin-source-action>small{display:block;color:var(--muted);font-size:11px;line-height:1.7;margin-top:9px}.ds-admin-confirm{display:flex;align-items:start;gap:10px;color:var(--muted);font-size:12px;line-height:1.6;margin:20px 0;cursor:pointer}.ds-admin-confirm input{width:16px;height:16px;flex:0 0 auto;margin:2px 0 0;accent-color:var(--accent-solid)}.ds-admin-confirm input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-admin-source-action button{display:inline-flex;align-items:center;justify-content:center;min-height:35px;padding:7px 13px;background:var(--accent-solid);color:#fff;border:1px solid transparent;border-radius:6px;font:600 13px Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;cursor:pointer;transition:background 140ms ease}.ds-admin-source-action button:hover:not(:disabled){background:var(--accent-hover)}.ds-admin-source-action button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-admin-source-action button:active:not(:disabled){transform:translateY(1px)}.ds-admin-source-action button:disabled{opacity:.45;cursor:not-allowed}.ds-admin-source-audit{margin-top:30px;border-top:1px solid var(--line);padding-top:26px}.ds-admin-source-audit ol{list-style:none;padding:0;margin:20px 0}.ds-admin-source-audit li{border-bottom:1px solid var(--line);padding-bottom:18px}.ds-admin-source-audit li>div{display:flex;justify-content:space-between;align-items:start;gap:18px}.ds-admin-source-audit strong{font-size:13px;font-weight:600}.ds-admin-source-audit time,.ds-admin-source-audit small{color:var(--muted);font-size:11px}.ds-admin-source-audit p{margin:8px 0}.ds-admin-source-audit small{display:block;overflow-wrap:anywhere}.ds-admin-source-audit>a{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}.ds-admin-source-audit>a:hover{text-decoration:underline;text-underline-offset:4px}.ds-admin-source-audit>a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}@media(max-width:1200px){.ds-admin-source-layout{grid-template-columns:minmax(0,1fr);gap:24px}}@media(max-width:650px){.ds-admin-source-facts dl>div{grid-template-columns:minmax(0,1fr);gap:5px}.ds-admin-source-audit li>div{flex-direction:column;gap:5px}}@media(prefers-reduced-motion:reduce){.ds-admin-source-action button{transition:none}}"
+    },
+    {
+      "name": "CI dependency evidence disclosure",
+      "kind": "custom",
+      "description": "Native dependency and collection disclosures retain file/line, reference state and evidence limits. Synthetic saved snapshot; filtering, source links and recheck persistence belong to the application.",
+      "html": "<section class=\"ds-ci\"><p class=\"ds-ci-example\">Synthetic CI configuration preview</p><dl class=\"ds-ci-source\"><div><dt>Read commit</dt><dd><code>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</code></dd></div></dl><h3>Workflow dependencies</h3><p class=\"ds-ci-meta\">1 reference in 1 checked file · Partial snapshot</p><p class=\"ds-ci-boundary\">A pinned reference or lock entry does not establish that the dependency is trustworthy or that a workflow ran.</p><details class=\"ds-ci-coverage\" open><summary>1 collection issue to review<svg class=\"ds-ci-chevron\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><ul><li><code>.gitlab-ci.yml</code><p>This synthetic file could not be read; its dependencies remain unknown.</p></li></ul></details><details class=\"ds-ci-dependency\" open><summary><span class=\"ds-ci-identity\"><strong>example/setup</strong><span>GitHub action</span><code>.github/workflows/ci.yml:12</code></span><span class=\"ds-ci-state\">Mutable reference</span><svg class=\"ds-ci-chevron\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-ci-detail\"><dl><div><dt>Reference</dt><dd><code>example/setup@v1</code></dd></div><div><dt>What was observed</dt><dd>A tag reference was observed in this synthetic configuration.</dd></div><div><dt>Next step</dt><dd>Review the action source and select a reviewed immutable reference through normal code review.</dd></div></dl><p class=\"ds-ci-boundary\">Use the file and line above at the read commit recorded in this snapshot.</p></div></details><details class=\"ds-ci-coverage\"><summary>Files and collection limits<svg class=\"ds-ci-chevron\" width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><ul><li><code>.github/workflows/ci.yml</code></li><li>External action source was not fetched or executed.</li></ul></details></section>",
+      "css": ".ds-ci{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.7;min-width:0}.ds-ci-example,.ds-ci-meta,.ds-ci-boundary{color:var(--muted);font-size:12px;margin:0 0 13px;overflow-wrap:anywhere}.ds-ci-source{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:16px;margin:0 0 22px;font-size:12px}.ds-ci-source>div{display:grid;grid-template-columns:125px minmax(0,1fr);gap:10px}.ds-ci-source dt{color:var(--muted)}.ds-ci-source dd{margin:0;overflow-wrap:anywhere}.ds-ci h3{font-size:14px;font-weight:600;margin:0 0 5px}.ds-ci code{font-family:var(--mono);font-size:12px;overflow-wrap:anywhere}.ds-ci-dependency{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:18px}.ds-ci-dependency>summary{display:grid;grid-template-columns:minmax(0,1fr) auto 14px;align-items:start;gap:12px;padding:17px 0;list-style:none;cursor:pointer}.ds-ci summary::-webkit-details-marker{display:none}.ds-ci summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-ci-dependency>summary:hover strong{color:var(--accent)}.ds-ci summary:active{color:var(--accent)}.ds-ci-identity{display:grid;gap:5px;min-width:0}.ds-ci-identity strong{font-size:13px;font-weight:600;overflow-wrap:anywhere}.ds-ci-identity>span,.ds-ci-identity code{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.ds-ci-state{max-width:19ch;font-size:11px;line-height:1.6;color:var(--warn)}.ds-ci-chevron{color:var(--muted);margin-top:3px;flex:none}.ds-ci details[open]>summary>.ds-ci-chevron{transform:rotate(180deg)}.ds-ci-detail{padding:0 0 20px}.ds-ci-detail dl{margin:0}.ds-ci-detail dl>div+div{margin-top:15px}.ds-ci-detail dt{font-size:12px;font-weight:600;margin-bottom:5px}.ds-ci-detail dd{margin:0;color:var(--muted);font-size:12px;line-height:1.8;overflow-wrap:anywhere;max-width:72ch}.ds-ci-detail code{color:var(--text)}.ds-ci-detail>.ds-ci-boundary{margin:16px 0 0}.ds-ci-coverage{margin-top:18px;color:var(--muted);font-size:12px;line-height:1.8}.ds-ci-coverage>summary{display:flex;align-items:start;justify-content:space-between;gap:12px;list-style:none;cursor:pointer}.ds-ci-coverage>summary:hover{color:var(--accent)}.ds-ci-coverage ul{margin:12px 0 0;padding-left:17px}.ds-ci-coverage li+li{margin-top:7px}.ds-ci-coverage p{margin:5px 0 0;overflow-wrap:anywhere}.ds-ci-coverage code{font-size:11px;color:var(--text)}@media(max-width:600px){.ds-ci-source{padding:14px}.ds-ci-source>div{grid-template-columns:105px minmax(0,1fr);gap:8px}.ds-ci-dependency>summary{grid-template-columns:minmax(0,1fr) 14px;gap:9px}.ds-ci-identity{grid-column:1;grid-row:1}.ds-ci-state{grid-column:1;grid-row:2;max-width:none}.ds-ci-dependency>summary>.ds-ci-chevron{grid-column:2;grid-row:1}}"
+    },
+    {
+      "name": "Organization scope and protected access",
+      "kind": "custom",
+      "description": "Searchable fixed organization identity, member permissions and an unconfirmed scoped role change. The open menu is an illustrative inline state: static search does not filter, switch scope, save access or execute application guards.",
+      "html": "<section class=\"ds-org\"><p class=\"ds-org-example\">Synthetic organization preview · Changes are not saved; open menu is illustrative</p><div class=\"ds-org-switcher\"><label for=\"ds-org-selection\">Organization</label><button class=\"ds-org-picker ds-org-switch-trigger\" id=\"ds-org-selection\" type=\"button\" aria-expanded=\"true\" aria-controls=\"ds-org-menu-example\" aria-describedby=\"ds-org-menu-note\"><span class=\"ds-org-picker-value\">Example security team</span><span class=\"ds-org-picker-icon\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></span></button><div class=\"ds-org-popup\" id=\"ds-org-menu-example\"><div class=\"ds-org-search\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m16 16 4 4\"/></svg><input aria-label=\"Illustrative organization search\" readonly placeholder=\"Find an organization\"></div><div class=\"ds-org-options\"><div class=\"ds-org-option\" data-selected><span class=\"ds-org-option-check\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg></span><span>Example security team<small>owner</small></span></div><div class=\"ds-org-option\"><span>Personal organization<small>owner · Personal organization</small></span></div></div></div><p class=\"ds-org-menu-note\" id=\"ds-org-menu-note\">Illustrative open menu. Live search uses existing identities; this preview does not filter or switch scope.</p><div class=\"ds-org-selection-meta\"><span>Owner</span><a href=\"#ds-org-members\">Manage</a></div></div><p class=\"ds-org-boundary\">Organization roles apply here; platform operator access is separate.</p><h2 id=\"ds-org-members\">Members</h2><article class=\"ds-org-member\"><div class=\"ds-org-identity\"><span class=\"ds-org-avatar\" aria-hidden=\"true\">ST</span><div><h3>Synthetic teammate</h3><p>teammate@example.invalid</p></div></div><div class=\"ds-org-access\"><strong class=\"ds-org-role\">Member</strong><p>Review projects and contribute findings, context and responses.</p></div></article><section class=\"ds-org-confirmation\" aria-labelledby=\"ds-org-change-title\"><h2 id=\"ds-org-change-title\">Change member role</h2><p><strong>Synthetic teammate</strong> · Example security team</p><label class=\"ds-org-field-label\" for=\"ds-org-new-role\">New role</label><button class=\"ds-org-picker\" id=\"ds-org-new-role\" type=\"button\" aria-describedby=\"ds-org-role-help\"><span class=\"ds-org-picker-value\">Admin</span><span class=\"ds-org-picker-icon\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></span></button><p class=\"ds-org-help\" id=\"ds-org-role-help\">Manage projects and members. Owner access stays with owners. Fixed role choices belong to the live application.</p><label class=\"ds-org-field-label\" for=\"ds-org-reason\">Reason for this change</label><textarea id=\"ds-org-reason\" rows=\"3\" minlength=\"10\" maxlength=\"500\" required>Synthetic review: update access after reviewing the admin role.</textarea><p class=\"ds-org-help\">10–500 characters. Saved in organization history; do not include secrets.</p><label class=\"ds-org-confirm-checkbox\"><span class=\"ds-org-check-wrap\"><input class=\"ds-org-check\" type=\"checkbox\"/><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg></span><span>I have reviewed this change to Synthetic teammate’s access.</span></label><button type=\"button\" disabled>Confirm role change</button><p class=\"ds-org-help\">Static unconfirmed state. Live authority/revision checks, confirmation reset, and saving belong to the application.</p></section><p class=\"ds-org-boundary\">Provider connections remain personal. Organization membership does not provide another person's credentials.</p></section>",
+      "css": ".ds-org{color:var(--text);font-family:Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;font-size:13px;line-height:1.65;min-width:0}.ds-org-example,.ds-org-boundary{color:var(--muted);font-size:12px;margin:0 0 18px;overflow-wrap:anywhere}.ds-org-switcher{max-width:340px;margin-bottom:18px;min-width:0}.ds-org-switcher>label{display:block;margin-bottom:7px;color:var(--muted);font-size:12px;font-weight:600}.ds-org-selection-meta{display:flex;justify-content:space-between;align-items:start;gap:10px;margin-top:7px;color:var(--muted);font-size:11px}.ds-org-selection-meta a{color:var(--accent);text-underline-offset:3px}.ds-org-selection-meta a:hover{color:var(--text)}.ds-org-selection-meta a:active{color:var(--accent)}.ds-org h2{font-size:18px;letter-spacing:-0.015em;margin:0 0 7px}.ds-org-member{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(180px,1fr);gap:24px;align-items:center;padding:20px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:18px 0 0}.ds-org-identity{display:flex;align-items:center;gap:12px;min-width:0}.ds-org-identity>div{min-width:0}.ds-org-avatar{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--surface-2);font-size:11px;flex:none}.ds-org h3{font-size:14px;margin:0;overflow-wrap:anywhere}.ds-org-member p{font-size:12px;color:var(--muted);margin:3px 0;overflow-wrap:anywhere}.ds-org-role{display:inline-flex;align-items:center;font-size:12px;line-height:1.4;font-weight:600;color:var(--accent);background:var(--tint);padding:4px 8px;border-radius:5px}.ds-org-access p{max-width:35ch;margin-top:6px}.ds-org-confirmation{background:var(--surface);padding:24px;border-radius:12px;margin:28px 0;max-width:760px}.ds-org-confirmation>p{font-size:14px;color:var(--muted);margin:6px 0 20px;overflow-wrap:anywhere}.ds-org-field-label{display:block;font-size:13px;font-weight:600;margin:18px 0 7px}.ds-org-confirmation>.ds-org-help{font-size:12px;color:var(--muted);margin:7px 0 0}.ds-org-confirm-checkbox{display:flex;align-items:start;gap:10px;font-size:13px;line-height:1.6;margin:20px 0;overflow-wrap:anywhere;cursor:pointer}.ds-org-confirm-checkbox:hover{color:var(--accent)}.ds-org-confirmation>button{display:inline-flex;align-items:center;justify-content:center;min-height:35px;padding:7px 13px;background:var(--accent-solid);color:#fff;border:1px solid transparent;border-radius:6px;font:600 13px Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;cursor:pointer;transition:background 140ms ease}.ds-org-confirmation>button:hover:not(:disabled){background:var(--accent-hover)}.ds-org-confirmation>button:active:not(:disabled){transform:translateY(1px)}.ds-org-confirmation>button:disabled{opacity:.45;cursor:not-allowed}.ds-org-confirmation>button:focus-visible,.ds-org a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}@media(max-width:600px){.ds-org-member{grid-template-columns:minmax(0,1fr);gap:12px}.ds-org-access{padding-left:44px}.ds-org-access p{max-width:none}.ds-org-confirmation{padding:20px 16px}}@media(prefers-reduced-motion:reduce){.ds-org-confirmation>button{transition:none}}.ds-org-picker{box-sizing:border-box;display:flex;align-items:center;gap:9px;width:100%;min-width:0;min-height:42px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:400 13px/1.5 Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;text-align:left;box-shadow:0 1px 2px rgb(0 0 0 / .08);transition:border-color 120ms ease-out,background-color 120ms ease-out}.ds-org-switch-trigger{font-weight:600;border-color:var(--accent)}.ds-org-picker-value{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-org-picker-icon{display:inline-flex;color:var(--muted);flex:none;margin-left:auto}.ds-org-picker:focus-visible,.ds-org-confirmation textarea:focus-visible{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:2px}.ds-org-picker[aria-invalid=true],.ds-org-confirmation textarea[aria-invalid=true]{border-color:var(--danger)}.ds-org-picker:disabled,.ds-org-confirmation textarea:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}.ds-org-popup{margin-top:6px;min-width:0;max-height:360px;overflow:hidden;border-radius:10px;background:var(--surface-2);box-shadow:0 12px 34px rgb(0 0 0 / .25),0 0 0 1px var(--line);transition:opacity 120ms ease-out,transform 120ms ease-out}.ds-org-search{display:flex;align-items:center;gap:9px;padding:0 12px;border-bottom:1px solid var(--line);color:var(--muted)}.ds-org-search>svg{flex:none}.ds-org-search input{appearance:none;box-sizing:border-box;flex:1;min-width:0;width:100%;min-height:40px;padding:9px 0;border:0;border-radius:0;outline:none;box-shadow:none;background:transparent;color:var(--text);font:400 13px/1.5 Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif}.ds-org-search input::placeholder{color:var(--muted);opacity:1}.ds-org-search:focus-within{box-shadow:inset 0 -1px var(--accent)}.ds-org-options{padding:5px;max-height:296px;overflow-y:auto;overscroll-behavior:contain}.ds-org-option{box-sizing:border-box;position:relative;display:flex;align-items:flex-start;gap:8px;min-height:36px;padding:9px 9px 9px 29px;border-radius:6px;font-size:13px;line-height:1.45;cursor:default}.ds-org-option>span:last-child{display:grid;gap:3px;min-width:0;overflow-wrap:anywhere}.ds-org-option small{color:var(--muted);font-size:11px;line-height:1.5}.ds-org-option:hover{background:var(--hover)}.ds-org-option[data-selected]{color:var(--accent)}.ds-org-option-check{position:absolute;left:9px;top:10px;display:flex;color:var(--accent)}.ds-org-menu-note{font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0 0;overflow-wrap:anywhere}.ds-org-confirmation textarea{box-sizing:border-box;display:block;width:100%;min-width:0;min-height:108px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:400 13px/1.6 Satoshi,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;resize:vertical;box-shadow:0 1px 2px rgb(0 0 0 / .08);transition:border-color 120ms ease-out,background-color 120ms ease-out}.ds-org-check-wrap{display:inline-flex;position:relative;width:18px;height:18px;flex:none;margin-top:2px}.ds-org-check{appearance:none;box-sizing:border-box;display:block;width:18px;height:18px;padding:0;margin:0;border:1px solid var(--quiet);border-radius:5px;background:var(--surface);cursor:pointer}.ds-org-check:checked{border-color:var(--accent-solid);background:var(--accent-solid)}.ds-org-check-wrap>svg{position:absolute;top:2px;left:2px;color:#fff;pointer-events:none;opacity:0}.ds-org-check:checked+svg{opacity:1}.ds-org-check:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.ds-org-check:disabled{opacity:.5;cursor:not-allowed}@media(hover:hover) and (pointer:fine){.ds-org-picker:not(:disabled):hover,.ds-org-confirmation textarea:not(:disabled):hover{border-color:var(--quiet)}.ds-org-picker:focus-visible:hover,.ds-org-confirmation textarea:focus-visible:hover{border-color:var(--accent)}}@media(pointer:coarse),(max-width:600px){.ds-org-picker,.ds-org-confirmation textarea{min-height:44px}.ds-org-search input,.ds-org-confirmation textarea{font-size:16px}.ds-org-option{min-height:44px;align-items:center}.ds-org-option-check{top:14px}.ds-org-confirm-checkbox{min-height:44px}}@media(prefers-reduced-motion:reduce){.ds-org-picker,.ds-org-popup,.ds-org-confirmation textarea{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Response desk",
+    "overview": "Wisesama uses the original geometric purple mark and wordmark, Satoshi typography, charcoal surfaces, and restrained purple emphasis. The user selected A — Response desk as the functional foundation on 2026-11-04; the later Mobbin workflow corrections establish the implemented compact inbox and full finding record. The public expansion carries that identity into spacious product explanations and readable guides without changing the compact private workspace. Light mode carries the same hierarchy with its own text, surface, accent, and status values.\n\nThis document captures the built interface in `apps/intel`, alongside the original crypto application. It records `src/app/globals.css`, the account, finding, public-advisory, public-site, subscription, repository-flow, project-security, response-playbook, and supporting-view components, and the reviewed captures in `.impeccable/review/`. The expansion contract is `.impeccable/briefs/public-and-repository-expansion.md`; page-specific structural decisions remain in `docs/PUBLIC-PAGE-DESIGN.md` and `docs/REPOSITORY-CONNECTIONS.md`. The baseline and response contracts are `.impeccable/briefs/project-security.md` and `.impeccable/briefs/response-playbooks.md`; their inspected references and accepted patterns are recorded in `docs/BASELINE-DESIGN.md` and the response brief. Earlier response references remain in `.impeccable/references/workflow-research.md`. Reference products do not supply Wisesama's identity or security claims.\n\nThe captures establish the rendered states shown. The independent review cleared the two listed mobile corrections: finding properties precede Suggested response and Activity, and inbox rows retain project identity. The later expansion review found and resolved the source-freshness issue (EXP01): source records now show the persisted project assessment time and assessment error independently from inventory synchronization. The final baseline/playbook finish review opened 14 captured screens and found two provenance gaps (FIN01 and FIN02). The reviewed corrections expose the exact guidance version and make saved answers and tasks inspectable even when an event has no evidence reference; both findings are resolved. The earlier layout assessment still applies, and the verdict permits shipping within the fixlist scope. The captures and these bounded verdicts do not certify the whole app, live repository authorization, real email delivery, or production operation. Example counts and local verification records are not customer or performance evidence; the source-provenance capture used a clearly labelled synthetic database fixture with no active provider connection.\n\nThe `/admin` extension carries the same Response desk world into a separate operator shell for users, advisory curation, intelligence sources, public subscriptions, failed work, and audit. Its contract and inspected references are `.impeccable/briefs/v2-admin.md` and `docs/ADMIN-DESIGN.md`. The finish review in `docs/ADMIN-FINISH-REVIEW.md` resolved ADM-FIN01 through readable mobile row facts and discoverable actual overflow, and ADM-FIN02 through explicit Collection and Check state labels. Its ship verdict covers those scored fixes and their observed regressions; it does not broaden the production-verification limits above. The admin captures in `.impeccable/review/admin/` document the rendered extension, not an approved new comp or a new identity.\n\nThe CI dependency, organization, and free local skill extension uses the same world. Its contracts are `.impeccable/briefs/ci-dependencies.md`, `.impeccable/briefs/organizations.md`, and `.impeccable/briefs/open-source-skills.md`; inspected structural references and accepted patterns remain in `docs/CI-DEPENDENCY-DESIGN.md`, `docs/ORGANIZATIONS-DESIGN.md`, and `docs/SKILLS-PAGE-DESIGN.md`. The finish review in `docs/CI-ORG-FINISH-REVIEW.md` retains its original 18-capture assessment and scores nine replacement captures: both P2 findings are resolved through a native invitation-account anchor and wrapping private mobile navigation. Its ship verdict covers those repairs and their observed regressions. It does not establish production launch, live provider transport, real invitation email delivery, or external package publication. No new raster imagery was introduced; these factual settings and reading surfaces use evidence, controls, and prose.\n\nThe reviewed form-control refinement covers OrganizationSwitcher, OrganizationCreation, OrganizationSettings, and RepositoryOnboarding. It uses coss ui visual patterns with `@base-ui/react` (1.9.0), plain CSS, and the existing React 18 runtime. `.impeccable/review/form-controls/verification.json` records the checks and 12 captures; `finish-verdict.md` in that directory resolves FC-FIN01 (disable Add file during pending reads) and FC-FIN02 (document the scoped controls). Its ship disposition covers only those fixes and their observed regressions. The preview used the real local API, authentication, and PostgreSQL with explicitly synthetic GitHub transport; it establishes no live provider grant, real access change, production deployment, or full-app control rollout. The refinement ships no new raster assets and preserves the provenance above.",
+    "keyCharacteristics": [
+      "Compact rows and quiet separators support scanning.",
+      "Evidence, response actions, and assessment properties have distinct places.",
+      "Purple identifies actions and navigation; status colors retain written labels.",
+      "Dark and light themes share content order and component geometry.",
+      "Scope, uncertainty, source health, and user attestation remain visible.",
+      "Repository observations, self-reported context, and saved response progress retain separate provenance.",
+      "Public pages vary between product evidence, focused reading, and task completion while sharing one visual world.",
+      "Operator records separate authoritative facts, scoped changes, and recorded audit history.",
+      "CI reference states retain exact file/line, snapshot scope, and collection limits.",
+      "Selected organization, current role, and access consequences stay visible around shared work."
+    ],
+    "rules": [
+      {
+        "name": "The Separate Signals Rule",
+        "body": "Technical severity, CISA KEV evidence, EPSS forecast, and customer response status keep their own labels. Color never turns them into a combined risk score or a deployment claim.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Surface Rule",
+        "body": "Retain tonal layering and separators for the operational workspace. Do not introduce shadow elevation as a replacement for its existing hierarchy.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve the original Wisesama mark, Satoshi, and the charcoal/purple identity in both themes.",
+      "Do reuse semantic theme roles, quiet separators, compact rows, and visible keyboard focus.",
+      "Do retain project identity in every mobile finding row and place properties before Suggested response and Activity.",
+      "Do show source names, collection times, unknown or failed checks, and metadata scope near the assessment.",
+      "Do keep severity, KEV evidence, EPSS forecast, and customer response visually and verbally separate.",
+      "Do show response evidence in history and identify closure as a user attestation.",
+      "Do use wider product sections, focused article columns, and compact working controls according to the surface's task.",
+      "Do preserve copy recovery, contained code/table scrolling, mobile public navigation, and the illustration's natural proportions.",
+      "Do label synthetic product records and keep public subscription truth states separate from private alerts.",
+      "Do show inventory synchronization, assessed revision, assessment freshness/error, and response status as independent evidence.",
+      "Do preserve baseline paths/read commit, self-reported context, exact guidance version, and recorded answers/tasks in their own inspectable places.",
+      "Do keep public playbooks readable without an account and retain the selected incident through project choice.",
+      "Do retain admin row identity and labelled state/outcome/time facts at 650px and below, hiding the opposite field presentation from the accessibility tree.",
+      "Do name source Collection and Check state separately and show an overflow instruction with keyboard access only when a table actually overflows.",
+      "Do separate operator facts, consequence/reason/confirmation controls, and recorded audit history.",
+      "Do keep CI identity, exact file/line, reference state, partial collection, and retained stale or failed evidence inspectable together.",
+      "Do show selected organization, current role, project destination, and protected access consequences beside their controls.",
+      "Do preserve inline invitation authentication, the native account anchor, and separate explicit acceptance.",
+      "Do keep the free local skill's source, download, checksum, commands, evidence vocabulary, and limits in the reading flow."
+    ],
+    "donts": [
+      "Don't replace the original mark, import reference-product branding, or load an unimplemented heading font by inference.",
+      "Don't infer deployed exposure, code reachability, a verified fix, or complete coverage from a package-version match.",
+      "Don't equate absence from checked KEV with absence of exploitation, or present EPSS as observed exploitation.",
+      "Don't turn local verification data, sample counts, or a bounded review verdict into customer evidence, full-app certification, or proof of live provider/email operation.",
+      "Don't hide source failures or unavailable notification delivery behind a success state.",
+      "Don't turn repository authorization or successful inventory synchronization into a fresh assessment or verified deployment claim.",
+      "Don't activate or cancel a public subscription merely by opening its confirmation or preferences link.",
+      "Don't invent paid amounts, production assurances, private MCP access, or shared-team capabilities in public visual proof.",
+      "Don't turn an Observed configuration check, answered applicability question, completed task, or attested closure into a safety score or verified recovery claim.",
+      "Don't hide recorded answers or task state because a history event has no evidence reference, or show interactive progress controls on public reading pages.",
+      "Don't present collection resumption, queued work, or a successful HTTP response as a fresh successful check or recovered job.",
+      "Don't turn operator delivery controls into consent, or editorial controls into edits of upstream advisory facts.",
+      "Don't turn a pinned or locked CI reference into dependency safety, executed workflow, vulnerability, or deployment evidence.",
+      "Don't treat organization membership as a personal provider connection or platform operator access, or invitation creation as email delivery.",
+      "Don't persist invitation secrets, place them in account callbacks, or join an organization merely by opening its link."
+    ]
+  }
+}

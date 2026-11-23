@@ -70,7 +70,7 @@
     {
       "id": "wisesama-docs",
       "name": "Wisesama Blog",
-      "contentRoot": "apps/web/content/blog",
+      "contentRoot": "apps/dotsama-web/content/blog",
       "framework": "contentlayer",
       "contentType": "blog"
     }

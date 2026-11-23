@@ -1,31 +1,28 @@
 import 'dotenv/config';
-import Fastify from 'fastify';
+import { createHash } from 'node:crypto';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
-import rawBody from 'fastify-raw-body';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
-
-import { auth } from './lib/auth';
+import Fastify from 'fastify';
 import FastifyBetterAuth from 'fastify-better-auth';
-import { checkRoutes } from './modules/query/check.routes';
-import { identityRoutes } from './modules/identity/identity.routes';
-import { reportRoutes } from './modules/report/report.routes';
+import rawBody from 'fastify-raw-body';
+import { auth, githubSignInAvailable } from './lib/auth';
+import { publicSubscriptionRatelimit, ratelimit } from './lib/redis';
+import { requestLogUrl } from './lib/request-log';
+import { trustedApplicationOrigins } from './lib/request-origin';
 import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
 import { healthRoutes } from './modules/health/health.routes';
-import { statsRoutes } from './modules/stats/stats.routes';
-import { adminRoutes } from './modules/admin/admin.routes';
-import { whitelistRoutes } from './modules/admin/whitelist.routes';
-import { reportsAdminRoutes } from './modules/admin/reports.routes';
-import { contributionsRoutes } from './modules/admin/contributions.routes';
-import { whitelistRequestsAdminRoutes } from './modules/admin/whitelist-requests.routes';
-import { activityAdminRoutes } from './modules/admin/activity.routes';
-import { whitelistRequestRoutes } from './modules/whitelist/request.routes';
-import { jobsRoutes } from './modules/jobs/jobs.routes';
-import { telegramRoutes } from './modules/telegram/telegram.routes';
-import { discordRoutes } from './modules/discord/discord.routes';
-import { twitterRoutes } from './modules/twitter/twitter.routes';
-import { ratelimit } from './lib/redis';
+import { intelAdminRoutes } from './modules/intel/admin.routes';
+import { adminOpsRoutes } from './modules/intel/admin-ops.routes';
+import { intelRoutes } from './modules/intel/intel.routes';
+import { mcpRoutes } from './modules/intel/mcp.routes';
+import { organizationRoutes } from './modules/intel/organization.routes';
+import { playbookRoutes } from './modules/intel/playbook.routes';
+import { publicSubscriptionRoutes } from './modules/intel/public-subscription.routes';
+import { repositoryRoutes } from './modules/intel/repository.routes';
+import { securityBaselineRoutes } from './modules/intel/security-baseline.routes';
+import { intelJobsRoutes } from './modules/jobs/intel-jobs.routes';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -35,6 +32,14 @@ async function buildApp() {
     trustProxy: process.env.TRUST_PROXY === 'true' || process.env.VERCEL === '1',
     logger: {
       level: process.env.LOG_LEVEL || 'info',
+      serializers: {
+        req: (request) => ({
+          method: request.method,
+          url: requestLogUrl(request.url || ''),
+          hostname: request.hostname,
+          remoteAddress: request.ip,
+        }),
+      },
       transport:
         process.env.NODE_ENV === 'development'
           ? { target: 'pino-pretty', options: { colorize: true } }
@@ -52,10 +57,7 @@ async function buildApp() {
   });
 
   const isProduction = process.env.NODE_ENV === 'production';
-  const defaultCorsOrigins = ['http://localhost:3000', 'http://localhost:3002', 'https://www.wisesama.com', 'https://wisesama.com', 'https://wisesama-admin.vercel.app', 'https://admin.wisesama.com'];
-  const envCorsOrigins = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()).filter(Boolean) || [];
-  const appCorsOrigins = [process.env.APP_URL, process.env.ADMIN_APP_URL].filter(Boolean) as string[];
-  const allowedCorsOrigins = Array.from(new Set([...envCorsOrigins, ...appCorsOrigins, ...defaultCorsOrigins]));
+  const allowedCorsOrigins = trustedApplicationOrigins();
 
   // Security - CORS must be registered before helmet
   await fastify.register(cors, {
@@ -79,6 +81,7 @@ async function buildApp() {
     // Skip rate limiting for health checks, docs, and auth routes
     if (
       request.url === '/api/v1/health' ||
+      request.url === '/api/v1/auth-options' ||
       request.url.startsWith('/docs') ||
       request.url.startsWith('/api/auth') ||
       request.url.startsWith('/api/v1/telegram/webhook') ||
@@ -88,8 +91,18 @@ async function buildApp() {
       return;
     }
 
-    const identifier = request.headers['x-api-key']?.toString() || request.ip;
-    const { success, limit, remaining, reset } = await ratelimit.limit(identifier);
+    const isIntelligence =
+      request.url.startsWith('/api/v1/intel/') || request.url.startsWith('/api/v1/mcp');
+    const identifier = isIntelligence
+      ? `ip:${request.ip}`
+      : request.headers['x-api-key']
+        ? `key:${createHash('sha256').update(request.headers['x-api-key'].toString()).digest('hex')}`
+        : request.ip;
+    const consentEmail =
+      request.method === 'POST' &&
+      /^\/api\/v1\/intel\/subscriptions\/(request|manage\/request)(?:\?|$)/.test(request.url);
+    const limiter = consentEmail ? publicSubscriptionRatelimit : ratelimit;
+    const { success, limit, remaining, reset } = await limiter.limit(identifier);
 
     reply.header('X-RateLimit-Limit', limit);
     reply.header('X-RateLimit-Remaining', remaining);
@@ -109,7 +122,7 @@ async function buildApp() {
     openapi: {
       info: {
         title: 'Wisesama API',
-        description: 'Fraud detection API for the Polkadot/Dotsama ecosystem',
+        description: 'Wisesama vulnerability response and retained Dotsama crypto fraud APIs',
         version: '1.0.0',
       },
       servers: [
@@ -125,6 +138,10 @@ async function buildApp() {
         { name: 'api-keys', description: 'API key management' },
         { name: 'admin', description: 'Admin operations (requires admin role)' },
         { name: 'jobs', description: 'Background job endpoints' },
+        {
+          name: 'intel',
+          description: 'Vulnerability briefings, private inventories, and response tracking',
+        },
         { name: 'bots', description: 'Bot integrations (Telegram, Discord, X/Twitter)' },
       ],
       components: {
@@ -155,6 +172,7 @@ async function buildApp() {
       reply.statusCode < 300 &&
       typeof payload === 'string' &&
       !request.url.startsWith('/docs') &&
+      !request.url.startsWith('/api/v1/mcp') &&
       !request.url.startsWith('/api/auth')
     ) {
       try {
@@ -181,30 +199,30 @@ async function buildApp() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   await fastify.register(FastifyBetterAuth, { auth } as any);
 
-  // Routes
+  // Wisesama and shared account routes
+  fastify.get('/api/v1/auth-options', async (_request, reply) => {
+    reply.header('Cache-Control', 'public, max-age=60');
+    return { github: githubSignInAvailable };
+  });
   await fastify.register(healthRoutes, { prefix: '/api/v1' });
-  await fastify.register(statsRoutes, { prefix: '/api/v1' });
-  await fastify.register(checkRoutes, { prefix: '/api/v1' });
-  await fastify.register(identityRoutes, { prefix: '/api/v1' });
-  await fastify.register(reportRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });
-  await fastify.register(jobsRoutes, { prefix: '/api/v1' });
+  await fastify.register(intelRoutes, { prefix: '/api/v1' });
+  await fastify.register(organizationRoutes, { prefix: '/api/v1' });
+  await fastify.register(intelAdminRoutes, { prefix: '/api/v1' });
+  await fastify.register(adminOpsRoutes, { prefix: '/api/v1' });
+  await fastify.register(playbookRoutes, { prefix: '/api/v1' });
+  await fastify.register(repositoryRoutes, { prefix: '/api/v1' });
+  await fastify.register(securityBaselineRoutes, { prefix: '/api/v1' });
+  await fastify.register(publicSubscriptionRoutes, { prefix: '/api/v1' });
+  await fastify.register(mcpRoutes, { prefix: '/api/v1' });
+  await fastify.register(intelJobsRoutes, { prefix: '/api/v1' });
 
-  // Bot integrations (Telegram, Discord, X/Twitter)
-  await fastify.register(telegramRoutes, { prefix: '/api/v1' });
-  await fastify.register(discordRoutes, { prefix: '/api/v1' });
-  await fastify.register(twitterRoutes, { prefix: '/api/v1' });
-
-  // Public whitelist routes
-  await fastify.register(whitelistRequestRoutes, { prefix: '/api/v1' });
-
-  // Admin routes (require admin role)
-  await fastify.register(adminRoutes, { prefix: '/api/v1' });
-  await fastify.register(whitelistRoutes, { prefix: '/api/v1' });
-  await fastify.register(reportsAdminRoutes, { prefix: '/api/v1' });
-  await fastify.register(contributionsRoutes, { prefix: '/api/v1' });
-  await fastify.register(whitelistRequestsAdminRoutes, { prefix: '/api/v1' });
-  await fastify.register(activityAdminRoutes, { prefix: '/api/v1' });
+  // The preserved crypto product is an explicit deployment mode.
+  // Keep its routes and provider initialization outside the Wisesama launch by default.
+  if (process.env.DOTSAMA_API_ENABLED === 'true') {
+    const { dotsamaRoutes } = await import('./dotsama/routes');
+    await fastify.register(dotsamaRoutes, { prefix: '/api/v1' });
+  }
 
   return fastify;
 }

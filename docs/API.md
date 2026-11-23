@@ -1,6 +1,6 @@
-# Wisesama API Architecture
+# Dotsama Crypto API Architecture
 
-> Polkadot Ecosystem Fraud Detection & Risk Assessment Platform
+> Original Polkadot/Kusama fraud detection product, preserved under the Dotsama working name. Wisesama vulnerability-response endpoints are documented separately in [SECURITY-RESPONSE.md](./SECURITY-RESPONSE.md). Existing crypto URLs and database models are unchanged.
 
 ## Overview
 
@@ -33,14 +33,17 @@ wisesama/
 │   ├── api/                    # This package - Fastify API server
 │   │   ├── src/
 │   │   │   ├── index.ts        # App entry point
-│   │   │   ├── modules/        # Route handlers by domain
-│   │   │   ├── services/       # Business logic
+│   │   │   ├── dotsama/        # Original crypto product
+│   │   │   │   ├── modules/    # Original route handlers
+│   │   │   │   ├── services/   # Original business logic
+│   │   │   │   └── utils/      # Original normalization/detection helpers
+│   │   │   ├── modules/        # Wisesama and shared account routes
+│   │   │   ├── services/       # Wisesama and shared services
 │   │   │   ├── middleware/     # Auth, rate limiting
 │   │   │   ├── lib/            # Redis, external clients
-│   │   │   └── utils/          # Helpers (normalization, detection)
 │   │   └── scripts/            # CLI utilities
-│   ├── web/                    # Next.js frontend (public)
-│   └── admin/                  # Next.js admin dashboard (see ADMIN-DASHBOARD.md)
+│   ├── dotsama-web/                    # Next.js frontend (public)
+│   └── dotsama-admin/                  # Next.js admin dashboard (see ADMIN-DASHBOARD.md)
 │
 ├── packages/
 │   ├── database/               # Prisma schema & client
@@ -316,7 +319,7 @@ GET  /jobs/sync-status     - Current sync status
 
 ### QueryService
 
-**File:** `src/services/query.service.ts`
+**File:** `src/dotsama/services/query.service.ts`
 
 Core lookup logic:
 1. Detect entity type from input
@@ -331,7 +334,7 @@ Core lookup logic:
 
 ### PhishingSyncService
 
-**File:** `src/services/phishing-sync.service.ts`
+**File:** `src/dotsama/services/phishing-sync.service.ts`
 
 Syncs from [polkadot-js/phishing](https://github.com/polkadot-js/phishing):
 
@@ -344,7 +347,7 @@ Runs on schedule via QStash CRON and can be triggered manually by admins.
 
 ### PolkadotService
 
-**File:** `src/services/polkadot.service.ts`
+**File:** `src/dotsama/services/polkadot.service.ts`
 
 Queries on-chain identity via RPC:
 - Connects to Polkadot/Kusama WebSocket RPC
@@ -355,7 +358,7 @@ Queries on-chain identity via RPC:
 
 ### GitHubContributionService
 
-**File:** `src/services/github-contribution.service.ts`
+**File:** `src/dotsama/services/github-contribution.service.ts`
 
 Automates upstream contributions:
 1. Ensures fork of polkadot-js/phishing exists
@@ -366,13 +369,13 @@ Automates upstream contributions:
 
 ### LevenshteinService
 
-**File:** `src/services/levenshtein.service.ts`
+**File:** `src/dotsama/services/levenshtein.service.ts`
 
 Detects impersonation attacks by comparing Twitter handles against whitelisted accounts using string similarity (threshold: 70%).
 
 ### MLService
 
-**File:** `src/services/ml.service.ts`
+**File:** `src/dotsama/services/ml.service.ts`
 
 Behavioral risk scoring using weighted heuristics:
 - Extracts 21 features from on-chain data
@@ -384,7 +387,7 @@ Behavioral risk scoring using weighted heuristics:
 
 ### SubscanService
 
-**File:** `src/services/subscan.service.ts`
+**File:** `src/dotsama/services/subscan.service.ts`
 
 On-chain data extraction via Subscan API:
 - Account information (balance, nonce, identity flag)
@@ -398,7 +401,7 @@ On-chain data extraction via Subscan API:
 
 ### VirusTotalService
 
-**File:** `src/services/virustotal.service.ts`
+**File:** `src/dotsama/services/virustotal.service.ts`
 
 Domain security scanning via VirusTotal API:
 - Queries 80+ antivirus engines
@@ -407,7 +410,7 @@ Domain security scanning via VirusTotal API:
 
 ### ReverseLookupService
 
-**File:** `src/services/reverse-lookup.service.ts`
+**File:** `src/dotsama/services/reverse-lookup.service.ts`
 
 Finds on-chain identities by their social links:
 - `findByTwitter(handle)` - Find identities that registered a Twitter handle
@@ -418,7 +421,7 @@ Finds on-chain identities by their social links:
 
 ### EmailService
 
-**File:** `src/services/email.service.ts`
+**File:** `src/dotsama/services/email.service.ts`
 
 Transactional emails via Resend:
 - Report confirmation to submitter

@@ -4,14 +4,16 @@
   "private": true,
   "packageManager": "pnpm@9.14.2",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "turbo dev --filter=@wisesama/api --filter=@wisesama/intel",
     "build": "turbo build",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "clean": "turbo clean && rm -rf node_modules",
     "db:generate": "turbo db:generate",
     "db:push": "turbo db:push",
-    "db:studio": "pnpm --filter @wisesama/database db:studio"
+    "db:studio": "pnpm --filter @wisesama/database db:studio",
+    "dev:dotsama": "DOTSAMA_API_ENABLED=true turbo dev --filter=@wisesama/api --filter=@dotsama/web --filter=@dotsama/admin",
+    "dev:all": "DOTSAMA_API_ENABLED=true turbo dev"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.9",

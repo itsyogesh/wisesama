@@ -1,0 +1,75 @@
+{
+  "scope": "Organization controls and RepositoryOnboarding prototype",
+  "date": "2026-11-06",
+  "library": {
+    "behavior": "@base-ui/react 1.9.0",
+    "visual_reference": "coss ui",
+    "integration": "Plain CSS, existing React 18 and Wisesama Satoshi/purple theme tokens"
+  },
+  "checks": {
+    "intel_build": "pass",
+    "intel_typecheck": "pass; also included by final build",
+    "intel_lint": "pass, 20 preexisting CSS warnings",
+    "scoped_biome": "pass; existing 2 repository CSS warnings",
+    "frozen_lockfile_offline": "pass",
+    "detector": []
+  },
+  "dependency_scope": "One exact app dependency, nine new package/snapshot entries; no deletions or replacements of prior lockfile entries.",
+  "browser_checks": [
+    "Create organization and automatically scope Projects",
+    "Search organizations; no-match state; ArrowDown/Enter selection; Escape restores trigger focus",
+    "Repository search no-match state and connected-account picker",
+    "Free-typed branch survives Escape; main suggestion selectable by keyboard",
+    "Environment selection",
+    "Checkbox Space selects package.json",
+    "Duplicate selected path keeps Add file disabled",
+    "Review immutable commit and selected inventory",
+    "Create project, collect CI baseline, and reload saved project",
+    "CI evidence shows 11 references in 5 checked files",
+    "Invite role selector changes explanation without submitting invitation",
+    "Desktop1440, actual1044, mobile390; both themes; no horizontal overflow",
+    "Mobile search field computes16px; popup stays within viewport",
+    "FC-FIN01: local fixture API held during discovery and preview; with nonempty unselected custom path, Add file disabled, draft retained, package selection retained; local API resumed"
+  ],
+  "runtime": {
+    "api": "Real local Fastify/auth/PostgreSQL",
+    "provider": "Explicitly labelled synthetic immutable GitHub transport",
+    "organization": "Control review \u00b7 demo",
+    "project": "Checkout \u00b7 control review",
+    "project_id": "cmw45myfh0003vtvjiy5hg86k"
+  },
+  "not_verified": [
+    "Live GitHub/GitLab authorization",
+    "Real membership or invitation mutations",
+    "Whole-app control migration",
+    "Production deployment"
+  ],
+  "screenshots": [
+    "busy-discovery.png",
+    "busy-preview.png",
+    "desktop-light.png",
+    "desktop-menu.png",
+    "desktop.png",
+    "github-start.png",
+    "mobile-dark.png",
+    "mobile-menu.png",
+    "mobile.png",
+    "organization-desktop.png",
+    "organization-mobile.png",
+    "user-1044.png"
+  ],
+  "root_visual_rounds": 2,
+  "preview_url": "http://localhost:3003/app/projects/new",
+  "review_fix_rounds": 1,
+  "finish_review": {
+    "method": "Fresh generic subagent using packaged Impeccable review instructions",
+    "initial_disposition": "fix",
+    "verdict": "ship",
+    "resolved": [
+      "FC-FIN01",
+      "FC-FIN02"
+    ],
+    "scope": "Listed fixes and observed regressions only"
+  },
+  "documentation": "DESIGN.md and sidecar merged and validated;18previews retained,16unrelated previews unchanged"
+}

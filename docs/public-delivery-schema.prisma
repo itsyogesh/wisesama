@@ -1,0 +1,94 @@
+// Merge into the main Prisma schema; no account is needed for these records.
+model PublicSubscriber {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  status           String   @default("pending")
+  topics           Json     @default("[\"all\"]")
+  confirmedAt      DateTime?
+  lastRequestAt    DateTime @default(now())
+  nextDigestAt     DateTime?
+  lastCompiledAt   DateTime?
+  unsubscribeVersion Int    @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  tokens           PublicSubscriptionToken[]
+  deliveries       PublicFeedDelivery[]
+  mailReceipts     PublicMailReceipt[]
+
+  @@index([status, nextDigestAt])
+}
+
+model PublicSubscriptionToken {
+  id           String   @id @default(cuid())
+  subscriberId String
+  subscriber   PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  tokenHash    String   @unique
+  purpose      String
+  topics       Json?
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([subscriberId, purpose, createdAt])
+  @@index([expiresAt])
+}
+
+model PublicFeedState {
+  advisoryId  String   @id
+  fingerprint String
+  updatedAt   DateTime @updatedAt
+}
+
+model PublicFeedEvent {
+  id          String   @id
+  advisoryId  String
+  fingerprint String
+  data        Json
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model PublicFeedDelivery {
+  id                String   @id @default(cuid())
+  subscriberId      String
+  subscriber        PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  eventKey          String   @unique
+  items             Json
+  subject           String
+  status            String   @default("pending")
+  attempts          Int      @default(0)
+  nextAttemptAt     DateTime @default(now())
+  claimedAt         DateTime?
+  providerMessageId String?  @unique
+  error             String?
+  sentAt            DateTime?
+  createdAt         DateTime @default(now())
+
+  @@index([status, nextAttemptAt])
+  @@index([subscriberId, createdAt])
+}
+
+model PublicMailWebhook {
+  id        String   @id
+  type      String
+  providerMessageId String?
+  status    String   @default("pending")
+  attempts  Int      @default(0)
+  nextAttemptAt DateTime @default(now())
+  processedAt DateTime?
+  lastError String?
+  createdAt DateTime @default(now())
+
+  @@index([status, nextAttemptAt])
+  @@index([providerMessageId])
+}
+
+model PublicMailReceipt {
+  id           String @id // Provider message id, including consent and management emails.
+  subscriberId String
+  subscriber   PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+
+  @@index([subscriberId])
+}

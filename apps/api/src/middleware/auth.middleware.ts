@@ -1,7 +1,8 @@
-import type { FastifyRequest, FastifyReply } from 'fastify';
 import { prisma } from '@wisesama/database';
-import { auth } from '../lib/auth';
 import { fromNodeHeaders } from 'better-auth/node';
+import type { FastifyReply, FastifyRequest } from 'fastify';
+import { auth } from '../lib/auth';
+import { sessionMutationError } from '../lib/request-origin';
 import { sendApiKeyAlert } from '../services/email.service';
 
 export interface AuthUser {
@@ -24,17 +25,21 @@ declare module 'fastify' {
  */
 export async function authenticate(
   request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
+  reply: FastifyReply,
+): Promise<void | FastifyReply> {
   try {
     const session = await auth.api.getSession({
       headers: fromNodeHeaders(request.headers),
+      query: { disableCookieCache: true },
     });
 
     if (!session?.user) {
-      reply.status(401).send({ error: 'Missing or invalid session' });
-      return;
+      return reply.status(401).send({ error: 'Missing or invalid session' });
     }
+
+    const mutationError = sessionMutationError(request.method, request.headers);
+    if (mutationError)
+      return reply.status(mutationError.status).send({ error: mutationError.error });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const user = session.user as any;
@@ -47,7 +52,7 @@ export async function authenticate(
       remainingQuota: user.remainingQuota ?? 100,
     };
   } catch {
-    reply.status(401).send({ error: 'Invalid or expired session' });
+    return reply.status(401).send({ error: 'Invalid or expired session' });
   }
 }
 
@@ -57,16 +62,14 @@ export async function authenticate(
  */
 export async function requireAdmin(
   request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
+  reply: FastifyReply,
+): Promise<void | FastifyReply> {
   if (!request.user) {
-    reply.status(401).send({ error: 'Authentication required' });
-    return;
+    return reply.status(401).send({ error: 'Authentication required' });
   }
 
   if (request.user.role !== 'ADMIN') {
-    reply.status(403).send({ error: 'Admin access required' });
-    return;
+    return reply.status(403).send({ error: 'Admin access required' });
   }
 }
 
@@ -76,8 +79,8 @@ export async function requireAdmin(
  */
 export async function authenticateApiKey(
   request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
+  reply: FastifyReply,
+): Promise<void | FastifyReply> {
   const apiKey = request.headers['x-api-key'] as string | undefined;
 
   if (!apiKey) {
@@ -94,6 +97,7 @@ export async function authenticateApiKey(
         select: {
           id: true,
           email: true,
+          emailVerified: true,
           role: true,
           tier: true,
           remainingQuota: true,
@@ -103,27 +107,25 @@ export async function authenticateApiKey(
   });
 
   if (!key || !key.isActive) {
-    reply.status(401).send({ error: 'Invalid API key' });
-    return;
+    return reply.status(401).send({ error: 'Invalid API key' });
   }
 
   if (key.remainingQuota <= 0) {
-    reply.status(429).send({ error: 'API key quota exceeded' });
-    return;
+    return reply.status(429).send({ error: 'API key quota exceeded' });
   }
 
   const totalQuota = key.user.tier === 'free' ? 10000 : 100000;
   const remaining = key.remainingQuota;
   const threshold80 = Math.floor(totalQuota * 0.2);
 
-  if (remaining === threshold80) {
+  if (key.user.emailVerified && remaining === threshold80) {
     sendApiKeyAlert({
       email: key.user.email,
       keyName: key.name || key.keyPrefix,
       usagePercent: 80,
       limit: totalQuota,
     }).catch(console.error);
-  } else if (remaining === 1) {
+  } else if (key.user.emailVerified && remaining === 1) {
     sendApiKeyAlert({
       email: key.user.email,
       keyName: key.name || key.keyPrefix,

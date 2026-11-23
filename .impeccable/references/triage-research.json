@@ -1,0 +1,44 @@
+{
+  "task": "triage and investigation research",
+  "platform": "web",
+  "refs": [
+    {
+      "id": "c521f6eb-8d85-481e-a1a2-2e59710d3804",
+      "image_url": "https://mobbin.com/api/mcp/short/ytuLyR8d",
+      "mobbin_url": "https://mobbin.com/screens/c521f6eb-8d85-481e-a1a2-2e59710d3804",
+      "app_name": "Featurebase",
+      "platform": "web",
+      "role": "triage list",
+      "observed": "Single compact row per item. Search, Filters, and Recent posts sorting sit above the list. Priority, date, type, and status occupy distinct row fields. Status categories are in the left rail.",
+      "move": "Use one findings list with package/version and project context per row. Keep severity and response state in separate fields. Put search and filters above the list.",
+      "scope": "Structure only. Feedback-domain labels and voting do not carry over."
+    },
+    {
+      "id": "7bb8e601-b621-44db-82e7-a31b0f84b5d1",
+      "image_url": "https://mobbin.com/api/mcp/short/tABuT6fw",
+      "mobbin_url": "https://mobbin.com/screens/7bb8e601-b621-44db-82e7-a31b0f84b5d1",
+      "app_name": "Plane",
+      "platform": "web",
+      "role": "intake queue with adjacent record",
+      "observed": "Open/Closed tabs sit above a narrow queue. The selected record opens in an adjacent pane. Pending status and Accept/Decline actions sit in the record's upper bar. A date-picker overlay obscures the center of the record.",
+      "move": "Keep queue context when starting assessment, with one explicit investigation action beside the selected item's status.",
+      "scope": "Structure only. Accept/Decline do not directly map to security decisions, and the obstructed center is not evidence for content layout."
+    },
+    {
+      "id": "99bda2af-eea1-4405-89cf-c4543bcefd84",
+      "image_url": "https://mobbin.com/api/mcp/short/PCBFcf5L",
+      "mobbin_url": "https://mobbin.com/screens/99bda2af-eea1-4405-89cf-c4543bcefd84",
+      "app_name": "Plane",
+      "platform": "web",
+      "role": "full issue investigation",
+      "observed": "The record title and description lead the main column. Status, priority, assignee, and dates sit beneath the title. Activity and history are in the main column below. A separate right Properties rail holds metadata. An emoji picker overlays a portion of the lower left column.",
+      "move": "Use a dedicated finding detail page for assessment evidence and response history, with a stable metadata rail. Reserve the side inspector for quick review rather than the entire response form.",
+      "scope": "Structure only. The emoji control and work-item labels do not carry over."
+    }
+  ],
+  "notes": [
+    "No ai_usage_notice was returned.",
+    "Broad developer-tool issue triage search was weak; no conclusions rely on Replit, Klaviyo, v0, or Devin results.",
+    "This research is not approval of the rejected Wisesama concept-a mockup."
+  ]
+}

@@ -65,7 +65,7 @@ pnpm --filter @wisesama/database db:seed
 ## Project Structure
 
 ```
-apps/admin/
+apps/dotsama-admin/
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx              # Root layout with providers
@@ -238,7 +238,7 @@ NEXT_PUBLIC_API_URL=https://api.wisesama.com
 pnpm install
 
 # Start admin dashboard
-pnpm --filter @wisesama/admin dev
+pnpm --filter @dotsama/admin dev
 
 # Or start all apps
 pnpm dev
@@ -269,7 +269,7 @@ The admin dashboard is deployed separately from the main web app:
 
 ```bash
 # Deploy to Vercel
-cd apps/admin
+cd apps/dotsama-admin
 vercel --prod
 ```
 

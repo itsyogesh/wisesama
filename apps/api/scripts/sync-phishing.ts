@@ -3,7 +3,7 @@
  * Run with: pnpm --filter @wisesama/api sync
  */
 import 'dotenv/config';
-import { PhishingSyncService } from '../src/services/phishing-sync.service';
+import { PhishingSyncService } from '../src/dotsama/services/phishing-sync.service';
 
 async function main() {
   console.log('Starting manual phishing list sync...\n');

@@ -1,99 +1,66 @@
 # Wisesama
 
-> Polkadot Ecosystem Fraud Detection & Risk Assessment Platform
+Vulnerability intelligence and response for small software teams. The new product connects an exact software inventory to sourced advisories, helps teams assess what matters, and records their response evidence.
 
-Wisesama provides real-time risk assessment for Polkadot/Kusama addresses, domains, Twitter handles, and emails. It aggregates data from the official polkadot-js/phishing repository, community reports, on-chain identity verification, and behavioral analysis to help users identify potential scams.
+The original Polkadot/Kusama fraud detection product is preserved under **Dotsama** (working name). Its source was moved into clearly named folders; its API URLs and database records are unchanged.
 
-## Features
+## Products and shared infrastructure
 
-- **Multi-entity Risk Assessment** - Check addresses, domains, Twitter handles, and emails
-- **On-chain Identity Verification** - Lookup Polkadot Identity Pallet data with verification status
-- **Identity Timeline** - See when identities were created and first verified (with Relay → People Chain migration detection)
-- **ML-based Risk Scoring** - Behavioral analysis using 21 on-chain features
-- **VirusTotal Integration** - Domain scanning with 80+ antivirus engines
-- **Look-alike Detection** - Identify impersonation attempts on Twitter handles
-- **Reverse Lookup** - Find on-chain identities by Twitter handle or website
-- **Community Reports** - User-submitted fraud reports with admin verification
-- **Upstream Contributions** - Automatic PR creation to polkadot-js/phishing
+| Location | Purpose | Local port |
+|---|---|---|
+| `apps/intel` | Wisesama public site, response workspace and V2 admin | 3003 |
+| `apps/dotsama-web` | Original crypto public UI, now Dotsama | 3000 |
+| `apps/dotsama-admin` | Original crypto admin console | 3002 |
+| `apps/api` | Shared Fastify host, authentication, API keys and Wisesama services | 3001 |
+| `apps/api/src/dotsama` | Preserved crypto routes, services and helpers | Shared API |
+| `packages/database` | Shared PostgreSQL/Prisma schema and client | — |
+| `packages/types` | Original crypto API types | — |
+| `packages/config` | Shared TypeScript configuration | — |
 
-## Tech Stack
+## Run locally
 
-| Component | Technology |
-|-----------|------------|
-| **API** | Fastify 5.x, Node.js 20+ |
-| **Frontend** | Next.js 15, React, Tailwind CSS |
-| **Database** | PostgreSQL (Neon), Prisma ORM |
-| **Cache** | Upstash Redis |
-| **Blockchain** | Polkadot/Kusama RPC, Subscan API |
-| **Deployment** | Vercel Serverless |
-| **Package Manager** | pnpm (Monorepo with Turborepo) |
+Node 20+ and pnpm 9 are required. Install dependencies and generate the existing Prisma client before starting the apps. Keep credentials in ignored environment files.
 
-## Project Structure
-
+```bash
+pnpm install
+pnpm --filter @wisesama/database db:generate
+pnpm dev                 # Wisesama UI and shared API
+pnpm dev:dotsama         # Dotsama public UI, admin and shared API
+pnpm dev:all             # All apps
 ```
-wisesama/
-├── apps/
-│   ├── api/                    # Fastify API server
-│   ├── web/                    # Next.js frontend (public)
-│   └── admin/                  # Next.js admin dashboard (protected)
-├── packages/
-│   ├── database/               # Prisma schema & client
-│   ├── types/                  # Shared TypeScript types
-│   └── config/                 # ESLint, TS base configs
-└── docs/                       # Documentation
-```
+
+Run one of those development groups at a time; they share the API port. Existing database installations need the documented migration baseline before applying new additive migrations. Do not push the schema over a populated database as a substitute for that process.
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [API Architecture](./docs/API.md) | Full API documentation - endpoints, services, database schema |
-| [Admin Dashboard](./docs/ADMIN-DASHBOARD.md) | Admin interface for whitelist management and report review |
-| [ML & Risk Scoring](./docs/ML-RISK-SCORING.md) | Risk scoring algorithm, feature extraction, data sources |
-| [Swagger UI](http://localhost:3001/docs) | Interactive API documentation (when running locally) |
+- [Wisesama implementation and local setup](./apps/intel/README.md)
+- [Product purpose and current boundaries](./PRODUCT.md)
+- [Security-response workflow](./docs/SECURITY-RESPONSE.md)
+- [GitHub and GitLab.com setup](./docs/REPOSITORY-SETUP.md)
+- [Public email, RSS and MCP delivery](./docs/PUBLIC-DELIVERY.md)
+- [Dotsama code and existing crypto capabilities](./docs/DOTSAMA.md)
+- [Repository security baseline and project context](./docs/BASELINE-CONTRACT.md)
+- [Incident response playbooks and saved evidence](./docs/RESPONSE-PLAYBOOKS.md)
+- [Organization hierarchy, roles and invitation contract](./docs/ORGANIZATIONS-CONTRACT.md)
+- [Organization end-to-end verification](./docs/ORGANIZATIONS-VERIFICATION.md)
+- [CI dependency integrity contract](./docs/CI-DEPENDENCY-CONTRACT.md)
+- [Free open-source CI audit skill](./packages/security-skills/README.md)
+- [V2 admin setup and operator access](./docs/ADMIN-SETUP.md)
+- [Admin flow research](./docs/ADMIN-DESIGN.md) and [verification](./docs/ADMIN-VERIFICATION.md)
+- [Original crypto API reference](./docs/API.md)
 
-## Quick Start
+Provider registration, production email delivery, scheduling, domain cutover, legal details and billing have separate deployment requirements. A local working preview does not establish that those services are configured in production.
 
-```bash
-# Install dependencies
-pnpm install
-
-# Setup database
-pnpm --filter @wisesama/database db:generate
-pnpm --filter @wisesama/database db:push
-pnpm --filter @wisesama/database db:seed
-
-# Start development servers
-pnpm dev
-```
-
-## API Usage
+## Checks
 
 ```bash
-# Check an address
-curl http://localhost:3001/api/v1/check/155dDX3rWoNsY4aiJFbsu6wLB91c2J2Ws5BgMfJKyM1eGnkS
-
-# Check a domain
-curl http://localhost:3001/api/v1/check/polkadot.network
-
-# Check a Twitter handle
-curl http://localhost:3001/api/v1/check/@polkadot
+pnpm --filter @wisesama/api test
+pnpm --filter @wisesama/api type-check
+pnpm --filter @wisesama/intel build
+pnpm --filter @dotsama/web type-check
+pnpm --filter @dotsama/admin type-check
 ```
 
-## Environment Variables
+No secrets, generated Prisma output or production environment files should be committed.
 
-See [API Architecture](./docs/API.md#environment-variables) for the complete list of environment variables.
-
-**Required:**
-- `DATABASE_URL` - PostgreSQL connection string
-- `UPSTASH_REDIS_REST_URL` - Redis URL
-- `UPSTASH_REDIS_REST_TOKEN` - Redis token
-- `JWT_SECRET` - JWT signing key
-
-**Optional:**
-- `SUBSCAN_API_KEY` - For ML feature extraction and identity timeline
-- `VIRUSTOTAL_API_KEY` - For domain security scanning
-
-## License
-
-MIT
+The preserved crypto API is disabled in the Wisesama runtime by default. `pnpm dev:dotsama` and `pnpm dev:all` enable it explicitly; a separate Dotsama deployment needs `DOTSAMA_API_ENABLED=true`. See [Dotsama](./docs/DOTSAMA.md).

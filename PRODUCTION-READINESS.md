@@ -29,7 +29,7 @@ Live checklist to reach “production works” for Wisesama. Update status/owner
 - [ ] Add 5xx alerting and slow-request logging; wire to log sink (e.g., Vercel/Logtail).
 
 **Web & Admin (Next.js)**
-- [ ] Configure environment-specific `NEXT_PUBLIC_API_URL` in `apps/web` and `apps/admin` builds.
+- [ ] Configure environment-specific `NEXT_PUBLIC_API_URL` in `apps/dotsama-web` and `apps/dotsama-admin` builds.
 - [x] Restrict Next image remote hosts instead of `**` wildcard.
 - [ ] Add smoke/E2E path: landing page render, search flow, admin login/whitelist flow.
 

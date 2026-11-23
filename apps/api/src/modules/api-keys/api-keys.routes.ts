@@ -1,7 +1,7 @@
+import { prisma } from '@wisesama/database';
+import crypto from 'crypto';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import crypto from 'crypto';
-import { prisma } from '@wisesama/database';
 import { authenticate } from '../../middleware/auth.middleware';
 
 const createKeySchema = z.object({
@@ -96,7 +96,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
         rateLimitPerMin: apiKey.rateLimitPerMin,
         createdAt: apiKey.createdAt,
       };
-    }
+    },
   );
 
   // List API keys
@@ -152,7 +152,7 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       });
 
       return { keys };
-    }
+    },
   );
 
   // Revoke API key
@@ -206,6 +206,6 @@ export async function apiKeysRoutes(fastify: FastifyInstance) {
       });
 
       return { message: 'API key revoked successfully' };
-    }
+    },
   );
 }

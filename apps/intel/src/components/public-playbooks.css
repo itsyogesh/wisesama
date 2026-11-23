@@ -1,0 +1,141 @@
+.pb-loading {
+  min-height: 50vh;
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+.pb-guide-entry {
+  padding: 28px 0;
+  margin: 0 0 32px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.pb-guide-entry h2 {
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+.pb-guide-entry p {
+  color: var(--muted);
+  max-width: 70ch;
+  margin: 0 0 16px;
+}
+.pb-index {
+  padding-bottom: 100px;
+}
+.pb-principle {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 48px;
+  padding: 40px 0;
+  border-top: 1px solid var(--line);
+}
+.pb-principle h2 {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+.pb-principle p {
+  color: var(--muted);
+  max-width: 66ch;
+  margin: 0;
+  line-height: 1.7;
+}
+.pb-list > a {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 36px 0;
+  border-top: 1px solid var(--line);
+  text-decoration: none;
+}
+.pb-list h2 {
+  font-size: 24px;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+.pb-list p {
+  color: var(--muted);
+  max-width: 65ch;
+  line-height: 1.7;
+  margin: 0 0 14px;
+}
+.pb-list small {
+  color: var(--muted);
+}
+.pb-list > a > svg {
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.pb-list > a:hover h2 {
+  color: var(--accent);
+}
+.pb-boundary {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 40px;
+  max-width: 76ch;
+}
+.pb-boundary h2 {
+  font-size: 24px;
+}
+.pb-boundary p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.pb-boundary a {
+  margin-top: 20px;
+}
+.pb-scope {
+  padding: 22px;
+  background: var(--surface-2);
+  border-radius: 12px;
+  margin-top: 32px;
+  font-size: 14px;
+}
+.pub-article .pb-scope p {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+.pub-article .pb-questions li,
+.pub-article .pb-tasks li {
+  padding-left: 6px;
+  margin: 24px 0;
+}
+.pub-article .pb-questions li > p,
+.pub-article .pb-tasks li > p {
+  margin: 8px 0 0;
+}
+.pb-tasks h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.pub-article .pb-record {
+  font-size: 14px;
+}
+.pb-start {
+  padding: 32px 0 0;
+  border-top: 1px solid var(--line);
+  margin-top: 40px;
+}
+.pb-start .pub-button {
+  margin-top: 16px;
+}
+@media (max-width: 700px) {
+  .pb-index {
+    padding-bottom: 60px;
+  }
+  .pb-principle {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .pb-list > a {
+    gap: 20px;
+    padding: 28px 0;
+  }
+  .pb-list h2 {
+    font-size: 22px;
+  }
+  .pb-scope {
+    padding: 18px;
+  }
+}

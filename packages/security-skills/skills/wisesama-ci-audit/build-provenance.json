@@ -1,0 +1,31 @@
+{
+  "version": "0.1.2",
+  "source": "apps/api/src/services/intel/ci-dependencies.ts",
+  "sourceSha256": "69c38eaacc36c81a712184722d353b6b7f7b57d9b6d060cda4fcc524de94aa11",
+  "cliSourceSha256": "d9e5e6fa54ed80b8d407a636dba41be39a67288af7ee6fb7865da21820b37662",
+  "sources": [
+    {
+      "source": "apps/api/src/services/intel/ci-dependencies.ts",
+      "archivedAs": "source/ci-dependencies.ts",
+      "sourceSha256": "69c38eaacc36c81a712184722d353b6b7f7b57d9b6d060cda4fcc524de94aa11"
+    },
+    {
+      "source": "apps/api/src/services/intel/bounded-yaml.ts",
+      "archivedAs": "source/bounded-yaml.ts",
+      "sourceSha256": "b2b51d5996954024f170478df7345e218be061d13c352f803348e8db52c093e9"
+    }
+  ],
+  "bundled": [
+    {
+      "name": "yaml",
+      "version": "2.8.3",
+      "license": "ISC"
+    }
+  ],
+  "buildTool": {
+    "name": "esbuild",
+    "version": "0.27.0"
+  },
+  "runtimeDependencies": [],
+  "licenseScope": "This package and its bundled Wisesama CI checker, including bounded-yaml.ts, only; not the rest of the Wisesama repository."
+}

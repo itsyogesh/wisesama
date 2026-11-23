@@ -8,7 +8,7 @@
   - **Middleware**: `authenticate` (JWT) and `requireAdmin` are ready and used in Admin routes.
   - **Gap**: Web3 Wallet authentication (Sign-In with Substrate) is planned (DB has `walletAddress`) but not yet implemented in routes.
 
-### Frontend (`apps/web`)
+### Frontend (`apps/dotsama-web`)
 - **UI**: Missing authentication interfaces.
   - **Navbar**: Static "Check Address" button only. No "Login" or "Sign Up" actions.
   - **Pages**: No `/login`, `/register`, or `/dashboard` pages exist.
@@ -51,7 +51,7 @@
 ### Phase 3: Admin Integration
 
 1.  **Admin Protection**:
-    - Ensure Admin-only pages (if moved from `apps/admin` to `apps/web` or linked) check `user.role === 'ADMIN'`.
+    - Ensure Admin-only pages (if moved from `apps/dotsama-admin` to `apps/dotsama-web` or linked) check `user.role === 'ADMIN'`.
 
 ### Phase 4: Web3 Authentication (Future)
 
@@ -66,7 +66,7 @@
 
 ## Immediate Action Items (Next Steps)
 
-1.  [ ] Create `apps/web/src/context/auth-context.tsx` (or store).
+1.  [ ] Create `apps/dotsama-web/src/context/auth-context.tsx` (or store).
 2.  [ ] Build `/login` and `/register` pages using the existing dark theme components.
 3.  [ ] Update `SiteHeader` to be dynamic.
 4.  [ ] Build a simple `/dashboard` to view/create API keys.

@@ -496,13 +496,13 @@ When calculating the final risk assessment, signals are evaluated in priority or
 
 | Service | File | Purpose |
 |---------|------|---------|
-| `MLService` | `services/ml.service.ts` | Risk scoring algorithm |
-| `SubscanService` | `services/subscan.service.ts` | On-chain data extraction |
-| `PolkadotService` | `services/polkadot.service.ts` | Identity verification via RPC |
-| `VirusTotalService` | `services/virustotal.service.ts` | Domain security scanning |
-| `PhishingSyncService` | `services/phishing-sync.service.ts` | Blacklist synchronization |
-| `LevenshteinService` | `services/levenshtein.service.ts` | Impersonation detection |
-| `QueryService` | `services/query.service.ts` | Orchestrates all lookups |
+| `MLService` | `src/dotsama/services/ml.service.ts` | Risk scoring algorithm |
+| `SubscanService` | `src/dotsama/services/subscan.service.ts` | On-chain data extraction |
+| `PolkadotService` | `src/dotsama/services/polkadot.service.ts` | Identity verification via RPC |
+| `VirusTotalService` | `src/dotsama/services/virustotal.service.ts` | Domain security scanning |
+| `PhishingSyncService` | `src/dotsama/services/phishing-sync.service.ts` | Blacklist synchronization |
+| `LevenshteinService` | `src/dotsama/services/levenshtein.service.ts` | Impersonation detection |
+| `QueryService` | `src/dotsama/services/query.service.ts` | Orchestrates all lookups |
 
 ---
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wisesama CI audit"
+  short_description: "Review local CI dependencies without source uploads"
+  default_prompt: "Use $wisesama-ci-audit to review this project's CI dependency references and explain the evidence and next steps."

@@ -1,0 +1,17 @@
+{
+  "name": "@wisesama/security-skills",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Free, offline Wisesama skills for reviewing local CI dependency configuration.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/validate-skill.mjs && node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "lint": "biome check src scripts tests package.json",
+    "type-check": "node --check src/cli.mjs && node --check scripts/build.mjs"
+  }
+}

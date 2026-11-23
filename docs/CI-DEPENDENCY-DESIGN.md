@@ -1,0 +1,38 @@
+# CI dependency checks: UX research and implementation
+
+This extends Wisesama's existing project-security workflow. The Response desk identity, Satoshi, charcoal/purple palette, light theme, project identity, imported-commit provenance and separate self-reported context remain in place. The new task is to find a workflow dependency, understand its reference and evidence, follow the applicable next step, and collect a new snapshot after a repository change.
+
+## Mobbin references inspected
+
+The list, detail and recheck journey were searched separately. Every cited screenshot below was returned as an actual image and opened inline. These are structural references from developer platforms, not evidence for Wisesama's data or security guarantees. No screenshot or reference-product asset is shipped.
+
+| Target | Inspected reference and visible behavior | Wisesama decision |
+| --- | --- | --- |
+| Find the configuration issue | [Supabase Security Advisor](https://mobbin.com/screens/e3ac7f2c-bdd0-42a4-ac13-76fb893fd06d) shows compact issue/entity/description rows, written status tabs, a filter, Refresh and Docs. | Keep checks scanable and source-specific. The CI row opens within the existing baseline; dependency identity, reference state and file/line stay visible before detail. Search and state filters narrow the saved reference list. Do not copy Errors/Warnings severity counts as a security score. |
+| Inspect evidence and the next step | [Supabase expanded issue](https://mobbin.com/screens/59885ba7-5355-4923-bb94-af639000b820) keeps the issue list visible beside a named entity, issue explanation, description and Resolve area. [Base44 expanded security issue](https://mobbin.com/screens/5eaa299b-10fb-4978-a7ac-2a19085bf68a) reveals rule evidence and a recommended change in place. | Use native disclosures that retain the dependency's identity. Put its exact reference, what was observed, bounded recommendation and source-file link together. Preserve the full checked commit in the baseline above. No automatic patch, arbitrary SHA, Apply fix, or safety status is invented. |
+| Start, wait, then review a check | [Base44 Checking app security flow](https://mobbin.com/flows/dbeec765-2ca9-48fa-8d1e-4df4b604d151) was inspected at all three positions: explicit Check Security, visible Scanning state, then collected results with Run Security Scan available again. | Use the real existing Recheck endpoint and its busy/result/error states. Successful collection says configuration was read, while its findings can still need attention or remain unknown. Empty CI references and filtered-out references receive different explanations. Do not copy its Fix all issues control, paid scan offer or broad Up to date assurance. |
+| Inspect a failed execution | [Vercel Inspect a deployment flow](https://mobbin.com/flows/00a80f0e-9c97-43cb-a87d-6f3f324897ca) includes the inspected [failed record](https://mobbin.com/screens/ff81f1e9-25b1-46f9-8448-31fa40a77e4b): failure text, source commit, timing, logs and a separate Redeploy control. | Keep the latest attempt and failure beside the retained earlier snapshot; a check error must not replace evidence with a success claim. Recheck remains distinct from syncing a new repository commit. This reference establishes inspection and recovery placement, not a completed retry transition. Wisesama has no raw build-log stream on this page. |
+
+The AWS result was an AI assistance modal for a bucket-policy error. It was inspected but excluded: its lengthy generic response and overlay are a poor fit for concise, source-grounded CI evidence. The first Vercel flow preview was a deployment configuration form rather than a security check, so only the visibly relevant failed-record and log inspection structure informed the failure state.
+
+## Flow and state boundaries
+
+The project page retains its repository name, branch, read commit, checked paths, collection time and latest attempt before any check. A different imported/latest observed commit, changed selected paths, paused source and disconnected source retain their separate existing notices. Recheck reads the imported revision. A user must sync a changed revision before that new configuration can be assessed; a newer branch head does not prove a fix.
+
+The CI row opens by default and adds a structured reference review. Its summary comes from the backend check. Entries show a GitHub action, reusable workflow, container image, GitLab include or local action. Written reference states are Pinned reference, Lock entry observed, Mutable reference, Local reference and Unknown. They describe the saved static evidence. They never imply that GitHub/GitLab ran the workflow, that a remote commit is trustworthy, that a dependency is free of vulnerabilities, or that an incident affected this project.
+
+Opening a reference shows its full saved value, extracted observation and recommendation. A source-file link uses the known provider host, validated repository path, exact read commit and positive source line. Unsupported locations stay readable as file/line text; there is no arbitrary URL from a dependency. Fix guidance comes from the backend's bounded analysis. This screen does not fabricate replacement SHAs, write to a repository or create a pull request.
+
+Search and reference-state filters operate on the displayed saved snapshot without network requests. Their result count identifies that scope. A filtered empty result offers Clear dependency filters. A report with no supported references says so and keeps its checked files and limitations available; it does not declare that CI has no dependencies. An older snapshot without a CI report offers Collect CI dependency evidence through the real recheck action.
+
+Partial collection is identified beside the reference count. Collection issues retain exact paths/lines and explanations, and open when collection is incomplete. Checked files and all returned collection limitations remain in a separate native disclosure. Existing stale/error notices keep the previous successful CI report available. Source facts, check outcome, collection completeness and self-reported exposure context do not overwrite one another.
+
+## Responsive and accessibility behavior
+
+The implementation uses the incumbent theme tokens, flat separators and native details. The desktop reference row pairs identity/path with state and a disclosure icon; below 600px the state moves beneath identity. Filters become a single column. Full hashes, image references, paths and guidance wrap within the content width. This avoids hidden outcome columns on mobile and needs no new image or illustration.
+
+Controls use explicit labels and a native fieldset for the local filters. Native summaries remain keyboard-operable; focused inputs, links and summaries inherit the product's visible focus treatment. Written state names accompany color. The result count and existing recheck feedback use status announcements. Source links open with noopener/noreferrer. No clipboard action was added, so there is no simulated copy or unverified patch payload.
+
+## Verification ownership
+
+This implementation is limited to the frontend component, CSS, API types, surface brief and this research record. The child performs scoped Biome, TypeScript and React checks. The parent owns actual API/storage checks, the single detector pass, bounded browser captures in both themes and device widths, independent finish review and final documentation. Reference images and successful local type-checking do not establish production repository authorization or real CI execution.

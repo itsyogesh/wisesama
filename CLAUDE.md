@@ -1,6 +1,6 @@
 # Wisesama
 
-Polkadot/Kusama ecosystem fraud detection platform. Live at **wisesama.com**.
+Wisesama is the vulnerability-response product in `apps/intel`. The original Polkadot/Kusama fraud detection product is preserved as Dotsama (working name), with shared API and database infrastructure. See `PRODUCT.md` for current scope and `docs/DOTSAMA.md` for the preserved crypto product.
 
 ## Architecture
 
@@ -8,9 +8,10 @@ pnpm monorepo + Turborepo. All TypeScript strict mode.
 
 | Package | What | Port |
 |---------|------|------|
-| `apps/web` | Next.js 16 (App Router) - public UI | 3000 |
+| `apps/intel` | Next.js 16 Wisesama public site and response workspace | 3003 |
+| `apps/dotsama-web` | Next.js 16 (App Router) - public UI | 3000 |
 | `apps/api` | Fastify 5 REST API | 3001 |
-| `apps/admin` | Next.js 16 (App Router) - admin console | 3002 |
+| `apps/dotsama-admin` | Next.js 16 (App Router) - admin console | 3002 |
 | `packages/database` | Prisma (PostgreSQL) schema + client | - |
 | `packages/types` | Shared TS interfaces/types | - |
 | `packages/config` | Base ESLint + TSConfig | - |
@@ -21,10 +22,10 @@ pnpm monorepo + Turborepo. All TypeScript strict mode.
 
 ```bash
 pnpm install                          # Install deps
-pnpm dev                              # Dev all apps
-pnpm --filter @wisesama/web dev       # Dev just web
+pnpm dev                              # Dev Wisesama + API
+pnpm --filter @dotsama/web dev       # Dev just web
 pnpm --filter @wisesama/api dev       # Dev just api
-pnpm --filter @wisesama/admin dev     # Dev just admin
+pnpm --filter @dotsama/admin dev     # Dev just admin
 pnpm build                            # Build all
 pnpm lint                             # Lint all
 pnpm type-check                       # Type-check all
@@ -43,8 +44,8 @@ pnpm db:studio                        # Open Prisma Studio
 
 ## API Structure
 
-- Routes in `apps/api/src/modules/` (query, auth, report, api-keys, whitelist, admin, jobs, etc.)
-- Services in `apps/api/src/services/` (query, polkadot, subscan, phishing-sync, virustotal, ml, email, etc.)
+- Wisesama routes in `apps/api/src/modules/intel/`; shared health/account routes remain in `modules/`. Original crypto routes are grouped in `apps/api/src/dotsama/modules/` and registered without changing existing URLs.
+- Wisesama services in `apps/api/src/services/`. Original crypto services are in `apps/api/src/dotsama/services/`; original helpers are in `apps/api/src/dotsama/utils/`.
 - Auth: JWT Bearer token + API key (`x-api-key` header) with SHA256 hashing
 - All responses use standardized envelope: `{ meta: { requestId, timestamp, processingTimeMs }, data }`
 - CORS: wisesama.com, www.wisesama.com, localhost in dev

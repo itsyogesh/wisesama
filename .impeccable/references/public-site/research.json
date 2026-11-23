@@ -1,0 +1,20 @@
+{
+  "status": "Reference research; no marketing UI implemented",
+  "inspectedAt": "2026-11-04",
+  "references": [
+    {
+      "site": "GitHub",
+      "mobbin_url": "https://mobbin.com/sites/sections/e13b3db1-e2f8-454a-ad67-dc3516dbcd45",
+      "image_url": "https://mobbin.com/api/mcp/short/vkq2PO89",
+      "local_image": "github-security-hero.jpg",
+      "decision": "Security outcome beside product-interface evidence; replace sales actions with Wisesama self-service onboarding. Preserve our visual identity, not the floating panels."
+    },
+    {
+      "site": "1Password",
+      "mobbin_url": "https://mobbin.com/sites/sections/9e2a1671-1d4d-4b23-bf11-476ae27af70d",
+      "image_url": "https://mobbin.com/api/mcp/short/hURhSYBH",
+      "local_image": "1password-developer-hero.jpg",
+      "decision": "Developer-oriented entry and nearby quickstart for Agents/Guides structure; not evidence of Wisesama capabilities."
+    }
+  ]
+}

@@ -1,9 +1,11 @@
 # Repository Guidelines
-Wisesama is a pnpm/turbo monorepo for Polkadot/Kusama fraud detection; use these guardrails when contributing.
+Wisesama is a pnpm/turbo monorepo for vulnerability response. The original Polkadot/Kusama fraud detection product is preserved as Dotsama; use these guardrails when contributing.
 
 ## Project Structure & Module Ownership
 - `apps/api` – Fastify REST API (default `PORT=3001`), Swagger at `/docs`.
-- `apps/web` – Next.js 16 public UI on :3000; `apps/admin` – Next.js 16 admin console on :3002.
+- `apps/intel` – Wisesama Next.js 16 public site and response workspace on :3003.
+- `apps/dotsama-web` – original crypto public UI on :3000; `apps/dotsama-admin` – original crypto admin console on :3002.
+- `apps/api/src/dotsama` – preserved crypto routes, services and helpers; account/API infrastructure stays shared.
 - `packages/database` – Prisma schema/client and seeds; `packages/types` – shared TypeScript; `packages/config` – base ESLint/TS configs.
 - `docs/` holds architecture docs; `turbo.json` and `pnpm-workspace.yaml` orchestrate tasks.
 
@@ -13,7 +15,7 @@ Wisesama is a pnpm/turbo monorepo for Polkadot/Kusama fraud detection; use these
 - Prisma scripts read the root `.env`; app dev scripts load `.env.local`.
 
 ## Build, Test, and Development Commands
-- `pnpm dev` runs all apps via Turbo; scope with `pnpm --filter @wisesama/api|web|admin dev`.
+- `pnpm dev` runs Wisesama and the shared API via Turbo; `pnpm dev:dotsama` runs the crypto product with the shared API. Scope individual apps with `pnpm --filter @wisesama/api|intel dev` or `pnpm --filter @dotsama/web|admin dev`.
 - Quality gates: `pnpm lint`, `pnpm type-check`; release build with `pnpm build`.
 - Tests: `pnpm --filter @wisesama/api test` (watch `test:watch`, coverage `test:coverage`).
 - Database: `pnpm --filter @wisesama/database db:generate | db:push | db:migrate | db:seed | db:studio`.

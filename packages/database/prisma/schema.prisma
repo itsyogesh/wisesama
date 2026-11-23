@@ -174,12 +174,29 @@ enum UserRole {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  name          String?
-  image         String?
-  emailVerified Boolean  @default(false)
-  role          UserRole @default(USER)
+  personalOrganization            Organization?                 @relation("PersonalOrganization")
+  createdOrganizations            Organization[]                @relation("OrganizationCreator")
+  organizationMemberships         OrganizationMember[]
+  organizationInvitationsCreated  OrganizationInvitation[]      @relation("OrganizationInvitationCreator")
+  organizationInvitationsAccepted OrganizationInvitation[]      @relation("OrganizationInvitationAcceptor")
+  organizationAudit               OrganizationAudit[]           @relation("OrganizationAuditActor")
+  organizationAuditTargets        OrganizationAudit[]           @relation("OrganizationAuditTarget")
+  intelAdmin                      Boolean                       @default(false)
+  intelSuspendedAt                DateTime?
+  intelSuspensionReason           String                        @default("")
+  intelRevision                   Int                           @default(0)
+  intelAdminAudit                 IntelAdminAudit[]
+  playbookResponses               SecurityPlaybookResponse[]
+  playbookEvents                  SecurityPlaybookEvent[]
+  repositoryConnections           RepositoryConnection[]
+  repositoryConnectionAttempts    RepositoryConnectionAttempt[]
+  repositorySources               ProjectRepositorySource[]
+  id                              String                        @id @default(cuid())
+  email                           String                        @unique
+  name                            String?
+  image                           String?
+  emailVerified                   Boolean                       @default(false)
+  role                            UserRole                      @default(USER)
 
   // Quota
   remainingQuota Int    @default(100)
@@ -194,11 +211,14 @@ model User {
   accounts Account[]
 
   // App relations
-  apiKeys           ApiKey[]
-  reports           Report[]
-  searches          Search[]
-  watchedAddresses  WatchedAddress[]
-  whitelistRequests WhitelistRequest[]
+  apiKeys               ApiKey[]
+  reports               Report[]
+  searches              Search[]
+  watchedAddresses      WatchedAddress[]
+  whitelistRequests     WhitelistRequest[]
+  securityProjects      SecurityProject[]
+  securityNotifications SecurityNotificationSettings?
+  securityDeliveries    SecurityDelivery[]
 }
 
 model Session {
@@ -232,6 +252,7 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@unique([providerId, accountId])
   @@index([userId])
 }
 
@@ -487,4 +508,496 @@ model ActivityLog {
 
   @@index([type])
   @@index([createdAt])
+}
+
+// Vulnerability response lives alongside the original crypto product.
+// Inventories are private to the owning account; advisory records are public.
+model SecurityProject {
+  organizationId     String
+  organization       Organization               @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  playbookResponses  SecurityPlaybookResponse[]
+  internetFacing     String                     @default("unknown")
+  sensitiveData      String                     @default("unknown")
+  hosting            String                     @default("")
+  contextUpdatedAt   DateTime?
+  repositorySource   ProjectRepositorySource?
+  id                 String                     @id @default(cuid())
+  userId             String
+  user               User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  environment        String                     @default("production")
+  packages           Json                       @default("[]")
+  runtime            Json?
+  inventoryRevision  String                     @default(cuid())
+  inventoryUpdatedAt DateTime                   @default(now())
+  lastScannedAt      DateTime?
+  nextScanAt         DateTime                   @default(now())
+  scanError          String?
+  scanToken          String?
+  scanStartedAt      DateTime?
+  sources            Json                       @default("[]")
+  warnings           Json                       @default("[]")
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  findings           SecurityFinding[]
+  deliveries         SecurityDelivery[]
+
+  @@index([userId, createdAt])
+  @@index([organizationId, createdAt])
+  @@index([lastScannedAt])
+}
+
+// V2 team boundaries. Provider credentials remain on their original User connection.
+model Organization {
+  id                String                   @id @default(cuid())
+  name              String
+  personalForUserId String?                  @unique
+  personalForUser   User?                    @relation("PersonalOrganization", fields: [personalForUserId], references: [id], onDelete: SetNull)
+  createdById       String?
+  createdBy         User?                    @relation("OrganizationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  revision          Int                      @default(0)
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  members           OrganizationMember[]
+  invitations       OrganizationInvitation[]
+  audit             OrganizationAudit[]
+  projects          SecurityProject[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String       @default("member")
+  revision       Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([userId, createdAt])
+}
+
+model OrganizationInvitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String       @default("member")
+  tokenHash      String       @unique
+  status         String       @default("pending")
+  revision       Int          @default(0)
+  expiresAt      DateTime
+  createdById    String?
+  createdBy      User?        @relation("OrganizationInvitationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  acceptedById   String?
+  acceptedBy     User?        @relation("OrganizationInvitationAcceptor", fields: [acceptedById], references: [id], onDelete: SetNull)
+  acceptedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, email])
+  @@index([organizationId, status, expiresAt])
+}
+
+model OrganizationAudit {
+  id                 String       @id @default(cuid())
+  organizationId     String
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actorId            String?
+  actor              User?        @relation("OrganizationAuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  targetUserId       String?
+  targetUser         User?        @relation("OrganizationAuditTarget", fields: [targetUserId], references: [id], onDelete: SetNull)
+  targetInvitationId String?
+  action             String
+  reason             String       @default("")
+  metadata           Json         @default("{}")
+  createdAt          DateTime     @default(now())
+
+  @@index([organizationId, createdAt])
+}
+
+model SecurityAdvisory {
+  adminReview IntelAdvisoryReview?
+  id          String               @id
+  aliases     String[]             @default([])
+  data        Json
+  fetchedAt   DateTime             @default(now())
+  findings    SecurityFinding[]
+}
+
+model SecurityFinding {
+  id               String                 @id @default(cuid())
+  projectId        String
+  project          SecurityProject        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  advisoryId       String
+  advisory         SecurityAdvisory       @relation(fields: [advisoryId], references: [id])
+  ecosystem        String
+  packageName      String
+  installedVersion String
+  fixedVersion     String?
+  riskSnapshot     Json                   @default("{}")
+  status           String                 @default("open")
+  note             String                 @default("")
+  evidence         String                 @default("")
+  firstSeenAt      DateTime               @default(now())
+  lastSeenAt       DateTime               @default(now())
+  resolvedAt       DateTime?
+  events           SecurityFindingEvent[]
+
+  @@unique([projectId, advisoryId, ecosystem, packageName, installedVersion], map: "SecurityFinding_match_key")
+  @@index([projectId, status])
+}
+
+model SecurityFindingEvent {
+  id        String          @id @default(cuid())
+  findingId String
+  finding   SecurityFinding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+  actorId   String?
+  status    String
+  note      String          @default("")
+  evidence  String          @default("")
+  createdAt DateTime        @default(now())
+
+  @@index([findingId, createdAt])
+}
+
+model SecurityNotificationSettings {
+  userId       String   @id
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+}
+
+model SecurityDelivery {
+  id                String           @id @default(cuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId         String?
+  project           SecurityProject? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  eventKey          String           @unique
+  subject           String
+  body              String
+  status            String           @default("pending")
+  attempts          Int              @default(0)
+  nextAttemptAt     DateTime         @default(now())
+  claimedAt         DateTime?
+  providerMessageId String?
+  error             String?
+  sentAt            DateTime?
+  createdAt         DateTime         @default(now())
+
+  @@index([userId, createdAt])
+  @@index([status, nextAttemptAt])
+}
+
+// Additive provider records. Scalar owner/project IDs are checked at every service edge.
+// Provider credentials are encrypted AES-256-GCM envelopes, never response fields.
+model RepositoryConnection {
+  owner            User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources          ProjectRepositorySource[]
+  id               String                    @id @default(cuid())
+  userId           String
+  provider         String
+  providerUserId   String
+  accountName      String
+  installationId   String?
+  installationAccountName String?
+  repositorySelection String?
+  status           String                    @default("connected")
+  credentials      String?
+  expiresAt        DateTime?
+  validatedAt      DateTime?
+  refreshLock      String?
+  refreshStartedAt DateTime?
+  error            String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  @@unique([userId, provider, providerUserId, installationId], map: "RepositoryConnection_owner_identity_installation_key")
+  @@index([userId, createdAt])
+}
+
+model RepositoryConnectionAttempt {
+  owner          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String    @id @default(cuid())
+  userId         String
+  provider       String
+  stateHash      String    @unique
+  verifier       String
+  installationId String?
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([expiresAt])
+}
+
+model ProjectRepositorySource {
+  baseline            Json?
+  baselineCheckedAt   DateTime?
+  baselineAttemptedAt DateTime?
+  baselineError       String?
+  baselineToken       String?
+  baselineStartedAt   DateTime?
+  owner               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project             SecurityProject      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  connection          RepositoryConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  id                  String               @id @default(cuid())
+  userId              String
+  projectId           String               @unique
+  connectionId        String
+  provider            String
+  repositoryId        String
+  repositoryName      String
+  repositoryUrl       String
+  branch              String
+  paths               String[]
+  scope               String               @default("repository_inventory")
+  paused              Boolean              @default(false)
+  status              String               @default("idle")
+  observedCommit      String?
+  importedCommit      String?
+  inventoryDigest     String?
+  importedFiles       Json                 @default("[]")
+  lastSyncedAt        DateTime?
+  lastAttemptAt       DateTime?
+  nextSyncAt          DateTime             @default(now())
+  syncToken           String?
+  syncStartedAt       DateTime?
+  error               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([connectionId])
+  @@index([provider, repositoryId])
+  @@index([paused, nextSyncAt])
+}
+
+model SecurityPlaybookResponse {
+  id              String                  @id @default(cuid())
+  userId          String
+  owner           User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId       String
+  project         SecurityProject         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  playbookId      String
+  templateVersion String
+  status          String                  @default("investigating")
+  answers         Json                    @default("{}")
+  checks          Json                    @default("{}")
+  note            String                  @default("")
+  evidence        String                  @default("")
+  revision        Int                     @default(0)
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  closedAt        DateTime?
+  events          SecurityPlaybookEvent[]
+
+  @@unique([projectId, playbookId])
+  @@index([userId, updatedAt])
+}
+
+model SecurityPlaybookEvent {
+  id         String                   @id @default(cuid())
+  responseId String
+  response   SecurityPlaybookResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  actorId    String?
+  actor      User?                    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  status     String
+  note       String                   @default("")
+  evidence   String                   @default("")
+  answers    Json                     @default("{}")
+  checks     Json                     @default("{}")
+  createdAt  DateTime                 @default(now())
+
+  @@index([responseId, createdAt])
+}
+
+model RepositoryWebhookDelivery {
+  id             String    @id @default(cuid())
+  provider       String
+  deliveryId     String
+  event          String
+  repositoryId   String?
+  installationId String?
+  status         String    @default("pending")
+  receivedAt     DateTime  @default(now())
+  processedAt    DateTime?
+  error          String?
+
+  @@unique([provider, deliveryId])
+  @@index([status, receivedAt])
+}
+
+// Merge into the main Prisma schema; no account is needed for these records.
+model PublicSubscriber {
+  adminRevision      Int                       @default(0)
+  id                 String                    @id @default(cuid())
+  email              String                    @unique
+  status             String                    @default("pending")
+  topics             Json                      @default("[\"all\"]")
+  confirmedAt        DateTime?
+  lastRequestAt      DateTime                  @default(now())
+  nextDigestAt       DateTime?
+  lastCompiledAt     DateTime?
+  unsubscribeVersion Int                       @default(1)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  tokens             PublicSubscriptionToken[]
+  deliveries         PublicFeedDelivery[]
+  mailReceipts       PublicMailReceipt[]
+
+  @@index([status, nextDigestAt])
+}
+
+model PublicSubscriptionToken {
+  id           String           @id @default(cuid())
+  subscriberId String
+  subscriber   PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  tokenHash    String           @unique
+  purpose      String
+  topics       Json?
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  createdAt    DateTime         @default(now())
+
+  @@index([subscriberId, purpose, createdAt])
+  @@index([expiresAt])
+}
+
+model PublicFeedState {
+  advisoryId  String   @id
+  fingerprint String
+  updatedAt   DateTime @updatedAt
+}
+
+model PublicFeedEvent {
+  id          String   @id
+  advisoryId  String
+  fingerprint String
+  data        Json
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model PublicFeedDelivery {
+  id                String           @id @default(cuid())
+  subscriberId      String
+  subscriber        PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  eventKey          String           @unique
+  items             Json
+  subject           String
+  status            String           @default("pending")
+  attempts          Int              @default(0)
+  nextAttemptAt     DateTime         @default(now())
+  claimedAt         DateTime?
+  providerMessageId String?          @unique
+  error             String?
+  sentAt            DateTime?
+  createdAt         DateTime         @default(now())
+
+  @@index([status, nextAttemptAt])
+  @@index([subscriberId, createdAt])
+}
+
+model PublicMailWebhook {
+  id                String    @id
+  type              String
+  providerMessageId String?
+  status            String    @default("pending")
+  attempts          Int       @default(0)
+  nextAttemptAt     DateTime  @default(now())
+  processedAt       DateTime?
+  lastError         String?
+  createdAt         DateTime  @default(now())
+
+  @@index([status, nextAttemptAt])
+  @@index([providerMessageId])
+}
+
+model PublicMailReceipt {
+  id           String           @id // Provider message id, including consent and management emails.
+  subscriberId String
+  subscriber   PublicSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  createdAt    DateTime         @default(now())
+
+  @@index([subscriberId])
+}
+
+// Dedicated v2 operator controls; Dotsama ADMIN role grants no access here.
+model IntelAdminAudit {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  targetType String
+  targetId   String
+  reason     String
+  metadata   Json     @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model IntelAdvisoryReview {
+  advisoryId   String           @id
+  advisory     SecurityAdvisory @relation(fields: [advisoryId], references: [id], onDelete: Cascade)
+  visibility   String           @default("published")
+  guidance     String           @default("")
+  note         String           @default("")
+  revision     Int              @default(0)
+  reviewedAt   DateTime?
+  reviewedById String?
+}
+
+model IntelSourceControl {
+  id            String    @id
+  paused        Boolean   @default(false)
+  revision      Int       @default(0)
+  lastAttemptAt DateTime?
+  lastSuccessAt DateTime?
+  lastError     String?
+  health        String    @default("unknown")
+  updatedAt     DateTime  @updatedAt
+}
+
+model IntelAdminJob {
+  id             String                 @id @default(cuid())
+  kind           String
+  targetId       String?
+  actorId        String?
+  reason         String
+  status         String                 @default("queued")
+  attempts       Int                    @default(0)
+  nextAttemptAt  DateTime               @default(now())
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  leaseToken     String?
+  leaseStartedAt DateTime?
+  error          String?
+  activeKey      String?                @unique
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  attemptRecords IntelAdminJobAttempt[]
+
+  @@index([status, nextAttemptAt])
+  @@index([kind, targetId, createdAt])
+}
+
+model IntelAdminJobAttempt {
+  id         String        @id @default(cuid())
+  jobId      String
+  job        IntelAdminJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  attempt    Int
+  status     String
+  error      String?
+  startedAt  DateTime
+  finishedAt DateTime?
+
+  @@unique([jobId, attempt])
 }

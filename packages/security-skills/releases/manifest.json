@@ -1,0 +1,12 @@
+{
+  "name": "wisesama-ci-audit",
+  "version": "0.1.2",
+  "filename": "wisesama-ci-audit-0.1.2.tar.gz",
+  "sha256": "15d8f5a573aa7f123f2c2b06cd5bd354dbc9d05c85506d771ab063e6e4c39c99",
+  "bytes": 74990,
+  "node": ">=20",
+  "license": "MIT",
+  "accountRequired": false,
+  "networkRequired": false,
+  "sourceUploaded": false
+}

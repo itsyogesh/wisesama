@@ -7,7 +7,7 @@
  *   pnpm --filter @wisesama/api backfill-identities --chain=kusama
  */
 import 'dotenv/config';
-import { identitySyncService } from '../src/services/identity-sync.service';
+import { identitySyncService } from '../src/dotsama/services/identity-sync.service';
 
 async function main() {
   const chainArg = process.argv.find((a) => a.startsWith('--chain='))?.split('=')[1] || 'all';

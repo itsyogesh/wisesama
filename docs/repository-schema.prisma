@@ -1,0 +1,92 @@
+// Additive provider records; apply with the repository-relations migration as well.
+// Owner/project foreign keys cascade on deletion; services still check tenant ownership.
+// Provider credentials are encrypted AES-256-GCM envelopes, never response fields.
+model RepositoryConnection {
+  owner User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sources ProjectRepositorySource[]
+  id                 String   @id @default(cuid())
+  userId             String
+  provider           String
+  providerUserId     String
+  accountName        String
+  installationId     String?
+  status             String   @default("connected")
+  credentials        String?
+  expiresAt          DateTime?
+  validatedAt        DateTime?
+  refreshLock        String?
+  refreshStartedAt   DateTime?
+  error              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([userId, provider, providerUserId, installationId], map: "RepositoryConnection_owner_identity_installation_key")
+  @@index([userId, createdAt])
+}
+
+model RepositoryConnectionAttempt {
+  owner User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                 String   @id @default(cuid())
+  userId             String
+  provider           String
+  stateHash          String   @unique
+  verifier           String
+  installationId     String?
+  expiresAt          DateTime
+  consumedAt         DateTime?
+  createdAt          DateTime @default(now())
+
+  @@index([expiresAt])
+}
+
+model ProjectRepositorySource {
+  owner User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project SecurityProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  connection RepositoryConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  id                 String   @id @default(cuid())
+  userId             String
+  projectId          String   @unique
+  connectionId       String
+  provider           String
+  repositoryId       String
+  repositoryName     String
+  repositoryUrl      String
+  branch             String
+  paths              String[]
+  scope              String   @default("repository_inventory")
+  paused             Boolean  @default(false)
+  status             String   @default("idle")
+  observedCommit     String?
+  importedCommit     String?
+  inventoryDigest    String?
+  importedFiles      Json     @default("[]")
+  lastSyncedAt       DateTime?
+  lastAttemptAt      DateTime?
+  nextSyncAt         DateTime @default(now())
+  syncToken          String?
+  syncStartedAt      DateTime?
+  error              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([connectionId])
+  @@index([provider, repositoryId])
+  @@index([paused, nextSyncAt])
+}
+
+model RepositoryWebhookDelivery {
+  id                 String   @id @default(cuid())
+  provider           String
+  deliveryId         String
+  event              String
+  repositoryId       String?
+  installationId     String?
+  status             String   @default("pending")
+  receivedAt         DateTime @default(now())
+  processedAt        DateTime?
+  error              String?
+
+  @@unique([provider, deliveryId])
+  @@index([status, receivedAt])
+}

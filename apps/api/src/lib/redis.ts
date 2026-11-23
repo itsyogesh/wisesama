@@ -1,5 +1,5 @@
-import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 // Upstash Redis client
 export const redis = new Redis({
@@ -13,6 +13,14 @@ export const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(100, '1 m'),
   analytics: true,
   prefix: 'wisesama:ratelimit',
+});
+
+// Public consent email is bounded by the caller's IP, independently of API-key headers.
+export const publicSubscriptionRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '1 h'),
+  analytics: false,
+  prefix: 'wisesama:public-subscription',
 });
 
 // Cache helpers

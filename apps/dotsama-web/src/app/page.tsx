@@ -1,0 +1,77 @@
+import {
+  HeroSection,
+  StatsSection,
+  TechnologySection,
+  EntityTypesSection,
+  HowItWorksSection,
+  RecentSpamsTicker,
+  RecentReportsSection,
+  BlogsSection,
+} from '@/components/marketing';
+import { getAllPosts, formatDate } from '@/lib/blog';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Dotsama',
+    description:
+      'Polkadot ecosystem fraud detection platform. Detect crypto fraud, phishing, ransomware, and money laundering in the Dotsama ecosystem.',
+    url: 'https://wisesama.com',
+    applicationCategory: 'SecurityApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    provider: {
+      '@type': 'Organization',
+      name: 'Dotsama',
+      url: 'https://wisesama.com',
+    },
+    featureList: [
+      'Wallet address risk assessment',
+      'Domain phishing detection',
+      'Twitter handle impersonation detection',
+      'On-chain identity verification',
+      'Community-driven fraud reporting',
+      'Real-time threat intelligence',
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Dotsama',
+    url: 'https://wisesama.com',
+    logo: 'https://wisesama.com/logo.svg',
+    description: 'Polkadot ecosystem fraud detection and identity verification platform.',
+    sameAs: [
+      'https://github.com/itsyogesh/wisesama',
+    ],
+  },
+];
+
+export default function HomePage() {
+  const posts = getAllPosts().map((post) => ({
+    ...post,
+    date: formatDate(post.date),
+  }));
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <HeroSection />
+      <StatsSection />
+      <RecentSpamsTicker />
+      <EntityTypesSection />
+      <TechnologySection />
+      <HowItWorksSection />
+      <RecentReportsSection />
+      <BlogsSection posts={posts} />
+    </>
+  );
+}
