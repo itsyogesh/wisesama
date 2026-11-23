@@ -37,7 +37,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const path = `/${segments.join('/')}`;
   const guide = publicGuides.find((item) => path === `/guides/${item.slug}`);
   return {
-    description: guide?.description,
+    description:
+      guide?.description ??
+      'Find affected dependencies, prepare a coding-agent handoff, and keep fix, test, and deployment evidence together.',
     title: `${guide?.title || titles[path] || (path === '/admin' || path.startsWith('/admin/') ? 'Platform administration' : path.startsWith('/app') ? 'Response workspace' : 'Security response')} · Wisesama`,
     referrer: 'no-referrer',
     alternates: { canonical: path, types: { 'application/rss+xml': '/feed.xml' } },
