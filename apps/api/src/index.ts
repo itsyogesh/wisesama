@@ -20,6 +20,7 @@ import { mcpRoutes } from './modules/intel/mcp.routes';
 import { organizationRoutes } from './modules/intel/organization.routes';
 import { playbookRoutes } from './modules/intel/playbook.routes';
 import { publicSubscriptionRoutes } from './modules/intel/public-subscription.routes';
+import { remediationRoutes } from './modules/intel/remediation.routes';
 import { repositoryRoutes } from './modules/intel/repository.routes';
 import { securityBaselineRoutes } from './modules/intel/security-baseline.routes';
 import { intelJobsRoutes } from './modules/jobs/intel-jobs.routes';
@@ -212,6 +213,7 @@ async function buildApp() {
   await fastify.register(adminOpsRoutes, { prefix: '/api/v1' });
   await fastify.register(playbookRoutes, { prefix: '/api/v1' });
   await fastify.register(repositoryRoutes, { prefix: '/api/v1' });
+  await fastify.register(remediationRoutes, { prefix: '/api/v1' });
   await fastify.register(securityBaselineRoutes, { prefix: '/api/v1' });
   await fastify.register(publicSubscriptionRoutes, { prefix: '/api/v1' });
   await fastify.register(mcpRoutes, { prefix: '/api/v1' });

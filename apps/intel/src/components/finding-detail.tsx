@@ -18,6 +18,8 @@ import Link from 'next/link';
 import { type FormEvent, useId, useRef, useState } from 'react';
 import type { Finding, FindingStatus, FindingUpdate, Project } from '../lib/models';
 
+import { FindingRemediation } from './finding-remediation';
+
 interface FindingDetailProps {
   finding: Finding;
   project?: Project;
@@ -343,6 +345,8 @@ function FindingRecord({
               </div>
             </div>
           ) : null}
+
+          <FindingRemediation findingId={finding.id} canEdit={canManage} />
 
           <section className="fd-section" aria-labelledby={`${formId}-match`}>
             <div className="fd-section-heading">

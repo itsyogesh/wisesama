@@ -644,6 +644,8 @@ model SecurityFinding {
   firstSeenAt      DateTime               @default(now())
   lastSeenAt       DateTime               @default(now())
   resolvedAt       DateTime?
+  remediation      Json                   @default("{}")
+  remediationRevision Int                @default(0)
   events           SecurityFindingEvent[]
 
   @@unique([projectId, advisoryId, ecosystem, packageName, installedVersion], map: "SecurityFinding_match_key")
@@ -658,6 +660,7 @@ model SecurityFindingEvent {
   status    String
   note      String          @default("")
   evidence  String          @default("")
+  remediation Json?
   createdAt DateTime        @default(now())
 
   @@index([findingId, createdAt])

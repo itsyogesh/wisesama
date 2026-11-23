@@ -4,10 +4,11 @@ import './globals.css';
 import '../components/finding-detail.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.wisesama.com'),
   title: 'Wisesama · Security response',
   description:
-    'Match your software inventory to sourced vulnerability intelligence and track your response.',
-  robots: { index: false, follow: false },
+    'Find affected dependencies, prepare a coding-agent handoff, and keep fix, test, and deployment evidence together.',
+  robots: { index: true, follow: true },
   icons: { icon: '/favicon.svg' },
 };
 

@@ -49,14 +49,14 @@ const steps = [
   {
     label: 'Respond',
     icon: Check,
-    title: 'Record the fix and verify it',
+    title: 'Keep the fix and its evidence together',
     description: 'Keep the updated dependency, assessed commit, and deployment evidence together.',
     facts: [
       ['Updated version', 'example-package@1.2.4'],
       ['Assessed commit', 'c83b05e'],
       ['Deployment evidence', 'Recorded'],
     ],
-    status: 'Verified',
+    status: 'Evidence recorded',
     action: 'Close the finding with evidence',
   },
 ] as const;
@@ -122,10 +122,10 @@ export function HomeShowcase() {
     <div className="home-showcase">
       <section className="home-hero pub-wrap">
         <div className="home-hero-copy">
-          <h1>Find the vulnerabilities that affect your code.</h1>
+          <h1>From security alert to reviewed fix.</h1>
           <p>
-            Connect a repository to see which advisories match your dependencies, what to check
-            first, and what your team has already fixed.
+            For small teams shipping with AI: find affected dependencies, hand the context to your
+            coding agent, and keep the fix, tests, and deployment evidence together.
           </p>
           <div className="home-hero-actions">
             <Link className="pub-button" href="/app/projects/new?provider=github">
@@ -156,7 +156,7 @@ export function HomeShowcase() {
 
       <section className="home-feature-section pub-wrap" aria-labelledby="home-features">
         <div className="home-section-heading">
-          <h2 id="home-features">From advisory to verified fix.</h2>
+          <h2 id="home-features">A clear path from finding to fix.</h2>
           <p>Start with one project. Give your team the evidence to make the next call.</p>
         </div>
         <div className="home-bento">
@@ -214,10 +214,10 @@ export function HomeShowcase() {
           </article>
           <article className="home-feature home-feature-small">
             <ListChecks className="home-feature-icon" aria-hidden="true" />
-            <h3>Give every finding a next step.</h3>
+            <h3>Put your coding agent to work.</h3>
             <p>
-              Record what you checked, what you changed, and the evidence that the fix reached
-              production.
+              Prepare a finding-specific handoff for your coding agent. Review its change, recheck
+              the repository, and export a record of the fix and what shipped.
             </p>
             <Link className="pub-text-link" href="/guides/respond-to-a-finding">
               Read the response guide <ArrowRight aria-hidden="true" />

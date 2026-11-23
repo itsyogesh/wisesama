@@ -34,6 +34,8 @@ const [
   { securityBaselineRoutes, createSecurityBaselineRoutes },
   { publicSubscriptionRoutes },
   { mcpRoutes },
+  { createRemediationRoutes },
+  { createRemediationService },
   { default: rawBody },
 ] = await Promise.all([
   import('fastify'),
@@ -49,6 +51,8 @@ const [
   import('../src/modules/intel/security-baseline.routes'),
   import('../src/modules/intel/public-subscription.routes'),
   import('../src/modules/intel/mcp.routes'),
+  import('../src/modules/intel/remediation.routes'),
+  import('../src/services/remediation.service'),
   import('fastify-raw-body'),
 ]);
 const ciPreview = process.env.INTEL_CI_PREVIEW === '1';
@@ -79,6 +83,38 @@ app.addHook('onSend', async (request, reply, payload) => {
 });
 await app.register(intelRoutes, { prefix: '/api/v1' });
 await app.register(organizationRoutes, { prefix: '/api/v1' });
+await app.register(
+  createRemediationRoutes(
+    ciService
+      ? {
+          service: createRemediationService({
+            sync: ciService.sync,
+            provider: {
+              scan: async () => {
+                const { readCiPreviewControl } = await import('./ci-preview-provider');
+                const control = await readCiPreviewControl();
+                return {
+                  matches: [],
+                  warnings: control.failBaseline ? ['Synthetic source unavailable.'] : [],
+                  sources: [
+                    {
+                      name: 'OSV',
+                      status: control.failBaseline
+                        ? ('unavailable' as const)
+                        : ('healthy' as const),
+                      checkedAt: new Date().toISOString(),
+                    },
+                  ],
+                  scannedAt: new Date().toISOString(),
+                };
+              },
+            },
+          }),
+        }
+      : {},
+  ),
+  { prefix: '/api/v1' },
+);
 await app.register(intelAdminRoutes, { prefix: '/api/v1' });
 await app.register(adminOpsRoutes, { prefix: '/api/v1' });
 await app.register(playbookRoutes, { prefix: '/api/v1' });

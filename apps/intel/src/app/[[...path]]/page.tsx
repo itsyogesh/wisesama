@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { AdminWorkspace } from '../../components/admin/admin-workspace';
 import { ProductEntry } from '../../components/product-entry';
 import { SecurityWorkspace } from '../../components/security-workspace';
+import { publicGuides } from '../../lib/public-content';
+import { knownPage } from '../../lib/public-routes';
 
 type Props = {
   params: Promise<{ path?: string[] }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 const titles: Record<string, string> = {
-  '/': 'Vulnerability intelligence for your software',
-  '/product': 'From advisory to response',
+  '/': 'From security alert to reviewed fix',
+  '/product': 'From finding to reviewed fix',
   '/feed': 'Public vulnerability feed',
   '/agents': 'Security intelligence for agents',
   '/skills': 'Free open-source CI audit skill',
@@ -33,22 +35,29 @@ const titles: Record<string, string> = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { path: segments = [] } = await params;
   const path = `/${segments.join('/')}`;
+  const guide = publicGuides.find((item) => path === `/guides/${item.slug}`);
   return {
-    title: `${titles[path] || (path === '/admin' || path.startsWith('/admin/') ? 'Platform administration' : path.startsWith('/app') ? 'Response workspace' : 'Security response')} · Wisesama`,
+    description: guide?.description,
+    title: `${guide?.title || titles[path] || (path === '/admin' || path.startsWith('/admin/') ? 'Platform administration' : path.startsWith('/app') ? 'Response workspace' : 'Security response')} · Wisesama`,
     referrer: 'no-referrer',
+    alternates: { canonical: path, types: { 'application/rss+xml': '/feed.xml' } },
     robots:
       path === '/invite' ||
+      path === '/sign-in' ||
+      path === '/sign-up' ||
+      path.startsWith('/subscribe/') ||
+      !knownPage(path) ||
       path === '/admin' ||
       path.startsWith('/admin/') ||
       path.startsWith('/app')
         ? { index: false, follow: false }
-        : undefined,
-    alternates: { types: { 'application/rss+xml': '/feed.xml' } },
+        : { index: true, follow: true },
   };
 }
 export default async function WorkspacePage({ params, searchParams }: Props) {
   const { path: segments = [] } = await params;
   const path = `/${segments.join('/')}`;
+  if (!knownPage(path)) notFound();
   const query = await searchParams;
   const suffix = new URLSearchParams(
     Object.entries(query).flatMap(([key, value]) =>

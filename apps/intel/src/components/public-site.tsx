@@ -174,7 +174,7 @@ export function PublicShell({ children, path = '' }: { children: ReactNode; path
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Early access terms</Link>
           </div>
-          <span>Made for the next action.</span>
+          <span>A Droidsize product.</span>
         </div>
       </footer>
     </div>
@@ -307,7 +307,8 @@ function Homepage() {
               The assessment integrations use read access. GitHub Contents permission covers
               selected repositories; GitLab read_api covers API reads under your user. Wisesama
               processes supported inventory files and allowlisted configuration for baseline checks.
-              It does not push code in this workflow.
+              Prepare a finding-specific handoff for your coding agent to propose a fix using your
+              existing tools. Review the change before merging.
             </p>
           </details>
           <details>
@@ -330,11 +331,11 @@ function ProductPage() {
       <section className="pub-page-intro pub-wrap">
         <h1>
           One thread from <br />
-          inventory to response.
+          finding to fix.
         </h1>
         <p>
-          A security finding should tell you where it came from, why it matches, and what you have
-          done about it.
+          Match advisories to your repository, give your coding agent the context for a fix, and
+          keep the pull request, tests, and deployment evidence together.
         </p>
         <ActionLinks secondary="Read the response guide" href="/guides/respond-to-a-finding" />
       </section>
@@ -377,13 +378,14 @@ function ProductPage() {
         <article>
           <div>
             <CircleCheck />
-            <h2>Record what you verified.</h2>
+            <h2>Review the fix and keep its evidence.</h2>
           </div>
           <div>
             <p>
-              Move from Open to Investigating, record a mitigation, or close as Resolved or Not
-              affected with written evidence. Activity keeps the decision and response together.
-              Closure records your attestation; it does not independently verify a deployment.
+              Prepare an agent handoff from the finding, review the resulting pull request, and
+              record the fix commit and test results. Recheck the tracked inventory and add the
+              deployment reference after shipping. Export the evidence and history as JSON for
+              review. Test and deployment results are reported by your team.
             </p>
             <Link className="pub-text-link" href="/guides/respond-to-a-finding">
               Work through a finding <ArrowRight />
@@ -722,8 +724,9 @@ function AgentsPage() {
             the evidence.
           </h1>
           <p>
-            Read sourced public vulnerability intelligence through MCP or the API. Keep the original
-            advisory, timestamps, and unknowns in the conversation.
+            Start with public intelligence through MCP, or prepare a private finding-specific
+            handoff in your workspace. Give your coding agent the affected dependency, repository
+            snapshot, and source guidance for a reviewed fix.
           </p>
           <div className="pub-actions">
             <Link className="pub-button" href="/docs/mcp">
@@ -753,6 +756,21 @@ function AgentsPage() {
             <span>Source URLs · advisory dates · evidence · unknowns</span>
           </div>
         </div>
+      </section>
+      <section className="pub-doc-callout pub-wrap">
+        <div>
+          <h2>Turn a finding into a reviewed change.</h2>
+          <p>
+            Open a workspace finding and choose Prepare agent handoff. Copy the instructions into
+            your coding agent in that repository. It checks the current version, proposes an
+            upgrade, and runs relevant tests using your existing tools. Review the change, record
+            the pull request and commit, then recheck your tracked inventory. Add deployment
+            evidence after shipping and export the record for your team.
+          </p>
+        </div>
+        <Link className="pub-text-link" href="/guides/respond-to-a-finding">
+          Follow the fix workflow <ArrowRight />
+        </Link>
       </section>
       <section className="pub-agent-principles pub-wrap">
         <article>
@@ -1325,7 +1343,7 @@ function PricingPage() {
           <div>
             <span>Available in early access</span>
             <h2>Free</h2>
-            <p>Get from an advisory to your own recorded response.</p>
+            <p>Prepare a reviewed fix and keep the evidence together.</p>
           </div>
           <Link className="pub-button" href="/app/projects/new">
             Start a project <ArrowRight />
@@ -1344,7 +1362,7 @@ function PricingPage() {
               <Check /> Supported inventory import and package assessment
             </li>
             <li>
-              <Check /> Finding response, notes, and evidence history
+              <Check /> Agent handoff, repository recheck, and evidence export
             </li>
             <li>
               <Check /> Public API and read-only public MCP
@@ -1363,7 +1381,7 @@ function PricingPage() {
             history, and shared workflows.
           </p>
           <p>
-            Prices, plan limits, billing, and private-agent access are not yet available. These are
+            Prices, plan limits, billing, and private MCP access are not yet available. These are
             directions for the product, not features you can purchase today.
           </p>
           <Link className="pub-text-link" href="/feed#subscribe">
@@ -1376,8 +1394,9 @@ function PricingPage() {
         <div>
           <h3>Can I use the feed without an account?</h3>
           <p>
-            Yes. Browse public advisories or follow the RSS feed without an account. Public email
-            updates are currently unavailable.
+            Yes. Browse public advisories or follow the RSS feed without an account. Email
+            subscriptions use a verified address; the feed shows whether subscriptions are currently
+            available.
           </p>
           <h3>Do I need to connect a repository?</h3>
           <p>
@@ -1411,10 +1430,10 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
           {page === 'security'
             ? 'The assessment boundary, provider permissions, and the evidence Wisesama keeps.'
             : page === 'privacy'
-              ? 'A product-level explanation for the current early access implementation.'
+              ? 'How Wisesama uses account, repository, assessment, and notification information.'
               : 'The practical conditions and limits of the current early access service.'}
         </p>
-        <span>Updated November 5, 2026</span>
+        <span>Updated November 24, 2026</span>
         <nav aria-label="Trust resources">
           <Link aria-current={page === 'security' ? 'page' : undefined} href="/security">
             Security & data
@@ -1473,12 +1492,16 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
               </p>
             </section>
             <section>
-              <h2>Reporting and launch readiness</h2>
+              <h2>Report a security issue</h2>
               <p>
-                Do not put secrets or exploit details in public feed subscriptions or advisory
-                searches. A dedicated vulnerability-reporting contact and operator details must be
-                published before the service is opened for production use. No certification, audit,
-                or response-time guarantee is claimed here.
+                Contact{' '}
+                <a href="mailto:contact@droidsize.com?subject=Wisesama%20security%20report">
+                  contact@droidsize.com
+                </a>{' '}
+                with “Wisesama security report” in the subject. Describe the affected area and how
+                to reproduce the issue without including credentials or unrelated personal data.
+                Wisesama is a Droidsize product. No certification or response-time guarantee is
+                claimed.
               </p>
             </section>
           </>
@@ -1489,9 +1512,10 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
               <p>
                 A private workspace stores account information, selected project details, imported
                 package names and exact versions, inventory timestamps, findings, response notes,
-                verification evidence, self-reported exposure context, static repository baseline
-                evidence, playbook answers and task history, and delivery records. Avoid placing
-                credentials or unrelated personal information in inventory or response fields.
+                fix references, team-reported test and deployment evidence, self-reported exposure
+                context, static repository baseline evidence, playbook answers and task history, and
+                delivery records. Avoid placing credentials or unrelated personal information in
+                inventory or response fields.
               </p>
             </section>
             <section>
@@ -1511,9 +1535,9 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
                 alerts.
               </p>
               <p>
-                Email delivery uses the configured provider. A provider may report acceptance,
-                failure, bounce, or complaint. Unsubscribed or suppressed public addresses are
-                excluded from subsequent digest delivery.
+                Email delivery providers process the recipient address and message. They may report
+                acceptance, failure, bounce, or complaint. Unsubscribed or suppressed public
+                addresses are excluded from subsequent digest delivery.
               </p>
             </section>
             <section>
@@ -1525,13 +1549,46 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
               </p>
             </section>
             <section>
-              <h2>Retention, deletion, and operator details</h2>
+              <h2>Retention and your choices</h2>
               <p>
-                Disconnecting a repository stops future access through that connection. It does not
-                delete prior assessment history. Fixed retention periods, a self-service account
-                deletion flow, a privacy contact, and operator identity have not been finalized for
-                public launch. This early access notice must be completed with those details before
-                production registration opens.
+                Assessment records and fix activity are kept to provide your workspace history.
+                Disconnecting a repository stops future access through that connection and retains
+                earlier records. You can revoke the provider grant in GitHub or GitLab and
+                unsubscribe from public email using the link in each edition.
+              </p>
+              <p>
+                For access, correction, or deletion requests, email{' '}
+                <a href="mailto:contact@droidsize.com?subject=Wisesama%20privacy%20request">
+                  contact@droidsize.com
+                </a>{' '}
+                and identify the Wisesama account or organization concerned. We may need to confirm
+                your identity and authority over that workspace. Information needed for legal
+                obligations, abuse prevention, or security records may need to be retained.
+                Retention depends on the record and its purpose.
+              </p>
+            </section>
+            <section>
+              <h2>Cookies and service providers</h2>
+              <p>
+                Sign-in uses cookies to maintain your session. Your display preference is stored in
+                your browser. Hosting, storage, security, repository, intelligence, and email
+                providers process information needed to deliver their parts of the service. This may
+                involve processing outside your country. An agent handoff is shared with your chosen
+                coding tool only when you copy or download it and provide it to that tool.
+              </p>
+            </section>
+            <section>
+              <h2>Who operates Wisesama</h2>
+              <p>
+                Wisesama is operated by DROIDSIZE TECHNOLOGIES PRIVATE LIMITED, based in New Delhi,
+                India. See{' '}
+                <a href="https://www.droidsize.com/company" target="_blank" rel="noreferrer">
+                  Droidsize’s company information
+                </a>{' '}
+                for its registered details and grievance contact. Contact{' '}
+                <a href="mailto:contact@droidsize.com">contact@droidsize.com</a> with privacy or
+                product-support questions. This notice applies to Wisesama and may be updated as the
+                service changes.
               </p>
             </section>
           </>
@@ -1572,12 +1629,24 @@ function TrustPage({ page }: { page: 'security' | 'privacy' | 'terms' }) {
               </p>
             </section>
             <section>
-              <h2>Before public launch</h2>
+              <h2>Operator, service changes, and support</h2>
               <p>
-                These are early access service conditions, not a completed commercial agreement.
-                Operator identity, legal contact, governing terms, retention commitments, and any
-                future billing conditions still require publication before a production launch or
-                paid offer.
+                Wisesama is a product of Droidsize Technologies Private Limited.{' '}
+                <a href="https://www.droidsize.com/company" target="_blank" rel="noreferrer">
+                  Company information
+                </a>{' '}
+                identifies the operator and its registered details. Contact{' '}
+                <a href="mailto:contact@droidsize.com?subject=Wisesama%20support">
+                  contact@droidsize.com
+                </a>{' '}
+                for support or questions about these service conditions.
+              </p>
+              <p>
+                The service is available on an early access basis and may change or be interrupted.
+                Review source guidance and test proposed fixes before deployment. Evidence exports
+                support your review process; they do not certify compliance or establish that a
+                production system is secure. Any future paid plan will state its price and
+                applicable terms before purchase.
               </p>
             </section>
           </>

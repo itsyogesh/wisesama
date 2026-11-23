@@ -210,8 +210,9 @@ export const publicGuides: PublicGuide[] = [
   },
   {
     slug: 'respond-to-a-finding',
-    title: 'Take a finding through to a recorded response',
-    description: 'Investigate the match, choose an action, and keep the verification evidence.',
+    title: 'Take a finding through to a reviewed fix',
+    description:
+      'Prepare an agent handoff, review the change, recheck the inventory, and export the fix evidence.',
     category: 'Respond',
     minutes: 5,
     sections: [
@@ -234,6 +235,21 @@ export const publicGuides: PublicGuide[] = [
         ],
         paragraphs: [
           'Keep severity, exploitation evidence, and your environment’s exposure as separate parts of the decision. If source collection is degraded, retain that uncertainty in the investigation.',
+        ],
+      },
+      {
+        id: 'agent-fix',
+        title: 'Prepare a fix with your coding agent',
+        steps: [
+          'In the finding’s Fix workflow, choose Prepare agent handoff. Copy or download the instructions.',
+          'Open the connected repository in your coding agent and review the proposed change. The handoff includes private project context; use tools your team trusts.',
+          'Have the agent confirm the current versions, choose a compatible fixed release, update the dependency and lockfile, and run relevant tests.',
+          'Review the pull request before merging. Record the pull request URL, full fix commit SHA, test commands, results, and CI run reference in Wisesama.',
+          'Save the evidence, then choose Recheck inventory. Connected repositories sync the tracked branch before checking. A fix on an unmerged branch will not clear the tracked inventory.',
+          'After deployment, record the deployed commit, release link, environment, and what you verified. Export evidence to download the saved record and change history as JSON.',
+        ],
+        paragraphs: [
+          'Rechecks establish whether this advisory still matches the checked inventory. Results expire after 24 hours, and changes to the inventory or advisory require another check. Failed sources or incomplete imports keep the result uncertain. Tests and deployments are reported by your team; a recheck never closes the finding automatically.',
         ],
       },
       {
