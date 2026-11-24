@@ -33,8 +33,10 @@ Create a GitHub OAuth App under the operator's account or organization with home
 `https://www.wisesama.com` and callback `https://api.wisesama.com/api/auth/callback/github`.
 Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` on the API and redeploy. Sign-in requests
 `read:user` and `user:email`. People with an existing Wisesama account sign in with email first,
-then add GitHub in Connections. Linking requires a verified GitHub email that matches the
-Wisesama account. Repository selection happens through the GitHub App after sign-in.
+then add GitHub in Connections. Linking requires a verified local email and verified GitHub
+email, plus explicit linking from the signed-in Wisesama session. Different email addresses
+are supported in that explicit linking flow; a signed-out email collision does not silently
+join accounts. Repository selection happens through the GitHub App after sign-in.
 
 ## GitHub App
 
@@ -84,6 +86,25 @@ Failed or revoked access retains the last good inventory, SHA and response histo
 Use a real consenting test repository to verify installation plus user authorization, organization approval, missing selected-repository recovery, exact committed inventory, a changed push and scheduled refresh, an unchanged commit with new intelligence, GitLab rotating access tokens, revoked membership, pause/resume, branch/path changes and disconnect. Verify API callback cookies under the actual HTTPS origins. The local test suite checks protocol/ownership invariants without contacting providers; the disposable repository smoke script checks persistence and assessment with explicitly synthetic providers.
 
 ## Droidsize pilot
+
+Production proof, 24 November 2026: the verified fresh account owns the Droidsize organization
+and has GitHub sign-in linked. The Wisesama GitHub App was installed with only
+`droidsize/triplewave` selected. The production picker imported `pnpm-lock.yaml` on `main`
+at `1d01298a38c56d88fb93b1a7388f602b5cabccd5`: 1,066 exact package versions,
+repository-wide scope. Its initial assessment returned five open matches (three high and
+two medium), with OSV, CISA KEV and FIRST EPSS reporting healthy. The configuration baseline
+observed four mutable workflow dependencies and a cooldown setting needing review. These
+are inventory/configuration observations, not verified production exposure or compromise.
+
+The existing `wisesama-v2-security-response` QStash schedule is active at `*/5 * * * *`.
+Recent scheduled calls were delivered successfully, including 07:10 UTC after import.
+Repository sources become eligible for reconciliation separately from scheduler cadence.
+A Brevo test alert to the approved pilot recipient was accepted by the mail service;
+this does not independently confirm inbox delivery. The old Wisesama account was retained.
+Changed-push delivery, actual token expiry/refresh and access-revocation recovery remain
+separate acceptance checks; this initial import does not establish those behaviors.
+
+The following staging procedure remains available for isolated acceptance checks:
 
 1. Deploy a reviewed v2 revision to separate staging projects for `apps/intel` and `apps/api`. Use stable HTTPS hosts on the same site, for example `staging.wisesama.com` and `api-staging.wisesama.com`. Set the web build's `NEXT_PUBLIC_API_URL` to the staging API. Point `BETTER_AUTH_URL` and `REPOSITORY_API_URL` at that API and `INTEL_APP_URL` at the staging web app.
 2. Use staging PostgreSQL and Redis. Apply the migrations to staging and set separate Better Auth and repository encryption secrets. Set `BETTER_AUTH_CROSS_SUBDOMAIN_COOKIES=false` and `BETTER_AUTH_COOKIE_PREFIX=wisesama-staging` on the API so the browser uses a separate session on the staging API host.
