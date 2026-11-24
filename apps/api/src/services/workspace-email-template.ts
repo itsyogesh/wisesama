@@ -68,6 +68,21 @@ function renderEmail(input: {
   };
 }
 
+export function signInEmail(url: string) {
+  return renderEmail({
+    subject: 'Your Wisesama sign-in link',
+    title: 'Continue to Wisesama',
+    preheader: 'Your one-time link to sign in or finish creating your account.',
+    paragraphs: [
+      'You requested an email sign-in link for Wisesama.',
+      'Open the link in the browser where you want to use Wisesama, then choose Continue. If you’re new, that step creates your account.',
+    ],
+    action: { label: 'Continue to Wisesama', href: url },
+    footer:
+      'This link works once and expires in 10 minutes. Keep it private. If you didn’t request it, you can ignore this email.',
+  });
+}
+
 export function verificationEmail(url: string) {
   return renderEmail({
     subject: 'Verify your Wisesama email',

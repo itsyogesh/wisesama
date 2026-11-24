@@ -23,6 +23,14 @@ export const publicSubscriptionRatelimit = new Ratelimit({
   prefix: 'wisesama:public-subscription',
 });
 
+// Sign-in email requests share a limit across production instances.
+export const authEmailRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(20, '10 m'),
+  analytics: false,
+  prefix: 'wisesama:auth-email',
+});
+
 // Cache helpers
 const DEFAULT_TTL = 300; // 5 minutes
 

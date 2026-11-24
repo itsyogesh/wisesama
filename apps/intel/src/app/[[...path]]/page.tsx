@@ -46,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     robots:
       path === '/invite' ||
       path === '/sign-in' ||
+      path === '/sign-in/verify' ||
       path === '/sign-up' ||
       path.startsWith('/subscribe/') ||
       !knownPage(path) ||

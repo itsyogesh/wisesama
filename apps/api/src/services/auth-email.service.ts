@@ -1,12 +1,14 @@
 import { sendBrevoEmail, usesBrevo } from './brevo-email.service';
-import { verificationEmail } from './workspace-email-template';
+import { signInEmail, verificationEmail } from './workspace-email-template';
 
 /** Authentication email must fail visibly when delivery is unavailable. */
 export async function sendAuthenticationEmail(input: {
   email: string;
   url: string;
+  purpose?: 'sign-in';
 }): Promise<void> {
-  const template = verificationEmail(input.url);
+  const template =
+    input.purpose === 'sign-in' ? signInEmail(input.url) : verificationEmail(input.url);
   if (usesBrevo()) {
     const result = await sendBrevoEmail({ to: input.email, ...template });
     if (result.status !== 'sent') throw new Error(result.error);

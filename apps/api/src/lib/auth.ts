@@ -1,9 +1,11 @@
 import { prisma } from '@wisesama/database';
-import { betterAuth } from 'better-auth';
+import { type BetterAuthPlugin, betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { magicLink } from 'better-auth/plugins/magic-link';
 import { sendAuthenticationEmail } from '../services/auth-email.service';
 import { workspaceEmailConfigured } from '../services/brevo-email.service';
+import { emailLinkLanding } from './email-link';
 import { trustedApplicationOrigins } from './request-origin';
 
 const trustedOrigins = trustedApplicationOrigins();
@@ -14,6 +16,23 @@ export const githubSignInAvailable = Boolean(
   process.env.GITHUB_CLIENT_ID?.trim() && process.env.GITHUB_CLIENT_SECRET?.trim(),
 );
 
+const emailLinkPlugin: BetterAuthPlugin = magicLink({
+  expiresIn: 600,
+  storeToken: 'hashed',
+  rateLimit: { window: 60, max: 5 },
+  sendMagicLink: async ({ email, url }) => {
+    if (!workspaceUrl || !workspaceEmailConfigured())
+      throw new APIError('SERVICE_UNAVAILABLE', {
+        message: 'Email sign-in is temporarily unavailable.',
+      });
+    await sendAuthenticationEmail({
+      email,
+      url: emailLinkLanding(url, workspaceUrl),
+      purpose: 'sign-in',
+    });
+  },
+});
+
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   basePath: '/api/auth',
@@ -22,6 +41,7 @@ export const auth = betterAuth({
     process.env.BETTER_AUTH_URL?.trim() ||
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3001'),
   emailAndPassword: { enabled: true },
+  plugins: [emailLinkPlugin],
   account: {
     encryptOAuthTokens: true,
     accountLinking: {
@@ -35,6 +55,28 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (context) => {
+      if (context.path === '/sign-in/magic-link' || context.path === '/magic-link/verify') {
+        if (context.path === '/sign-in/magic-link') {
+          const origin = context.request?.headers.get('origin') ?? context.headers?.get('origin');
+          if (!origin || !trustedOrigins.includes(origin))
+            throw new APIError('FORBIDDEN', {
+              message: 'A trusted application origin is required.',
+            });
+        }
+        const values = context.path === '/sign-in/magic-link' ? context.body : context.query;
+        for (const key of ['callbackURL', 'newUserCallbackURL', 'errorCallbackURL']) {
+          const value = values?.[key];
+          if (value === undefined) continue;
+          try {
+            const target = new URL(String(value), workspaceUrl || 'http://localhost:3003');
+            if (!trustedOrigins.includes(target.origin) || target.username || target.password)
+              throw new Error('Untrusted destination');
+          } catch {
+            throw new APIError('FORBIDDEN', { message: 'Use a Wisesama sign-in destination.' });
+          }
+        }
+      }
+
       if (
         (context.path === '/sign-in/social' || context.path === '/link-social') &&
         context.body?.provider === 'github' &&

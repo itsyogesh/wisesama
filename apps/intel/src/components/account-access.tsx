@@ -3,7 +3,12 @@
 import { Github } from 'lucide-react';
 import Link from 'next/link';
 import { type FormEvent, useEffect, useId, useState } from 'react';
-import { authClient, githubAuthError, githubSignInOption } from '../lib/auth-client';
+import {
+  authClient,
+  githubAuthError,
+  githubNeedsAccountLink,
+  githubSignInOption,
+} from '../lib/auth-client';
 import './account-access.css';
 
 interface AccountAccessProps {
@@ -21,6 +26,11 @@ export function AccountAccess({
 }: AccountAccessProps) {
   const id = useId();
   const [mode, setMode] = useState<'sign-in' | 'register'>(initialMode);
+  const [method, setMethod] = useState<'password' | 'email-link'>(
+    initialMode === 'register' || githubNeedsAccountLink(githubError) ? 'email-link' : 'password',
+  );
+  const [emailLinkAvailable, setEmailLinkAvailable] = useState(false);
+  const usingEmailLink = emailLinkAvailable && method === 'email-link';
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -37,10 +47,12 @@ export function AccountAccess({
     [null, 'github'].includes(githubDestination.searchParams.get('provider'));
 
   useEffect(() => {
-    if (!githubReturnTo) return;
     const controller = new AbortController();
     void githubSignInOption(controller.signal)
-      .then(({ github }) => setGithubAvailable(github))
+      .then(({ github, emailLink }) => {
+        setGithubAvailable(Boolean(githubReturnTo) && github);
+        setEmailLinkAvailable(emailLink);
+      })
       .catch(() => {});
     return () => controller.abort();
   }, [githubReturnTo]);
@@ -87,6 +99,29 @@ export function AccountAccess({
     setError('');
     setMessage('');
     try {
+      if (usingEmailLink) {
+        const callback = new URL(githubReturnTo || '/app/inbox', window.location.origin);
+        if (githubNeedsAccountLink(githubError)) {
+          callback.pathname = '/app/settings/integrations';
+          callback.search = new URLSearchParams({
+            next: githubReturnTo || '/app/inbox',
+          }).toString();
+        }
+        const failed = new URL('/sign-in', window.location.origin);
+        failed.searchParams.set('next', githubReturnTo || '/app/inbox');
+        const result = await authClient.signIn.magicLink({
+          email: email.trim(),
+          ...(mode === 'register' ? { name: name.trim() } : {}),
+          callbackURL: callback.href,
+          errorCallbackURL: failed.href,
+        });
+        if (result.error) setError('We couldn’t send the sign-in link. Try again in a moment.');
+        else
+          setMessage(
+            'Check your email for a one-time sign-in link. Open it in this browser, then choose Continue to Wisesama. The link expires in 10 minutes.',
+          );
+        return;
+      }
       const result =
         mode === 'register'
           ? await authClient.signUp.email({
@@ -250,24 +285,26 @@ export function AccountAccess({
               disabled={busy}
             />
           </div>
-          <div className="account-field">
-            <label htmlFor={`${id}-password`}>Password</label>
-            <input
-              id={`${id}-password`}
-              type="password"
-              autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              minLength={mode === 'register' ? 8 : undefined}
-              maxLength={128}
-              required
-              disabled={busy}
-              aria-describedby={mode === 'register' ? `${id}-password-help` : undefined}
-            />
-            {mode === 'register' ? (
-              <small id={`${id}-password-help`}>Use at least 8 characters.</small>
-            ) : null}
-          </div>
+          {!usingEmailLink ? (
+            <div className="account-field">
+              <label htmlFor={`${id}-password`}>Password</label>
+              <input
+                id={`${id}-password`}
+                type="password"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                minLength={mode === 'register' ? 8 : undefined}
+                maxLength={128}
+                required
+                disabled={busy}
+                aria-describedby={mode === 'register' ? `${id}-password-help` : undefined}
+              />
+              {mode === 'register' ? (
+                <small id={`${id}-password-help`}>Use at least 8 characters.</small>
+              ) : null}
+            </div>
+          ) : null}
           {error ? (
             <p className="account-error" role="alert">
               {error}
@@ -279,9 +316,34 @@ export function AccountAccess({
             </p>
           ) : null}
           <button className="account-submit" type="submit" disabled={busy}>
-            {busy ? 'Please wait…' : mode === 'sign-in' ? 'Sign in' : 'Create account'}
+            {busy
+              ? 'Please wait…'
+              : usingEmailLink
+                ? 'Email me a sign-in link'
+                : mode === 'sign-in'
+                  ? 'Sign in'
+                  : 'Create account'}
           </button>
         </form>
+        {emailLinkAvailable ? (
+          <div className="account-verification">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setMethod(usingEmailLink ? 'password' : 'email-link');
+                setError('');
+                setMessage('');
+              }}
+            >
+              {usingEmailLink ? 'Use a password instead' : 'Use an email sign-in link'}
+            </button>
+            <p>
+              An email link signs you in or creates an account after you confirm it.{' '}
+              <Link href="/terms">Service terms</Link> · <Link href="/privacy">Privacy</Link>
+            </p>
+          </div>
+        ) : null}
         {createdEmail ? (
           <div className="account-verification">
             <p>Verify your account email to receive security alerts.</p>

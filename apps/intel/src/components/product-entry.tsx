@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { githubNeedsAccountLink, safeWorkspaceDestination, useSession } from '../lib/auth-client';
 import { AccountAccess } from './account-access';
 import { AdvisoryDetail } from './advisory-detail';
+import { EmailSignIn } from './email-sign-in';
 import { OrganizationInvitation } from './organization-workspace';
 import { PublicShell, PublicSite } from './public-site';
 import { PublicSubscription, SubscriptionPage } from './public-subscription';
@@ -56,6 +57,12 @@ export function ProductEntry({ path }: { path: string }) {
         <div id="invitation-account" tabIndex={-1}>
           <OrganizationInvitation />
         </div>
+      </PublicShell>
+    );
+  if (path === '/sign-in/verify')
+    return (
+      <PublicShell path={path}>
+        <EmailSignIn />
       </PublicShell>
     );
   if (path === '/sign-in' || path === '/sign-up')

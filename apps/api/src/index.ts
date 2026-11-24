@@ -8,7 +8,7 @@ import Fastify from 'fastify';
 import FastifyBetterAuth from 'fastify-better-auth';
 import rawBody from 'fastify-raw-body';
 import { auth, githubSignInAvailable } from './lib/auth';
-import { publicSubscriptionRatelimit, ratelimit } from './lib/redis';
+import { authEmailRatelimit, publicSubscriptionRatelimit, ratelimit } from './lib/redis';
 import { requestLogUrl } from './lib/request-log';
 import { trustedApplicationOrigins } from './lib/request-origin';
 import { apiKeysRoutes } from './modules/api-keys/api-keys.routes';
@@ -24,6 +24,7 @@ import { remediationRoutes } from './modules/intel/remediation.routes';
 import { repositoryRoutes } from './modules/intel/repository.routes';
 import { securityBaselineRoutes } from './modules/intel/security-baseline.routes';
 import { intelJobsRoutes } from './modules/jobs/intel-jobs.routes';
+import { workspaceEmailConfigured } from './services/brevo-email.service';
 
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -79,7 +80,17 @@ async function buildApp() {
 
   // Rate limiting with Upstash
   fastify.addHook('onRequest', async (request, reply) => {
-    // Skip rate limiting for health checks, docs, and auth routes
+    if (
+      request.method === 'POST' &&
+      /^\/api\/auth\/sign-in\/magic-link(?:\?|$)/.test(request.url)
+    ) {
+      const result = await authEmailRatelimit.limit(`ip:${request.ip}`);
+      if (!result.success)
+        return reply
+          .code(429)
+          .send({ error: 'Wait a few minutes before requesting another sign-in email.' });
+    }
+    // Skip rate limiting for health checks, docs, and other auth routes
     if (
       request.url === '/api/v1/health' ||
       request.url === '/api/v1/auth-options' ||
@@ -203,7 +214,7 @@ async function buildApp() {
   // Wisesama and shared account routes
   fastify.get('/api/v1/auth-options', async (_request, reply) => {
     reply.header('Cache-Control', 'public, max-age=60');
-    return { github: githubSignInAvailable };
+    return { github: githubSignInAvailable, emailLink: workspaceEmailConfigured() };
   });
   await fastify.register(healthRoutes, { prefix: '/api/v1' });
   await fastify.register(apiKeysRoutes, { prefix: '/api/v1' });

@@ -28,6 +28,7 @@ export function knownPage(path: string) {
     publicPaths.includes(path) ||
     [
       '/sign-in',
+      '/sign-in/verify',
       '/sign-up',
       '/invite',
       '/subscribe/confirm',

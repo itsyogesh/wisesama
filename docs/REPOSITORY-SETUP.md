@@ -92,3 +92,13 @@ Use a real consenting test repository to verify installation plus user authoriza
 5. Configure and verify a signed QStash job against the staging API. Check a push and scheduled refresh, then verify that removing access pauses the source and preserves the previous inventory. Exercise all-repository access on a consenting test installation to confirm the picker expands while import stays a one-repository action.
 
 Primary references checked for this build: [GitHub setup callback security](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/about-the-setup-url), [installation tokens](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-an-installation-access-token-for-a-github-app), [GitLab OAuth/PKCE and rotation](https://docs.gitlab.com/api/oauth2/), [GitLab signed webhooks](https://docs.gitlab.com/user/project/integrations/webhooks/).
+
+## Email sign-in and GitHub account recovery
+
+The account screen also offers a one-time email sign-in link through the configured workspace email provider (Brevo when configured). Existing and fresh accounts prove email ownership before receiving a session. This does not weaken GitHub account-linking checks: joining a GitHub identity with a different email still requires explicit linking from a signed-in Wisesama session.
+
+Links expire after ten minutes and store only a hash in verification storage. The emailed URL opens `/sign-in/verify` with its bearer parameters in the fragment, which is removed from browser history on load. Loading that page does not consume the token. The recipient must choose Continue, review the terms for a new account, and then redeem it through Better Auth. That final action creates a verified account or signs in an existing account. Tokens are consumed atomically; expiry and replay are rejected.
+
+Send and redemption callbacks are restricted to trusted application origins. The email request endpoint also uses a distributed IP limit, in addition to Better Auth's plugin limits. Failures do not claim delivery or create a session. As documented by Better Auth, proving the email of an existing unverified account revokes any credentials and sessions established before email ownership was proven; the account's project data remains. Fresh-account onboarding with a different address leaves the old account untouched.
+
+`verify-email-link.ts` verifies the actual Prisma-backed flow and concurrent redemption in the exact disposable loopback database used by the other verification scripts. It intercepts all email transport, blocks real outbound delivery, and removes its synthetic user afterwards. The plugin uses the existing verification/user/session schema and needs no migration or new credentials.
