@@ -61,7 +61,7 @@ export function ProductEntry({ path }: { path: string }) {
     );
   if (path === '/sign-in/verify')
     return (
-      <PublicShell path={path}>
+      <PublicShell path={path} focused>
         <EmailSignIn />
       </PublicShell>
     );

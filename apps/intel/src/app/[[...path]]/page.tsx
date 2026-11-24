@@ -29,6 +29,7 @@ const titles: Record<string, string> = {
   '/privacy': 'Privacy',
   '/terms': 'Preview terms',
   '/sign-in': 'Sign in',
+  '/sign-in/verify': 'Confirm your sign-in',
   '/sign-up': 'Create your account',
   '/invite': 'Organization invitation',
 };

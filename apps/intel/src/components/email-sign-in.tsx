@@ -1,9 +1,11 @@
 'use client';
 
+import { ArrowRight, Clock3, Link2Off, LoaderCircle, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { API_BASE } from '../lib/api';
 import { safeWorkspaceDestination } from '../lib/auth-client';
+import './email-sign-in.css';
 
 export function EmailSignIn() {
   const [verification, setVerification] = useState('');
@@ -33,36 +35,58 @@ export function EmailSignIn() {
     setReady(true);
   }, []);
   return (
-    <section className="pub-wrap pub-trust" style={{ maxWidth: 560, paddingBlock: 80 }}>
-      <h1>
+    <section className="email-signin-card" aria-labelledby="email-signin-title" aria-busy={!ready}>
+      <div className="email-signin-icon" aria-hidden="true">
+        {!ready ? (
+          <LoaderCircle className="email-signin-spin" />
+        ) : verification ? (
+          <ShieldCheck />
+        ) : (
+          <Link2Off />
+        )}
+      </div>
+      <p className="email-signin-eyebrow">Secure sign-in</p>
+      <h1 id="email-signin-title">
         {!ready
-          ? 'Checking your sign-in link…'
+          ? 'Checking your link…'
           : verification
             ? 'Continue to Wisesama'
-            : 'Request a new sign-in link'}
+            : 'Let’s get you a new link'}
       </h1>
-      <p>
+      <p className="email-signin-description">
         {verification
-          ? 'This one-time link signs you in. If this is your first visit, continuing creates your Wisesama account.'
+          ? 'Use your email link to open your workspace. If you’re new, we’ll create your account when you continue.'
           : ready
-            ? 'This page needs the complete link from your email. Links expire after 10 minutes and can be used once.'
-            : ''}
+            ? 'Open the complete link from your email, or request another one to continue.'
+            : 'Your sign-in options will be ready in a moment.'}
       </p>
+      {ready ? (
+        <p className="email-signin-expiry">
+          <Clock3 size={14} aria-hidden="true" /> One use · Expires 10 minutes after request
+        </p>
+      ) : null}
       {verification ? (
         <>
-          <p>
+          <a className="email-signin-primary" href={verification} rel="noreferrer">
+            Continue to Wisesama <ArrowRight size={16} aria-hidden="true" />
+          </a>
+          <p className="email-signin-terms">
             By continuing, you agree to the <Link href="/terms">service terms</Link> and acknowledge
             the <Link href="/privacy">privacy notice</Link>.
           </p>
-          <a className="pub-button" href={verification} rel="noreferrer">
-            Continue to Wisesama
-          </a>
+          <Link className="email-signin-secondary" href="/sign-in">
+            Use another email
+          </Link>
         </>
       ) : ready ? (
-        <Link className="pub-button" href="/sign-in">
-          Request a new link
+        <Link className="email-signin-primary" href="/sign-in">
+          Request a new link <ArrowRight size={16} aria-hidden="true" />
         </Link>
-      ) : null}
+      ) : (
+        <p className="email-signin-loading" role="status">
+          Preparing secure sign-in…
+        </p>
+      )}
     </section>
   );
 }

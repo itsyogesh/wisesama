@@ -55,9 +55,17 @@ function PublicThemeToggle() {
   );
 }
 
-export function PublicShell({ children, path = '' }: { children: ReactNode; path?: string }) {
+export function PublicShell({
+  children,
+  path = '',
+  focused = false,
+}: {
+  children: ReactNode;
+  path?: string;
+  focused?: boolean;
+}) {
   return (
-    <div className="public-site">
+    <div className={`public-site${focused ? ' public-site-focused' : ''}`}>
       <a href="#public-main" className="skip-link">
         Skip to content
       </a>
