@@ -4,6 +4,7 @@ import {
   createRepositoryProvider,
   decryptCredential,
   encryptCredential,
+  encryptionKey,
   supportedFile,
   validateGithubWebhook,
   validateGitlabWebhook,
@@ -39,6 +40,21 @@ const json = (value: unknown, status = 200) =>
   new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json' } });
 
 describe('repository provider safety', () => {
+  it('accepts surrounding deployment whitespace without accepting malformed encryption keys', () => {
+    expect(
+      encryptionKey({ REPOSITORY_TOKEN_ENCRYPTION_KEY: ` ${key.toString('base64')}\n` }),
+    ).toEqual(key);
+    for (const value of [
+      '',
+      'not-a-key',
+      Buffer.alloc(16).toString('base64'),
+      key.toString('base64').slice(1),
+    ])
+      expect(() => encryptionKey({ REPOSITORY_TOKEN_ENCRYPTION_KEY: value })).toThrow(
+        'not configured',
+      );
+  });
+
   it('keeps actions.lock and local descriptors within scope without counting them as root workflows', async () => {
     const files: Record<string, string> = {
       'package.json': '{}',

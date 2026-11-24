@@ -59,7 +59,7 @@ const numericId = (value: unknown) => {
 };
 
 export function encryptionKey(env: NodeJS.ProcessEnv) {
-  const value = env.REPOSITORY_TOKEN_ENCRYPTION_KEY;
+  const value = env.REPOSITORY_TOKEN_ENCRYPTION_KEY?.trim();
   if (!value || !/^[A-Za-z0-9+/]{43}=$/.test(value))
     throw new RepositoryError(503, 'Repository credential storage is not configured.');
   const key = Buffer.from(value, 'base64');
@@ -170,6 +170,7 @@ export function createRepositoryProvider(
   const env = options.env ?? process.env;
   const fetcher = options.fetch ?? fetch;
   const now = options.now ?? (() => new Date());
+  const reportedSetup = new Set<RepositoryProvider>();
   function availability(provider: RepositoryProvider) {
     const keys =
       provider === 'github'
@@ -194,6 +195,16 @@ export function createRepositoryProvider(
       keys.every((name) => Boolean(env[name])) &&
       Boolean(env.REPOSITORY_API_URL) &&
       Boolean(env.INTEL_APP_URL);
+    if (!available && !reportedSetup.has(provider)) {
+      reportedSetup.add(provider);
+      console.warn('Repository integration setup incomplete', {
+        provider,
+        credentialStorageConfigured: storage,
+        missingSettings: keys.filter((name) => !env[name]?.trim()),
+        callbackConfigured: Boolean(env.REPOSITORY_API_URL?.trim()),
+        applicationConfigured: Boolean(env.INTEL_APP_URL?.trim()),
+      });
+    }
     return {
       provider,
       available,
